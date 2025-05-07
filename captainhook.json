@@ -5,7 +5,7 @@
             {
                 "action": "\\CaptainHook\\App\\Hook\\Message\\Action\\Regex",
                 "options": {
-                    "regex": "/^(feat|fix|docs|style|refactor|test|tests|chore|ci|build)(\\([a-zA-Z0-9_-]+\\))?:\\s.+$/",
+                    "regex": "/^(feat|fix|docs|style|refactor|test|tests|chore|ci|build)(\\(([a-zA-Z0-9_-]+)\\))?:\\s.+$/",
                     "error": "Commit message does not follow the pattern 'type(scope): message'"
                 }
             }
