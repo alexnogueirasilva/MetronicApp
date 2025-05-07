@@ -1,32 +1,31 @@
-<?php
+<?php declare(strict_types = 1);
 
 use Knuckles\Scribe\Extracting\Strategies;
-use Knuckles\Scribe\Config\Defaults;
-use Knuckles\Scribe\Config\AuthIn;
-use function Knuckles\Scribe\Config\{removeStrategies, configureStrategy};
-
-// Only the most common configs are shown. See the https://scribe.knuckles.wtf/laravel/reference/config for all.
+use Knuckles\Scribe\Matching\RouteMatcher;
 
 return [
-    // The HTML <title> for the generated documentation.
-    'title' => config('app.name').' API Documentation',
+    // The HTML <title> for the generated documentation. If this is empty, Scribe will infer it from config('app.name').
+    'title' => null,
 
     // A short description of your API. Will be included in the docs webpage, Postman collection and OpenAPI spec.
     'description' => '',
 
-    // The base URL displayed in the docs.
+    // The base URL displayed in the docs. If this is empty, Scribe will use the value of config('app.url') at generation time.
     // If you're using `laravel` type, you can set this to a dynamic string, like '{{ config("app.tenant_url") }}' to get a dynamic base URL.
-    'base_url' => config("app.url"),
+    'base_url' => null,
 
-    // Routes to include in the docs
     'routes' => [
         [
+            // Routes that match these conditions will be included in the docs
             'match' => [
                 // Match only routes whose paths match this pattern (use * as a wildcard to match any characters). Example: 'users/*'.
-                'prefixes' => ['api/*'],
+                'prefixes' => ['v1/*'],
 
                 // Match only routes whose domains match this pattern (use * as a wildcard to match any characters). Example: 'api.*'.
                 'domains' => ['*'],
+
+                // [Dingo router only] Match only routes registered under this version. Wildcards are NOT supported.
+                'versions' => ['v1'],
             ],
 
             // Include these routes even if they did not match the rules above.
@@ -44,8 +43,9 @@ return [
     // The type of documentation output to generate.
     // - "static" will generate a static HTMl page in the /public/docs folder,
     // - "laravel" will generate the documentation as a Blade view, so you can add routing and authentication.
-    // - "external_static" and "external_laravel" do the same as above, but pass the OpenAPI spec as a URL to an external UI template
-    'type' => 'laravel',
+    // - "external_static" and "external_laravel" do the same as above, but generate a basic template,
+    // passing the OpenAPI spec as a URL, allowing you to easily use the docs with an external generator
+    'type' => 'external_laravel',
 
     // See https://scribe.knuckles.wtf/laravel/reference/config#theme for supported options
     'theme' => 'scalar',
@@ -57,7 +57,8 @@ return [
     ],
 
     'laravel' => [
-        // Whether to automatically create a docs route for you to view your generated docs. You can still set up routing manually.
+        // Whether to automatically create a docs endpoint for you to view your generated docs.
+        // If this is false, you can still set up routing manually.
         'add_routes' => true,
 
         // URL path to use for the docs endpoint (if `add_routes` is true).
@@ -74,7 +75,7 @@ return [
     ],
 
     'external' => [
-        'html_attributes' => []
+        'html_attributes' => [],
     ],
 
     'try_it_out' => [
@@ -82,7 +83,8 @@ return [
         // Don't forget to enable CORS headers for your endpoints.
         'enabled' => true,
 
-        // The base URL to use in the API tester. Leave as null to be the same as the displayed URL (`scribe.base_url`).
+        // The base URL for the API tester to use (for example, you can set this to your staging URL).
+        // Leave as null to use the current app URL when generating (config("app.url")).
         'base_url' => null,
 
         // [Laravel Sanctum] Fetch a CSRF token before each request, and add it as an X-XSRF-TOKEN header.
@@ -95,17 +97,18 @@ return [
     // How is your API authenticated? This information will be used in the displayed docs, generated examples and response calls.
     'auth' => [
         // Set this to true if ANY endpoints in your API use authentication.
-        'enabled' => false,
+        'enabled' => true,
 
         // Set this to true if your API should be authenticated by default. If so, you must also set `enabled` (above) to true.
         // You can then use @unauthenticated or @authenticated on individual endpoints to change their status from the default.
-        'default' => false,
+        'default' => true,
 
         // Where is the auth value meant to be sent in a request?
-        'in' => AuthIn::BEARER->value,
+        // Options: query, body, basic, bearer, header (for custom header)
+        'in' => 'bearer',
 
-        // The name of the auth parameter (e.g. token, key, apiKey) or header (e.g. Authorization, Api-Key).
-        'name' => 'key',
+        // The name of the auth parameter (eg token, key, apiKey) or header (eg Authorization, Api-Key).
+        'name' => 'Authorization',
 
         // The value of the parameter to be used by Scribe to authenticate response calls.
         // This will NOT be included in the generated documentation. If empty, Scribe will use a random value.
@@ -121,16 +124,16 @@ return [
 
     // Text to place in the "Introduction" section, right after the `description`. Markdown and HTML are supported.
     'intro_text' => <<<INTRO
-        This documentation aims to provide all the information you need to work with our API.
+This documentation aims to provide all the information you need to work with our API.
 
-        <aside>As you scroll, you'll see code examples for working with the API in different programming languages in the dark area to the right (or as part of the content on mobile).
-        You can switch the language used with the tabs at the top right (or from the nav menu at the top left on mobile).</aside>
-    INTRO,
+<aside>As you scroll, you'll see code examples for working with the API in different programming languages in the dark area to the right (or as part of the content on mobile).
+You can switch the language used with the tabs at the top right (or from the nav menu at the top left on mobile).</aside>
+INTRO
+    ,
 
     // Example requests for each endpoint will be shown in each of these languages.
     // Supported options are: bash, javascript, php, python
     // To add a language of your own, see https://scribe.knuckles.wtf/laravel/advanced/example-requests
-    // Note: does not work for `external` docs types
     'example_languages' => [
         'bash',
         'javascript',
@@ -158,10 +161,6 @@ return [
         'overrides' => [
             // 'info.version' => '2.0.0',
         ],
-
-        // Additional generators to use when generating the OpenAPI spec.
-        // Should extend `Knuckles\Scribe\Writing\OpenApiSpecGenerators\OpenApiGenerator`.
-        'generators' => [],
     ],
 
     'groups' => [
@@ -171,7 +170,6 @@ return [
         // By default, Scribe will sort groups alphabetically, and endpoints in the order their routes are defined.
         // You can override this by listing the groups, subgroups and endpoints here in the order you want them.
         // See https://scribe.knuckles.wtf/blog/laravel-v4#easier-sorting and https://scribe.knuckles.wtf/laravel/reference/config#order for details
-        // Note: does not work for `external` docs types
         'order' => [],
     ],
 
@@ -189,12 +187,11 @@ return [
     // Available tokens are `{date:<format>}` and `{git:<format>}`.
     // The format you pass to `date` will be passed to PHP's `date()` function.
     // The format you pass to `git` can be either "short" or "long".
-    // Note: does not work for `external` docs types
     'last_updated' => 'Last updated: {date:F j, Y}',
 
     'examples' => [
-        // Set this to any number to generate the same example values for parameters on each run,
-        'faker_seed' => 1234,
+        // Set this to any number (eg. 1234) to generate the same example values for parameters on each run,
+        'faker_seed' => null,
 
         // With API resources and transformers, Scribe tries to generate example models to use in your API responses.
         // By default, Scribe will try the model's factory, and if that fails, try fetching the first from the database.
@@ -203,41 +200,61 @@ return [
     ],
 
     // The strategies Scribe will use to extract information about your routes at each stage.
-    // Use configureStrategy() to specify settings for a strategy in the list.
-    // Use removeStrategies() to remove an included strategy.
+    // If you create or install a custom strategy, add it here.
     'strategies' => [
         'metadata' => [
-            ...Defaults::METADATA_STRATEGIES,
-        ],
-        'headers' => [
-            ...Defaults::HEADERS_STRATEGIES,
-            Strategies\StaticData::withSettings(data: [
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-            ]),
+            Strategies\Metadata\GetFromDocBlocks::class,
+            Strategies\Metadata\GetFromMetadataAttributes::class,
         ],
         'urlParameters' => [
-            ...Defaults::URL_PARAMETERS_STRATEGIES,
+            Strategies\UrlParameters\GetFromLaravelAPI::class,
+            Strategies\UrlParameters\GetFromUrlParamAttribute::class,
+            Strategies\UrlParameters\GetFromUrlParamTag::class,
         ],
         'queryParameters' => [
-            ...Defaults::QUERY_PARAMETERS_STRATEGIES,
+            Strategies\QueryParameters\GetFromFormRequest::class,
+            Strategies\QueryParameters\GetFromInlineValidator::class,
+            Strategies\QueryParameters\GetFromQueryParamAttribute::class,
+            Strategies\QueryParameters\GetFromQueryParamTag::class,
+        ],
+        'headers' => [
+            Strategies\Headers\GetFromHeaderAttribute::class,
+            Strategies\Headers\GetFromHeaderTag::class,
+            [
+                'override',
+                [
+                    'Content-Type' => 'application/json',
+                    'Accept'       => 'application/json',
+                ],
+            ],
         ],
         'bodyParameters' => [
-            ...Defaults::BODY_PARAMETERS_STRATEGIES,
+            Strategies\BodyParameters\GetFromFormRequest::class,
+            Strategies\BodyParameters\GetFromInlineValidator::class,
+            Strategies\BodyParameters\GetFromBodyParamAttribute::class,
+            Strategies\BodyParameters\GetFromBodyParamTag::class,
         ],
-        'responses' => configureStrategy(
-            Defaults::RESPONSES_STRATEGIES,
-            Strategies\Responses\ResponseCalls::withSettings(
-                only: ['GET *'],
-                // Recommended: disable debug mode in response calls to avoid error stack traces in responses
-                config: [
-                    'app.debug' => false,
-                ]
-            )
-        ),
+        'responses' => [
+            Strategies\Responses\UseResponseAttributes::class,
+            Strategies\Responses\UseTransformerTags::class,
+            Strategies\Responses\UseApiResourceTags::class,
+            Strategies\Responses\UseResponseTag::class,
+            Strategies\Responses\UseResponseFileTag::class,
+            [
+                Strategies\Responses\ResponseCalls::class,
+                [
+                    'only' => ['GET *'],
+                    // Disable debug mode when generating response calls to avoid error stack traces in responses
+                    'config' => [
+                        'app.debug' => false,
+                    ],
+                ],
+            ],
+        ],
         'responseFields' => [
-            ...Defaults::RESPONSE_FIELDS_STRATEGIES,
-        ]
+            Strategies\ResponseFields\GetFromResponseFieldAttribute::class,
+            Strategies\ResponseFields\GetFromResponseFieldTag::class,
+        ],
     ],
 
     // For response calls, API resource responses and transformer responses,
@@ -249,4 +266,6 @@ return [
         // If you are using a custom serializer with league/fractal, you can specify it here.
         'serializer' => null,
     ],
+
+    'routeMatcher' => RouteMatcher::class,
 ];

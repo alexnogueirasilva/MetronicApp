@@ -24,7 +24,7 @@ return [
     | affect the paths of its internal API that aren't exposed to users.
     |
     */
-    'path' => '/scalar',
+    'path' => '/reference',
 
     /*
     |--------------------------------------------------------------------------
@@ -48,7 +48,7 @@ return [
     | Scalar Galaxy package. You can change this to use a custom OpenAPI file.
     |
     */
-    'url' => '/openapi.yaml',
+    'url' => '/docs/api.json',
 
     /*
     |--------------------------------------------------------------------------
