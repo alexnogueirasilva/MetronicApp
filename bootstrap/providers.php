@@ -1,5 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
 
 return [
     App\Providers\AppServiceProvider::class,
+    App\Providers\HorizonServiceProvider::class,
 ];
