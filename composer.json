@@ -10,6 +10,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "devaction-labs/filterable-package": "^1.0",
         "laradumps/laradumps": "^4.2",
         "laravel/framework": "^12.0",
         "laravel/horizon": "^5.31",

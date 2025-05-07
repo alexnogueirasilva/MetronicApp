@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a3ea998b3c79089e38b43e4e20897158",
+    "content-hash": "9e18bae2d7c73253ac7df2fc62c572c2",
     "packages": [
         {
             "name": "brick/math",
@@ -134,6 +134,65 @@
                 }
             ],
             "time": "2024-02-09T16:56:22+00:00"
+        },
+        {
+            "name": "devaction-labs/filterable-package",
+            "version": "1.0.23",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/devaction-labs/filterable-package.git",
+                "reference": "9841a7434cea93df8ccf733aebd6cd92fb1f58c7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/devaction-labs/filterable-package/zipball/9841a7434cea93df8ccf733aebd6cd92fb1f58c7",
+                "reference": "9841a7434cea93df8ccf733aebd6cd92fb1f58c7",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/cache": "^11|^12",
+                "illuminate/database": "^11|^12",
+                "illuminate/http": "^11|^12",
+                "illuminate/support": "^11|^12",
+                "php": "^8.2|^8.3|^8.4",
+                "vlucas/phpdotenv": "^5.6"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.13.7",
+                "mockery/mockery": "^1.6",
+                "pestphp/pest": "^3",
+                "phpstan/phpstan": "^1.11",
+                "rector/rector": "^1.2",
+                "roave/security-advisories": "dev-latest",
+                "symfony/var-dumper": "^6.4.0|^7.0.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "DevactionLabs\\FilterablePackage\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "DevAction Labs",
+                    "email": "alex@devaction.com.br"
+                }
+            ],
+            "description": "A Laravel package for filterable traits and classes.",
+            "keywords": [
+                "Skeleton",
+                "package",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/devaction-labs/filterable-package/issues",
+                "source": "https://github.com/devaction-labs/filterable-package/tree/v1.0.23"
+            },
+            "time": "2025-04-04T19:07:09+00:00"
         },
         {
             "name": "dflydev/dot-access-data",
