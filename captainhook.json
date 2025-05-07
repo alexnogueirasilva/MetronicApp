@@ -1,0 +1,76 @@
+{
+    "commit-msg": {
+        "enabled": true,
+        "actions": [
+            {
+                "action": "\\CaptainHook\\App\\Hook\\Message\\Action\\Regex",
+                "options": {
+                    "regex": "/^(feat|fix|docs|style|refactor|test|tests|chore|ci|build)(\\(([a-zA-Z0-9_-]+)\\))?:\\s.+$/",
+                    "error": "Commit message does not follow the pattern 'type(scope): message'"
+                }
+            }
+        ]
+    },
+    "pre-push": {
+        "enabled": false,
+        "actions": []
+    },
+    "pre-commit": {
+        "enabled": true,
+        "actions": [
+            {
+                "action": "vendor/bin/rector --dry-run",
+                "options": {}
+            },
+            {
+                "action": "vendor/bin/pest --parallel",
+                "options": {}
+            },
+            {
+                "action": "vendor/bin/pint --test",
+                "options": {}
+            },
+            {
+                "action": "vendor/bin/phpstan analyse --memory-limit=256M",
+                "options": {}
+            },
+            {
+                "action": "./vendor/bin/pest --coverage --min=50",
+                "options": {}
+            },
+            {
+                "action": "php artisan scribe:generate",
+                "options": {}
+            }
+        ]
+    },
+    "prepare-commit-msg": {
+        "enabled": false,
+        "actions": []
+    },
+    "post-commit": {
+        "enabled": false,
+        "actions": []
+    },
+    "post-merge": {
+        "enabled": true,
+        "actions": [
+            {
+                "action": "composer install",
+                "options": {}
+            }
+        ]
+    },
+    "post-checkout": {
+        "enabled": false,
+        "actions": []
+    },
+    "post-rewrite": {
+        "enabled": false,
+        "actions": []
+    },
+    "post-change": {
+        "enabled": false,
+        "actions": []
+    }
+}

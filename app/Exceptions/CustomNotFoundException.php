@@ -4,7 +4,7 @@ namespace App\Exceptions;
 
 use Exception;
 use Illuminate\Http\{JsonResponse, Request};
-use Log;
+use Illuminate\Support\Facades\{Log};
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -56,7 +56,9 @@ class CustomNotFoundException extends Exception
             'message' => $this->userMessage,
         ];
 
-        if ($this->originalException instanceof NotFoundHttpException && app()->environment('production')) {
+        $appEnv = config('app.env');
+
+        if ($this->originalException instanceof NotFoundHttpException && $appEnv === 'production') {
             $errorDetails = [
                 'developer_message' => $this->developerMessage,
                 'exception'         => $this->originalException::class,
@@ -67,7 +69,7 @@ class CustomNotFoundException extends Exception
             Log::warning('Recurso não encontrado', $errorDetails);
         }
 
-        if ($this->originalException instanceof NotFoundHttpException && app()->environment('local')) {
+        if ($this->originalException instanceof NotFoundHttpException && $appEnv === 'local') {
             $responseData = array_merge($responseData, [
                 'developer_message' => $this->developerMessage,
                 'exception'         => $this->originalException::class,

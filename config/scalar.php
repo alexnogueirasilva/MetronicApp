@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 return [
 
@@ -74,8 +74,7 @@ return [
     */
     'configuration' => [
         /** A string to use one of the color presets */
-        'theme' =>
-        // 'alternate',
+        'theme' => // 'alternate',
         // 'bluePlanet',
         // 'deepSpace',
         // 'default',
@@ -135,7 +134,7 @@ return [
          * @see https://unhead.unjs.io/usage/composables/use-seo-meta
          */
         'metaData' => [
-            'title' => config('app.name').' API Reference',
+            'title' => config('app.name') . ' API Reference',
         ],
 
         /**
@@ -155,7 +154,7 @@ return [
 
         /** Determine the HTTP client that’s selected by default */
         'defaultHttpClient' => [
-            'targetId' => 'shell',
+            'targetId'  => 'shell',
             'clientKey' => 'curl',
         ],
 

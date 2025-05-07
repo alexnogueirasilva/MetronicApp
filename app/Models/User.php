@@ -8,6 +8,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * @property string $id
+ * @property string $name
+ * @property string $email
+ * @property string $password
+ * @property ?string $remember_token
+ * @property ?string $email_verified_at
+ */
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */

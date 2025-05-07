@@ -10,6 +10,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "captainhook/captainhook": "^5.25",
         "devaction-labs/filterable-package": "^1.0",
         "knuckleswtf/scribe": "^5.2",
         "laradumps/laradumps": "^4.2",
@@ -23,6 +24,7 @@
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
+        "larastan/larastan": "^3.4",
         "laravel/pail": "^1.2.2",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.41",
