@@ -37,10 +37,6 @@
             {
                 "action": "./vendor/bin/pest --coverage --min=50",
                 "options": {}
-            },
-            {
-                "action": "php artisan scribe:generate",
-                "options": {}
             }
         ]
     },
