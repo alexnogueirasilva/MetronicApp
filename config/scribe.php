@@ -5,7 +5,7 @@ use Knuckles\Scribe\Matching\RouteMatcher;
 
 return [
     // The HTML <title> for the generated documentation. If this is empty, Scribe will infer it from config('app.name').
-    'title' => null,
+    'title' => config('app.name') . ' API',
 
     // A short description of your API. Will be included in the docs webpage, Postman collection and OpenAPI spec.
     'description' => '',
