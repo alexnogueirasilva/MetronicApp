@@ -1,7 +1,10 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 1);
 
+use App\Exceptions\CustomNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\{Exceptions, Middleware};
+use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -17,5 +20,5 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->renderable(fn (NotFoundHttpException $e): JsonResponse => CustomNotFoundException::fromNotFoundHttpException($e)->render(request()));
     })->create();

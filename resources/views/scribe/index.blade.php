@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-    <title>Laravel Documentation</title>
+    <title>NFeEngine API</title>
     <meta charset="utf-8"/>
     <meta
         name="viewport"

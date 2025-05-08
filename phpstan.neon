@@ -1,0 +1,13 @@
+includes:
+    - ./vendor/larastan/larastan/extension.neon
+
+parameters:
+    ignoreErrors:
+
+    noUnnecessaryCollectionCall: false
+    paths:
+        - app
+
+    level: max
+
+    treatPhpDocTypesAsCertain: false
