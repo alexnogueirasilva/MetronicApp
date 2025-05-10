@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Auth\{Role};
+use App\Models\Traits\HasRole;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\{Carbon};
 use Laravel\Sanctum\HasApiTokens;
 
 /**
@@ -27,6 +29,7 @@ class User extends Authenticatable
     use HasFactory;
     use Notifiable;
     use HasApiTokens;
+    use HasRole;
 
     /**
      * The attributes that should be hidden for serialization.
@@ -39,6 +42,13 @@ class User extends Authenticatable
     ];
 
     /**
+     * @return BelongsTo<Role, $this>
+     */
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class);
+    }
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -50,4 +60,5 @@ class User extends Authenticatable
             'password'          => 'hashed',
         ];
     }
+
 }
