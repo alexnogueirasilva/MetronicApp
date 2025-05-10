@@ -4,6 +4,7 @@ namespace App\Models\Auth;
 
 use App\Models\User;
 use Database\Factories\Auth\RoleFactory;
+use DevactionLabs\FilterablePackage\Traits\Filterable;
 use Illuminate\Database\Eloquent\{Collection, Model};
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -26,6 +27,7 @@ class Role extends Model
     /** @use HasFactory<RoleFactory> */
     use HasFactory;
     use HasUlids;
+    use Filterable;
 
     /**
      * @return BelongsToMany<Permission, $this>
