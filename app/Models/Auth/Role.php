@@ -46,7 +46,10 @@ class Role extends Model
     }
 
     /**
-     * @return array{granted: \Illuminate\Support\Collection<int, Permission>, revoked: \Illuminate\Support\Collection<int, Permission>}
+     * @return array{
+     *     granted: Collection<int, Permission>,
+     *     revoked: Collection<int, Permission>
+     * }
      */
     public function groupedPermissions(): array
     {
