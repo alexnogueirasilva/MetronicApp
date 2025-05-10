@@ -7,7 +7,7 @@ use App\Models\Traits\HasRole;
 use Database\Factories\UserFactory;
 use DevactionLabs\FilterablePackage\Traits\Filterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\{BelongsToMany};
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\{Carbon};
@@ -44,11 +44,11 @@ class User extends Authenticatable
     ];
 
     /**
-     * @return BelongsTo<Role, $this>
+     * @return BelongsToMany<Role, $this>
      */
-    public function role(): BelongsTo
+    public function role(): BelongsToMany
     {
-        return $this->belongsTo(Role::class);
+        return $this->belongsToMany(Role::class, 'role_user');
     }
     /**
      * Get the attributes that should be cast.

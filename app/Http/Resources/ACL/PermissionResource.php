@@ -1,15 +1,16 @@
-<?php declare(strict_types = 1);
+<?php
+declare(strict_types = 1);
 
 namespace App\Http\Resources\ACL;
 
-use App\Models\Auth\Role;
+use App\Models\Auth\Permission;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @mixin Role
+ * @mixin Permission
  */
-class RoleResource extends JsonResource
+class PermissionResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -24,7 +25,6 @@ class RoleResource extends JsonResource
             'description' => $this->description,
             'created_at'  => $this->created_at,
             'updated_at'  => $this->updated_at,
-            'permissions' => $this->groupedPermissions(),
         ];
     }
 }

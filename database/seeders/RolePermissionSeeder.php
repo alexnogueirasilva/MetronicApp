@@ -2,10 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\Auth\Permission;
+use App\Models\Auth\{Permission, Role};
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
-class PermissionSeeder extends Seeder
+class RolePermissionSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -34,5 +35,27 @@ class PermissionSeeder extends Seeder
             }
         }
 
+        $roles = [
+            'Administrator',
+            'Viewer',
+            'Remote Developer',
+            'Customer Support',
+            'Project Manager',
+            'Remote Designer',
+            'HR Manager',
+        ];
+
+        foreach ($roles as $roleName) {
+            Role::firstOrCreate([
+                'name' => $roleName,
+            ]);
+        }
+
+        $user = User::query()->where('email', 'alex@devaction.com.br')->first();
+
+        $adminRole = Role::where('name', 'Administrator')->first();
+        $user->role()->sync($adminRole);
+
+        $adminRole->permissions()->sync(Permission::pluck('id'));
     }
 }
