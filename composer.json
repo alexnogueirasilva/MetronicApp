@@ -23,6 +23,7 @@
         "scalar/laravel": "^0.2.0"
     },
     "require-dev": {
+        "roave/security-advisories": "dev-latest",
         "fakerphp/faker": "^1.23",
         "larastan/larastan": "^3.4",
         "laravel/pail": "^1.2.2",
@@ -42,7 +43,11 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app\\Support\\Helpers.php",
+            "app\\Support\\RouteScanner.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
