@@ -33,7 +33,7 @@ it('assigns a role and checks permissions correctly', function (): void {
     $role->permissions()->attach($permission);
     $user->assignRole($role);
     $user->refresh();
-    $user->load('roles.permissions'); // 🔥 necessário
+    $user->load('roles.permissions');
 
     expect($user->roles()->count())->toBe(1)
         ->and($user->hasRole($role))->toBeTrue()
@@ -48,7 +48,7 @@ it('returns permissions via role and caches them', function (): void {
     $role->permissions()->attach($permission);
     $user->assignRole($role);
     $user->refresh();
-    $user->load('roles.permissions'); // 🔥 garante cache correto
+    $user->load('roles.permissions');
 
     $permissions = $user->getCachedPermissions();
 
@@ -65,7 +65,7 @@ it('checks permission using hasPermission method', function (): void {
     $role->permissions()->attach($permission);
     $user->assignRole($role);
     $user->refresh();
-    $user->load('roles.permissions'); // 🔥 importante
+    $user->load('roles.permissions');
 
     expect($user->hasPermission('view_orders'))->toBeTrue();
 });
