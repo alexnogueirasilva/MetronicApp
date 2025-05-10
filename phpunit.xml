@@ -16,6 +16,10 @@
         <include>
             <directory>app</directory>
         </include>
+        <exclude>
+            <directory>app/Support</directory>
+            <directory>app/Traits</directory>
+        </exclude>
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
