@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TypeOtp;
 use App\Models\Auth\{Role};
 use App\Models\Traits\HasRole;
 use Database\Factories\UserFactory;
@@ -63,6 +64,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password'          => 'hashed',
+            'otp_method'        => TypeOtp::class,
+            'totp_verified'     => 'bool',
         ];
     }
 

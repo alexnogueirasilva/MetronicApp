@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ACL\{PermissionController, RoleController};
 use App\Http\Controllers\Auth\{AuthMeController,
+    ConfirmTotpController,
+    DisableOtpController,
     ForgotPasswordController,
     LoginController,
     LogoutController,
@@ -23,8 +25,8 @@ Route::group([
     Route::post('/otp/verify', [OtpController::class, 'verifyEmailCode'])->name('otp.verify');
     Route::post('/otp/totp/setup', [OtpController::class, 'setupTotp'])->name('otp.totp.setup')->middleware('auth:sanctum');
     Route::post('/otp/totp/verify', [OtpController::class, 'verifyTotp'])->name('otp.totp.verify')->middleware('auth:sanctum');
-    //    Route::post('/otp/totp/confirm', ConfirmTotpController::class)->name('otp.totp.confirm')->middleware('auth:sanctum');
-    //    Route::post('/otp/disable', DisableOtpController::class)->name('otp.disable')->middleware('auth:sanctum');
+    Route::post('/otp/totp/confirm', ConfirmTotpController::class)->name('otp.totp.confirm')->middleware('auth:sanctum');
+    Route::post('/otp/disable', DisableOtpController::class)->name('otp.disable')->middleware('auth:sanctum');
 
 });
 
