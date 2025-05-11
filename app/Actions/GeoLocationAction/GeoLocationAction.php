@@ -3,10 +3,14 @@
 namespace App\Actions\GeoLocationAction;
 
 use App\DTO\GeoLocation\GeoLocationDTO;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 
 class GeoLocationAction
 {
+    /**
+     * @throws ConnectionException
+     */
     public function lookup(string $ip): GeoLocationDTO
     {
         $response = Http::timeout(5)->get("http://ip-api.com/json/{$ip}");
