@@ -16,6 +16,7 @@ Metronic API is a high-performance RESTful API backend built with Laravel. The a
 ### Authentication System
 - Standard email/password login
 - Two-factor authentication with Time-based One-Time Password (TOTP)
+- Magic Link authentication (passwordless login)
 - Password reset functionality
 - JWT authentication via Laravel Sanctum
 - Email verification

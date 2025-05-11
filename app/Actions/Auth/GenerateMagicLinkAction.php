@@ -7,8 +7,17 @@ use App\Models\Auth\OtpCode;
 use App\Models\User;
 use Illuminate\Support\Str;
 
+/**
+ * Action para gerar URLs de magic link
+ *
+ * Esta classe tem a responsabilidade única de gerar um link de autenticação
+ * que pode ser enviado por email ao usuário.
+ */
 class GenerateMagicLinkAction
 {
+    /**
+     * Gera um magic link para o email especificado
+     */
     public function execute(string $email): string
     {
         $user = User::query()->where('email', $email)->first();
@@ -20,13 +29,15 @@ class GenerateMagicLinkAction
         return $this->generateRealLink($email);
     }
 
+    /**
+     * Gera um link falso para usuários não existentes (prevenção de enumeração)
+     */
     private function generateFakeLink(): string
     {
         $token   = Str::random(64);
         $email   = 'unknown@example.com';
         $expires = now()->addMinutes(30)->timestamp;
 
-        // Obter APP_KEY como string de forma segura
         $appKey       = config('app.key');
         $appKeyString = is_string($appKey) ? $appKey : '';
 
@@ -40,6 +51,9 @@ class GenerateMagicLinkAction
         ]);
     }
 
+    /**
+     * Gera um link real para usuários existentes
+     */
     private function generateRealLink(string $email): string
     {
         OtpCode::query()->where('email', $email)
@@ -49,7 +63,6 @@ class GenerateMagicLinkAction
         $token   = Str::random(64);
         $expires = now()->addMinutes(30)->timestamp;
 
-        // Obter APP_KEY como string de forma segura
         $appKey       = config('app.key');
         $appKeyString = is_string($appKey) ? $appKey : '';
 
