@@ -7,21 +7,25 @@ use Illuminate\Support\Facades\Cache;
 
 class RoleObserver
 {
-    public function updated(Role $role): void
+    public function updating(Role $role): void
     {
         self::clearPermissionsCacheForAllUsers($role);
     }
 
     protected static function clearPermissionsCacheForAllUsers(Role $role): void
     {
-        foreach ($role->users as $user) {
+        foreach ($role->users()->get() as $user) {
             Cache::forget("user_{$user->id}_permissions");
         }
     }
 
-    public function deleted(Role $role): void
+    public function deleting(Role $role): void
     {
         self::clearPermissionsCacheForAllUsers($role);
     }
 
+    public function deleted(Role $role): void
+    {
+        // Este método pode ser necessário para limpar qualquer cache adicional após a exclusão completa
+    }
 }

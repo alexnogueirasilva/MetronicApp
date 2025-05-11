@@ -17,7 +17,7 @@ Route::group([
 ], static function (): void {
     Route::post('/login', LoginController::class)->name('login');
     Route::delete('/logout', LogoutController::class)->name('logout')->middleware('auth:sanctum');
-    Route::get('/me', AuthMeController::class)->name('me')->middleware('auth:sanctum');
+    Route::get('/me', AuthMeController::class)->name('me')->middleware(['auth:sanctum', 'totp.verify']);
     Route::post('/forgot-password', ForgotPasswordController::class)->name('forgot-password');
     Route::post('/reset-password', ResetPasswordController::class)->name('reset-password');
 
@@ -30,7 +30,7 @@ Route::group([
 
 });
 
-Route::middleware('auth:sanctum')->group(static function (): void {
+Route::middleware(['auth:sanctum', 'totp.verify'])->group(static function (): void {
     Route::group([
         'prefix' => 'acl',
         'as'     => 'acl.',
