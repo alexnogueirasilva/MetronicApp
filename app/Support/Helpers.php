@@ -1,4 +1,5 @@
-<?php declare(strict_types = 1);
+<?php
+declare(strict_types = 1);
 
 use Illuminate\Support\Stringable;
 
@@ -68,8 +69,6 @@ if (!function_exists('format_currency_br')) {
     }
 }
 
-// Em um arquivo de helpers, por exemplo, app/Helpers/TypeConversion.php
-
 if (!function_exists('as_nullable_string')) {
     /**
      * Converte um valor para string ou retorna nulo.
@@ -88,4 +87,37 @@ if (!function_exists('as_bool')) {
     {
         return is_bool($value) ? $value : null;
     }
+}
+
+if (!function_exists('decodeEmailBase64UrlSafe')) {
+    /**
+     * Decodifica uma string codificada em Base64 URL-safe para seu valor original.
+     *
+     * @param  string  $input  String codificada em Base64 URL-safe
+     * @return string String decodificada
+     *
+     * @throws InvalidArgumentException Se a entrada não puder ser decodificada
+     */
+    function decodeEmailBase64UrlSafe(string $input): string
+    {
+        if (in_array(preg_match('/^[a-zA-Z0-9\-_]*$/', $input), [0, false], true)) {
+            throw new InvalidArgumentException('A entrada contém caracteres Base64 URL-safe inválidos');
+        }
+
+        $remainder = strlen($input) % 4;
+
+        if ($remainder !== 0) {
+            $padlen = 4 - $remainder;
+            $input .= str_repeat('=', $padlen);
+        }
+
+        $result = base64_decode(strtr($input, '-_', '+/'));
+
+        if ($result === false) {
+            throw new InvalidArgumentException('Não foi possível decodificar a string Base64');
+        }
+
+        return $result;
+    }
+
 }
