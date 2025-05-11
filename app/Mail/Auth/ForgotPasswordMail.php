@@ -37,8 +37,9 @@ class ForgotPasswordMail extends Mailable
      */
     public function content(): Content
     {
-        $url_front = toString(config('app.frontend_url'));
-        $url       = "{$url_front}/auth/reset-password?token={$this->token}";
+        $url_front    = toString(config('app.frontend_url'));
+        $emailEncoded = rtrim(strtr(base64_encode($this->email), '+/', '-_'), '=');
+        $url          = "{$url_front}/auth/reset-password?token={$this->token}&email={$emailEncoded}";
 
         return new Content(
             view: 'emails.auth.forgot-password',

@@ -4,7 +4,7 @@
 
 @section('heading')
     <div style="text-align: center; margin-bottom: 1rem;">
-        <img src="{{ url(asset('img/logo/DevAction.png')) }}"
+        <img src="{{ url(asset('img/logo/devaction-logo.png')) }}"
              alt="DevAction Logo"
              style="height: 48px;">
     </div>
