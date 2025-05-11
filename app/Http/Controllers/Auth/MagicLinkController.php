@@ -21,8 +21,6 @@ class MagicLinkController extends Controller
 
         $magicLink = $action->execute($email);
 
-        // Sempre envia email, independentemente se o usuário existe ou não
-        // Isso mantém consistência e evita vazamento de informação sobre existência de usuários
         SendMagicLinkEmailJob::dispatch($email, $magicLink);
 
         return response()->json([
@@ -32,21 +30,49 @@ class MagicLinkController extends Controller
 
     public function verify(Request $request): JsonResponse
     {
-        if (!$request->hasValidSignature()) {
-            return $this->invalidLinkResponse();
+        if ($request->isMethod('get')) {
+            // Validação e conversão de tipos segura
+            $email     = is_string($request->email) ? $request->email : '';
+            $token     = is_string($request->token) ? $request->token : '';
+            $expires   = is_numeric($request->expires) ? (int) $request->expires : 0;
+            $signature = is_string($request->signature) ? $request->signature : '';
+
+            // Obter APP_KEY como string de forma segura
+            $appKey       = config('app.key');
+            $appKeyString = is_string($appKey) ? $appKey : '';
+
+            if ($expires < now()->timestamp) {
+                Log::warning('Magic link expirado', ['expires' => $expires]);
+
+                return $this->invalidLinkResponse();
+            }
+
+            // Gerar assinatura esperada
+            $expectedSignature = hash_hmac('sha256', $email . $token . $expires, $appKeyString);
+
+            if (!hash_equals($expectedSignature, $signature)) {
+                Log::warning('Magic link com assinatura inválida', [
+                    'expectedSignature' => $expectedSignature,
+                    'receivedSignature' => $signature,
+                ]);
+
+                return $this->invalidLinkResponse();
+            }
         }
 
-        $token = $request->token;
-        $email = $request->email;
+        // Validação e conversão de tipos segura para parâmetros da requisição
+        $requestToken = is_string($request->token) ? $request->token : '';
+        $email        = is_string($request->email) ? $request->email : '';
 
-        $otpCode = OtpCode::query()->where('code', $token)
+        $otpCode = OtpCode::query()
+            ->where('code', $requestToken)
             ->where('email', $email)
             ->where('type', TypeOtp::MAGIC_LINK)
             ->where('expires_at', '>', now())
             ->first();
 
         if (!$otpCode) {
-            Log::warning('Magic link inválido ou expirado', ['token' => $token]);
+            Log::warning('Magic link inválido ou expirado', ['token' => $requestToken]);
 
             return $this->invalidLinkResponse();
         }
@@ -63,9 +89,9 @@ class MagicLinkController extends Controller
 
         $otpCode->delete();
 
-        $token = $user->createToken('magic-link-' . now()->timestamp)->plainTextToken;
+        $authToken = $user->createToken('magic-link-' . now()->timestamp)->plainTextToken;
 
-        return $this->successResponse($token, $user);
+        return $this->successResponse($authToken, $user);
     }
 
     private function invalidLinkResponse(): JsonResponse

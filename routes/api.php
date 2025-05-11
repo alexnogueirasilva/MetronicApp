@@ -23,7 +23,8 @@ Route::group([
     Route::post('/reset-password', ResetPasswordController::class)->name('reset-password');
 
     Route::post('/magic-link', [MagicLinkController::class, 'request'])->name('magic-link.request');
-    Route::get('/magic-link/verify', [MagicLinkController::class, 'verify'])->name('magic-link.verify');
+    Route::post('/magic-link/verify', [MagicLinkController::class, 'verify'])->name('magic-link.verify');
+    Route::get('/magic-link/verify', [MagicLinkController::class, 'verify'])->name('magic-link.verify.get');
 
     Route::post('/otp/request', [OtpController::class, 'requestEmailCode'])->name('otp.request');
     Route::post('/otp/verify', [OtpController::class, 'verifyEmailCode'])->name('otp.verify');

@@ -14,7 +14,9 @@ class MagicLinkMail extends Mailable
 
     public function __construct(
         private readonly string $magicLink,
-    ) {}
+    ) {
+        // Não há necessidade de modificar o magicLink agora, pois não estamos usando URLs assinadas
+    }
 
     public function envelope(): Envelope
     {

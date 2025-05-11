@@ -71,7 +71,8 @@ Metronic API is a high-performance RESTful API backend built with Laravel. The a
 - POST `/api/auth/forgot-password` - Request password reset
 - POST `/api/auth/reset-password` - Reset password
 - POST `/api/auth/magic-link` - Request magic link authentication
-- GET `/api/auth/magic-link/verify` - Verify magic link and login
+- GET `/api/auth/magic-link/verify` - Verify magic link from email (signed URL)
+- POST `/api/auth/magic-link/verify` - Verify magic link via API (direct token)
 
 ### OTP/2FA
 - POST `/api/auth/otp/request` - Request email verification code

@@ -4,7 +4,7 @@ use App\Enums\TypeOtp;
 use App\Jobs\Auth\SendMagicLinkEmailJob;
 use App\Models\Auth\OtpCode;
 use App\Models\User;
-use Illuminate\Support\Facades\{Queue, URL};
+use Illuminate\Support\Facades\{Queue};
 
 use function Pest\Laravel\postJson;
 
@@ -63,16 +63,16 @@ it('successfully verifies magic link and returns auth token', function (): void 
         'expires_at' => now()->addMinutes(30),
     ]);
 
-    // Create valid signed URL
-    $url = URL::temporarySignedRoute(
-        'auth.magic-link.verify',
-        now()->addMinutes(30),
-        ['token' => $code, 'email' => $user->email]
-    );
+    // Criamos os parâmetros com a assinatura correta
+    $expires   = now()->addMinutes(30)->timestamp;
+    $signature = hash_hmac('sha256', $user->email . $code . $expires, config('app.key'));
 
-    // Extract query parameters from URL
-    $parsedUrl = parse_url($url);
-    parse_str($parsedUrl['query'] ?? '', $params);
+    $params = [
+        'token'     => $code,
+        'email'     => $user->email,
+        'expires'   => $expires,
+        'signature' => $signature,
+    ];
 
     // Make request with signature params
     $this->get(route('auth.magic-link.verify', $params))
@@ -91,8 +91,10 @@ it('successfully verifies magic link and returns auth token', function (): void 
 
 it('rejects invalid signature', function (): void {
     $this->get(route('auth.magic-link.verify', [
-        'token' => 'any_token',
-        'email' => 'user@example.com',
+        'token'     => 'any_token',
+        'email'     => 'user@example.com',
+        'expires'   => now()->addMinutes(30)->timestamp,
+        'signature' => 'invalid_signature',
     ]))
         ->assertStatus(401)
         ->assertJson([
@@ -103,16 +105,17 @@ it('rejects invalid signature', function (): void {
 it('rejects expired or invalid token', function (): void {
     $user = User::factory()->create();
 
-    // Create signed URL but don't add the OTP token to database
-    $url = URL::temporarySignedRoute(
-        'auth.magic-link.verify',
-        now()->addMinutes(30),
-        ['token' => 'token_not_in_db', 'email' => $user->email]
-    );
+    // Criamos params com signature válida mas token que não existe no banco
+    $expires   = now()->addMinutes(30)->timestamp;
+    $token     = 'token_not_in_db';
+    $signature = hash_hmac('sha256', $user->email . $token . $expires, config('app.key'));
 
-    // Extract query parameters from URL
-    $parsedUrl = parse_url($url);
-    parse_str($parsedUrl['query'] ?? '', $params);
+    $params = [
+        'token'     => $token,
+        'email'     => $user->email,
+        'expires'   => $expires,
+        'signature' => $signature,
+    ];
 
     $this->get(route('auth.magic-link.verify', $params))
         ->assertStatus(401)
