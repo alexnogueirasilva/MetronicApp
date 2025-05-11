@@ -69,8 +69,6 @@ if (!function_exists('format_currency_br')) {
     }
 }
 
-// Em um arquivo de helpers, por exemplo, app/Helpers/TypeConversion.php
-
 if (!function_exists('as_nullable_string')) {
     /**
      * Converte um valor para string ou retorna nulo.
@@ -102,7 +100,6 @@ if (!function_exists('decodeEmailBase64UrlSafe')) {
      */
     function decodeEmailBase64UrlSafe(string $input): string
     {
-        // Verifica se a entrada contém caracteres válidos
         if (in_array(preg_match('/^[a-zA-Z0-9\-_]*$/', $input), [0, false], true)) {
             throw new InvalidArgumentException('A entrada contém caracteres Base64 URL-safe inválidos');
         }
