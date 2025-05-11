@@ -20,7 +20,7 @@ class OtpCodeFactory extends Factory
         return [
             'email'      => $this->faker->unique()->safeEmail(),
             'code'       => $this->faker->randomNumber(6, true),
-            'type'       => $this->faker->randomElement(['email', 'sms']),
+            'type'       => $this->faker->randomElement(['email', 'totp']),
             'expires_at' => now()->addMinutes(5),
             'used'       => false,
         ];

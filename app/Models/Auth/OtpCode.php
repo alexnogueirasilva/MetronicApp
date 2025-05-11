@@ -24,6 +24,8 @@ class OtpCode extends Model
     use HasFactory;
     use HasUlids;
 
+    protected $guarded = [];
+
     public function isExpired(): bool
     {
         return now()->greaterThan($this->expires_at);
@@ -34,6 +36,7 @@ class OtpCode extends Model
         return [
             'used'       => 'boolean',
             'expires_at' => 'datetime',
+            'type'       => TypeOtp::class,
         ];
     }
 }

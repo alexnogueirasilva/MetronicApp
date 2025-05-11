@@ -7,6 +7,7 @@ namespace App\Enums;
  */
 enum TypeOtp: string
 {
-    case TOTP  = 'totp';
-    case EMAIL = 'email';
+    case TOTP       = 'totp';
+    case EMAIL      = 'email';
+    case MAGIC_LINK = 'magic_link';
 }

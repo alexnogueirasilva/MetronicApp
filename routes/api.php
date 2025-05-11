@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\{AuthMeController,
     ForgotPasswordController,
     LoginController,
     LogoutController,
+    MagicLinkController,
     OtpController,
     ResetPasswordController};
 use Illuminate\Support\Facades\Route;
@@ -20,6 +21,9 @@ Route::group([
     Route::get('/me', AuthMeController::class)->name('me')->middleware(['auth:sanctum', 'totp.verify']);
     Route::post('/forgot-password', ForgotPasswordController::class)->name('forgot-password');
     Route::post('/reset-password', ResetPasswordController::class)->name('reset-password');
+
+    Route::post('/magic-link', [MagicLinkController::class, 'request'])->name('magic-link.request');
+    Route::get('/magic-link/verify', [MagicLinkController::class, 'verify'])->name('magic-link.verify');
 
     Route::post('/otp/request', [OtpController::class, 'requestEmailCode'])->name('otp.request');
     Route::post('/otp/verify', [OtpController::class, 'verifyEmailCode'])->name('otp.verify');

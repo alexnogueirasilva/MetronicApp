@@ -12,6 +12,7 @@
         "php": "^8.2",
         "captainhook/captainhook": "^5.25",
         "devaction-labs/filterable-package": "^1.0",
+        "doctrine/dbal": "^4.2",
         "knuckleswtf/scribe": "^5.2",
         "laradumps/laradumps": "^4.2",
         "laravel/framework": "^12.0",

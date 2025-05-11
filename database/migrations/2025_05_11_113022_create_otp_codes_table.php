@@ -15,7 +15,7 @@ return new class() extends Migration {
             $table->string('email')->index();
             $table->string('code')->index();
             $table->timestamp('expires_at');
-            $table->enum('type', ['email', 'sms']);
+            $table->enum('type', ['email', 'totp', 'magic_link']);
             $table->boolean('used')->default(false);
             $table->timestamps();
         });
