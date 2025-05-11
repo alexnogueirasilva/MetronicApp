@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\{AuthMeController,
     ForgotPasswordController,
     LoginController,
     LogoutController,
+    OtpController,
     ResetPasswordController};
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +18,12 @@ Route::group([
     Route::get('/me', AuthMeController::class)->name('me')->middleware('auth:sanctum');
     Route::post('/forgot-password', ForgotPasswordController::class)->name('forgot-password');
     Route::post('/reset-password', ResetPasswordController::class)->name('reset-password');
+
+    Route::post('/otp/request', [OtpController::class, 'requestEmailCode'])->name('otp.request');
+    Route::post('/otp/verify', [OtpController::class, 'verifyEmailCode'])->name('otp.verify');
+    Route::post('/otp/totp/setup', [OtpController::class, 'setupTotp'])->name('otp.totp.setup')->middleware('auth:sanctum');
+    Route::post('/otp/totp/verify', [OtpController::class, 'verifyTotp'])->name('otp.totp.verify')->middleware('auth:sanctum');
+
 });
 
 Route::middleware('auth:sanctum')->group(static function (): void {

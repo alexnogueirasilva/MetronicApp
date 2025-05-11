@@ -14,6 +14,33 @@ use Random\RandomException;
 class OtpController extends Controller
 {
     use AuthenticatedUser;
+
+    /**
+     * @throws RandomException
+     * @throws JsonException
+     */
+    public function requestEmailCode(RequestOtpCodeRequest $request, GenerateOtpCodeAction $action): JsonResponse
+    {
+        $action->__invoke(toString($request->email));
+
+        return response()->json(['message' => 'Código enviado por e-mail.']);
+    }
+
+    /**
+     * Handle the incoming request.
+     *
+     * @throws RandomException|JsonException
+     * @throws JsonException
+     */
+    public function __invoke(RequestOtpCodeRequest $request, GenerateOtpCodeAction $action): JsonResponse
+    {
+        $action->__invoke(toString($request->input('email')));
+
+        return response()->json([
+            'message' => 'OTP code sent successfully.',
+        ]);
+    }
+
     /**
      * @throws JsonException
      */
@@ -31,21 +58,6 @@ class OtpController extends Controller
         return response()->json([
             'secret' => $dto->secret,
             'qr'     => $dto->qr,
-        ]);
-    }
-
-    /**
-     * Handle the incoming request.
-     *
-     * @throws RandomException|JsonException
-     * @throws JsonException
-     */
-    public function __invoke(RequestOtpCodeRequest $request, GenerateOtpCodeAction $action): JsonResponse
-    {
-        $action->__invoke(toString($request->input('email')));
-
-        return response()->json([
-            'message' => 'OTP code sent successfully.',
         ]);
     }
 

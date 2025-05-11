@@ -1,4 +1,5 @@
-<?php declare(strict_types = 1);
+<?php
+declare(strict_types = 1);
 
 namespace App\DTO\Auth;
 
@@ -12,7 +13,8 @@ readonly class TotpSecretDTO
     ) {}
 
     /**
-     * @param array<string, string> $data
+     * @param  array<string, string>  $data
+     *
      * @throws JsonException
      */
     public function fromArray(array $data): self
