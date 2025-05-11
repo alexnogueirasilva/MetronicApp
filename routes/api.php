@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 
 use App\Http\Controllers\ACL\{PermissionController, RoleController};
-use App\Http\Controllers\Auth\{AuthMeController, LoginController, LogoutController};
+use App\Http\Controllers\Auth\{AuthMeController, ForgotPasswordController, LoginController, LogoutController};
 use Illuminate\Support\Facades\Route;
 
 Route::group([
@@ -11,6 +11,7 @@ Route::group([
     Route::post('/login', LoginController::class)->name('login');
     Route::delete('/logout', LogoutController::class)->name('logout')->middleware('auth:sanctum');
     Route::get('/me', AuthMeController::class)->name('me')->middleware('auth:sanctum');
+    Route::post('/forgot-password', ForgotPasswordController::class)->name('forgot-password');
 });
 
 Route::middleware('auth:sanctum')->group(static function (): void {
