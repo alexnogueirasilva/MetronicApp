@@ -23,6 +23,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property ?Carbon $email_verified_at
  * @property ?string $totp_secret
  * @property ?string $otp_method
+ * @property bool $totp_verified
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
