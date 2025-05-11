@@ -1,4 +1,5 @@
-<?php declare(strict_types = 1);
+<?php
+declare(strict_types = 1);
 
 namespace App\DTO\Auth;
 
@@ -11,7 +12,7 @@ readonly class LoginDTO
     ) {}
 
     /**
-     * @param array{email: string, password: string, device?: string} $data
+     * @param  array{email: string, password: string, device?: string}  $data
      */
     public static function fromRequest(array $data): self
     {

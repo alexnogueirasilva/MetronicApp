@@ -21,6 +21,8 @@ use Laravel\Sanctum\HasApiTokens;
  * @property string $password
  * @property ?string $remember_token
  * @property ?Carbon $email_verified_at
+ * @property ?string $totp_secret
+ * @property ?string $otp_method
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
