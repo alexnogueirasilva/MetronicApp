@@ -1,9 +1,9 @@
 <?php declare(strict_types = 1);
 
+use App\Enums\QueueEnum;
 use Illuminate\Support\Str;
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Horizon Domain
@@ -41,7 +41,7 @@ return [
     |
     */
 
-    'use' => 'default',
+    'use' => env('HORIZON_REDIS_CONNECTION', 'horizon'),
 
     /*
     |--------------------------------------------------------------------------
@@ -84,7 +84,13 @@ return [
     */
 
     'waits' => [
-        'redis:default' => 60,
+        'redis:' . QueueEnum::AUTH_CRITICAL->value         => 30,
+        'redis:' . QueueEnum::AUTH_DEFAULT->value          => 60,
+        'redis:' . QueueEnum::NOTIFICATIONS_HIGH->value    => 45,
+        'redis:' . QueueEnum::NOTIFICATIONS_DEFAULT->value => 90,
+        'redis:' . QueueEnum::BACKGROUND->value            => 120,
+        'redis:' . QueueEnum::MAINTENANCE->value           => 300,
+        'redis:' . QueueEnum::DEFAULT->value               => 60,
     ],
 
     /*
@@ -99,12 +105,12 @@ return [
     */
 
     'trim' => [
-        'recent'        => 60,
-        'pending'       => 60,
-        'completed'     => 60,
-        'recent_failed' => 10080,
-        'failed'        => 10080,
-        'monitored'     => 10080,
+        'recent'        => 60,     // 1 hour
+        'pending'       => 60,     // 1 hour
+        'completed'     => 60,     // 1 hour
+        'recent_failed' => 10080,  // 1 week
+        'failed'        => 10080,  // 1 week
+        'monitored'     => 10080,  // 1 week
     ],
 
     /*
@@ -135,8 +141,8 @@ return [
 
     'metrics' => [
         'trim_snapshots' => [
-            'job'   => 24,
-            'queue' => 24,
+            'job'   => 48,     // 2 days (previously 24)
+            'queue' => 48,     // 2 days (previously 24)
         ],
     ],
 
@@ -153,7 +159,7 @@ return [
     |
     */
 
-    'fast_termination' => false,
+    'fast_termination' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -166,7 +172,7 @@ return [
     |
     */
 
-    'memory_limit' => 64,
+    'memory_limit' => 128,
 
     /*
     |--------------------------------------------------------------------------
@@ -180,12 +186,103 @@ return [
     */
 
     'defaults' => [
-        'supervisor-1' => [
-            'connection'          => 'redis',
-            'queue'               => ['default'],
+        // Supervisor para jobs críticos de autenticação (máx 10 processos)
+        'auth-critical-supervisor' => [
+            'connection'          => env('HORIZON_QUEUE_CONNECTION', 'redis'),
+            'queue'               => [QueueEnum::AUTH_CRITICAL->value],
+            'balance'             => 'auto',
+            'autoScalingStrategy' => 'time',
+            'maxProcesses'        => 10,
+            'maxTime'             => 0,
+            'maxJobs'             => 0,
+            'memory'              => 128,
+            'tries'               => 3,
+            'timeout'             => 30,
+            'nice'                => 0,
+        ],
+
+        // Supervisor para jobs padrão de autenticação (máx 5 processos)
+        'auth-default-supervisor' => [
+            'connection'          => env('HORIZON_QUEUE_CONNECTION', 'redis'),
+            'queue'               => [QueueEnum::AUTH_DEFAULT->value],
+            'balance'             => 'auto',
+            'autoScalingStrategy' => 'time',
+            'maxProcesses'        => 5,
+            'maxTime'             => 0,
+            'maxJobs'             => 0,
+            'memory'              => 128,
+            'tries'               => 2,
+            'timeout'             => 60,
+            'nice'                => 0,
+        ],
+
+        // Supervisor para notificações de alta prioridade (máx 8 processos)
+        'notifications-high-supervisor' => [
+            'connection'          => env('HORIZON_QUEUE_CONNECTION', 'redis'),
+            'queue'               => [QueueEnum::NOTIFICATIONS_HIGH->value],
+            'balance'             => 'auto',
+            'autoScalingStrategy' => 'time',
+            'maxProcesses'        => 8,
+            'maxTime'             => 0,
+            'maxJobs'             => 0,
+            'memory'              => 128,
+            'tries'               => 3,
+            'timeout'             => 45,
+            'nice'                => 0,
+        ],
+
+        // Supervisor para notificações padrão (máx 3 processos)
+        'notifications-default-supervisor' => [
+            'connection'          => env('HORIZON_QUEUE_CONNECTION', 'redis'),
+            'queue'               => [QueueEnum::NOTIFICATIONS_DEFAULT->value],
+            'balance'             => 'auto',
+            'autoScalingStrategy' => 'time',
+            'maxProcesses'        => 3,
+            'maxTime'             => 0,
+            'maxJobs'             => 0,
+            'memory'              => 128,
+            'tries'               => 2,
+            'timeout'             => 90,
+            'nice'                => 0,
+        ],
+
+        // Supervisor para processamento em background (máx 2 processos)
+        'background-supervisor' => [
+            'connection'          => env('HORIZON_QUEUE_CONNECTION', 'redis'),
+            'queue'               => [QueueEnum::BACKGROUND->value],
+            'balance'             => 'auto',
+            'autoScalingStrategy' => 'time',
+            'maxProcesses'        => 2,
+            'maxTime'             => 0,
+            'maxJobs'             => 0,
+            'memory'              => 256,  // Mais memória para processamento pesado
+            'tries'               => 1,
+            'timeout'             => 300,  // Tempo maior para tarefas longas
+            'nice'                => 10,   // Menor prioridade
+        ],
+
+        // Supervisor para tarefas de manutenção (máx 1 processo)
+        'maintenance-supervisor' => [
+            'connection'          => env('HORIZON_QUEUE_CONNECTION', 'redis'),
+            'queue'               => [QueueEnum::MAINTENANCE->value],
             'balance'             => 'auto',
             'autoScalingStrategy' => 'time',
             'maxProcesses'        => 1,
+            'maxTime'             => 0,
+            'maxJobs'             => 0,
+            'memory'              => 128,
+            'tries'               => 1,
+            'timeout'             => 600,  // 10 minutos
+            'nice'                => 10,   // Menor prioridade
+        ],
+
+        // Supervisor para fila padrão (máx 3 processos)
+        'default-supervisor' => [
+            'connection'          => env('HORIZON_QUEUE_CONNECTION', 'redis'),
+            'queue'               => [QueueEnum::DEFAULT->value],
+            'balance'             => 'auto',
+            'autoScalingStrategy' => 'time',
+            'maxProcesses'        => 3,
             'maxTime'             => 0,
             'maxJobs'             => 0,
             'memory'              => 128,
@@ -197,17 +294,129 @@ return [
 
     'environments' => [
         'production' => [
-            'supervisor-1' => [
+            'auth-critical-supervisor' => [
                 'maxProcesses'    => 10,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+            ],
+            'auth-default-supervisor' => [
+                'maxProcesses'    => 5,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+            ],
+            'notifications-high-supervisor' => [
+                'maxProcesses'    => 8,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+            ],
+            'notifications-default-supervisor' => [
+                'maxProcesses'    => 3,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+            ],
+            'background-supervisor' => [
+                'maxProcesses'    => 2,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+            ],
+            'maintenance-supervisor' => [
+                'maxProcesses'    => 1,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+            ],
+            'default-supervisor' => [
+                'maxProcesses'    => 3,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+            ],
+        ],
+
+        'staging' => [
+            'auth-critical-supervisor' => [
+                'maxProcesses'    => 5,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+            ],
+            'auth-default-supervisor' => [
+                'maxProcesses'    => 3,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+            ],
+            'notifications-high-supervisor' => [
+                'maxProcesses'    => 3,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+            ],
+            'notifications-default-supervisor' => [
+                'maxProcesses'    => 2,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+            ],
+            'background-supervisor' => [
+                'maxProcesses'    => 1,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+            ],
+            'maintenance-supervisor' => [
+                'maxProcesses'    => 1,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+            ],
+            'default-supervisor' => [
+                'maxProcesses'    => 2,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
         ],
 
         'local' => [
-            'supervisor-1' => [
+            'auth-critical-supervisor' => [
                 'maxProcesses' => 3,
+            ],
+            'auth-default-supervisor' => [
+                'maxProcesses' => 2,
+            ],
+            'notifications-high-supervisor' => [
+                'maxProcesses' => 2,
+            ],
+            'notifications-default-supervisor' => [
+                'maxProcesses' => 1,
+            ],
+            'background-supervisor' => [
+                'maxProcesses' => 1,
+            ],
+            'maintenance-supervisor' => [
+                'maxProcesses' => 1,
+            ],
+            'default-supervisor' => [
+                'maxProcesses' => 2,
             ],
         ],
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Notifications Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure the notification settings for Horizon.
+    | This includes email and Slack notification channels.
+    |
+    */
+    'notifications' => [
+        'email'         => env('HORIZON_NOTIFICATION_EMAIL', 'admin@example.com'),
+        'slack_webhook' => env('SLACK_WEBHOOK_URL'),
+        'slack_channel' => env('SLACK_HORIZON_CHANNEL', '#horizon-notifications'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Access Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure which users have access to the Horizon dashboard.
+    | Add emails separated by commas in the environment variable.
+    |
+    */
+    'admin_emails' => env('HORIZON_ADMIN_EMAILS', 'admin@example.com'),
 ];

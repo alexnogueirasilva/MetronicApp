@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\QueueEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Jobs\Auth\SendForgotPasswordEmailJob;
@@ -20,7 +21,8 @@ class ForgotPasswordController extends Controller
         $user = User::query()->where('email', $email)->first();
 
         if ($user) {
-            SendForgotPasswordEmailJob::dispatch($user);
+            SendForgotPasswordEmailJob::dispatch($user)
+                ->onQueue(QueueEnum::AUTH_CRITICAL->value);
         }
 
         return response()->json([

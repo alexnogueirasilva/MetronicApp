@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Actions\Auth\{GenerateAuthTokenAction, GenerateMagicLinkAction, VerifyMagicLinkAction};
+use App\Enums\QueueEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\MagicLinkRequest;
 use App\Jobs\Auth\SendMagicLinkEmailJob;
@@ -32,7 +33,8 @@ class MagicLinkController extends Controller
 
         $magicLink = $generateAction->execute($email);
 
-        SendMagicLinkEmailJob::dispatch($email, $magicLink);
+        SendMagicLinkEmailJob::dispatch($email, $magicLink)
+            ->onQueue(QueueEnum::AUTH_DEFAULT->value);
 
         return response()->json([
             'message' => 'Se o e-mail estiver cadastrado, você receberá um link de acesso em breve.',

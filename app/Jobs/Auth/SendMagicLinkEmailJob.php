@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Auth;
 
+use App\Enums\QueueEnum;
 use App\Mail\Auth\MagicLinkMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -26,5 +27,19 @@ class SendMagicLinkEmailJob implements ShouldQueue
         Mail::to($this->email)->send(new MagicLinkMail(
             $this->magicLink,
         ));
+    }
+
+    /**
+     * Define as tags para o Horizon monitorar este job
+     *
+     * @return array<int, string>
+     */
+    public function tags(): array
+    {
+        return [
+            'magic-link',
+            'email:' . $this->email,
+            QueueEnum::AUTH_DEFAULT->value,
+        ];
     }
 }

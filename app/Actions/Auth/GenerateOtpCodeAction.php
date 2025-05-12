@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace App\Actions\Auth;
 
+use App\Enums\QueueEnum;
 use App\Jobs\Auth\SendOtpEmailJob;
 use App\Models\Auth\OtpCode;
 use Random\RandomException;
@@ -25,6 +26,8 @@ class GenerateOtpCodeAction
             'used'       => false,
         ])->save();
 
-        SendOtpEmailJob::dispatch($otp);
+        // OTP via email é uma autenticação crítica, merece prioridade alta
+        SendOtpEmailJob::dispatch($otp)
+            ->onQueue(QueueEnum::AUTH_CRITICAL->value);
     }
 }
