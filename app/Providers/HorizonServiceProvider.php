@@ -63,8 +63,7 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
      */
     protected function gate(): void
     {
-        Gate::define('viewHorizon', fn(User $user): bool =>
-            // Verificar se o usuário tem permissão para ver o Horizon
+        Gate::define('viewHorizon', fn (User $user): bool => // Verificar se o usuário tem permissão para ver o Horizon
             in_array($user->email, $this->getHorizonAdminEmails(), true) ||
                $user->hasRole('admin'));
     }
