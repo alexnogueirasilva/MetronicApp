@@ -217,7 +217,10 @@ MetronicApp é um boilerplate completo para desenvolvimento de APIs RESTful com 
 ## 🛡️ Recursos de Segurança
 
 - Proteção CSRF para rotas web
-- Rate limiting para APIs
+- Rate limiting avançado baseado em:
+  - Tenant e plano de assinatura
+  - Tipo de endpoint (maior proteção para endpoints sensíveis)
+  - Ajuste automático de limites conforme o contexto
 - Sanitização de inputs
 - Validação de dados robusta
 - Proteção contra ataques comuns:
@@ -257,7 +260,7 @@ Contribuições são bem-vindas! Por favor, siga estes passos:
 - [ ] Integrar login via redes sociais (OAuth)
 - [ ] Adicionar módulo de auditoria para ações de usuários
 - [ ] Implementar cache de resposta para endpoints públicos
-- [ ] Criar sistema de rate limit por plano/usuário
+- [x] Criar sistema de rate limit por plano/usuário
 - [ ] Adicionar suporte a GraphQL
 - [ ] Implementar versionamento de API
 - [ ] Documentação mais detalhada para cada módulo

@@ -68,8 +68,8 @@ Este documento contém uma lista de funcionalidades que podem ser adicionadas ao
 
 ### 10. Melhorias de Segurança
 
-- MFA expandido (SMS, apps, biometria)
-- Rate limiting avançado por endpoint/usuário
+- MFA expandido (SMS, apps, biometria) ✅
+- Rate limiting avançado por endpoint/usuário ✅
 - Regras de senha personalizáveis
 - Análise de vulnerabilidades
 - Detecção de tentativas de invasão
@@ -79,7 +79,7 @@ Este documento contém uma lista de funcionalidades que podem ser adicionadas ao
 - Implementação de API Gateway para roteamento
 - Cache inteligente de respostas
 - ETags para otimização de tráfego
-- Rate limiting granular e ajustável
+- Rate limiting granular e ajustável ✅
 
 ### 12. Documentação In-Code Automatizada
 
