@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\{AuthMeController,
     ResetPasswordController};
 use App\Http\Controllers\TenantController;
 use Illuminate\Support\Facades\Route;
+use Infinitypaul\Idempotency\Middleware\EnsureIdempotency;
 
 Route::middleware(['endpoint.ratelimit'])->group(static function (): void {
 
@@ -38,7 +39,7 @@ Route::middleware(['endpoint.ratelimit'])->group(static function (): void {
 
     });
 
-    Route::middleware(['auth:sanctum', 'totp.verify', 'tenant.ratelimit'])->group(static function (): void {
+    Route::middleware(['auth:sanctum', 'totp.verify', 'tenant.ratelimit', EnsureIdempotency::class])->group(static function (): void {
         Route::apiResource('tenant', TenantController::class);
 
         Route::group([

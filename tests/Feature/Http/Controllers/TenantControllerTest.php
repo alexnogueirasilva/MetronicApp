@@ -88,8 +88,8 @@ it('can create a new tenant', function () {
         'is_active' => true,
     ];
 
-    $response = postJson(route('tenant.store'), $data);
-
+    $response = postJson(route('tenant.store'), $data, ['Idempotency-Key' => Str::uuid()]);
+    ds($response->json());
     // Verificar resposta
     $response->assertCreated();
     $response->assertJsonStructure([
@@ -150,7 +150,7 @@ it('can update a tenant', function () {
         'plan' => PlanType::PROFESSIONAL->value,
     ];
 
-    $response = putJson(route('tenant.update', $tenant), $data);
+    $response = putJson(route('tenant.update', $tenant), $data, ['Idempotency-Key' => Str::uuid()]);
 
     $response->assertOk();
     $response->assertJson([
@@ -170,7 +170,7 @@ it('can update a tenant', function () {
 it('can delete a tenant', function () {
     $tenant = Tenant::factory()->create();
 
-    $response = deleteJson(route('tenant.destroy', $tenant));
+    $response = deleteJson(route('tenant.destroy', $tenant), [], ['Idempotency-Key' => Str::uuid()]);
 
     $response->assertOk();
     $response->assertJson([
@@ -186,7 +186,7 @@ it('prevents deletion of tenant with users', function () {
     $tenant = Tenant::factory()->create();
     User::factory()->create(['tenant_id' => $tenant->id]);
 
-    $response = deleteJson(route('tenant.destroy', $tenant));
+    $response = deleteJson(route('tenant.destroy', $tenant), [], ['Idempotency-Key' => Str::uuid()]);
 
     $response->assertStatus(409); // Conflict
     $response->assertJson([
