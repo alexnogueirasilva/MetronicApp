@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
+use App\Models\{Tenant, User};
 use Illuminate\Database\Seeder;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -14,14 +14,23 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Create default tenant
+        $tenant = Tenant::factory()->create([
+            'name'   => 'DevAction',
+            'domain' => 'devaction.com.br',
+        ]);
+
+        // Create default admin user
         User::factory()->create([
-            'name'     => 'Alex Nogueira',
-            'email'    => 'alex@devaction.com.br',
-            'password' => 'password',
+            'tenant_id' => $tenant->id,
+            'name'      => 'Alex Nogueira',
+            'email'     => 'alex@devaction.com.br',
+            'password'  => 'password',
         ]);
 
         $this->call([
             RolePermissionSeeder::class,
+            TenantSeeder::class,
         ]);
     }
 }

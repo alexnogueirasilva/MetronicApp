@@ -12,6 +12,8 @@
         "php": "^8.2",
         "captainhook/captainhook": "^5.25",
         "devaction-labs/filterable-package": "^1.0",
+        "doctrine/dbal": "^4.2",
+        "infinitypaul/idempotency-laravel": "^1.0",
         "knuckleswtf/scribe": "^5.2",
         "laradumps/laradumps": "^4.2",
         "laravel/framework": "^12.0",
@@ -20,7 +22,8 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
         "league/flysystem-aws-s3-v3": "^3.29",
-        "scalar/laravel": "^0.2.0"
+        "scalar/laravel": "^0.2.0",
+        "spomky-labs/otphp": "^11.3"
     },
     "require-dev": {
         "roave/security-advisories": "dev-latest",

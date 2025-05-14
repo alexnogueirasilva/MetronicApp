@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\QueueEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Jobs\Auth\SendPasswordChangedNotificationJob;
@@ -39,11 +40,12 @@ class ResetPasswordController extends Controller
                     'password' => toString($request->input('password')),
                 ])->save();
 
+                // Notificação de segurança sobre alteração de senha (alta prioridade)
                 SendPasswordChangedNotificationJob::dispatch(
                     user: $user,
                     ip: toString($request->ip()),
                     userAgent: toString($request->userAgent())
-                );
+                )->onQueue(QueueEnum::NOTIFICATIONS_HIGH->value);
             }
         );
 

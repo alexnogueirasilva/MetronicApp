@@ -1,224 +1,112 @@
-# NFeEngine - Engine de Faturamento NF-e Open Source
+# Sugestões de Melhorias para o Boilerplate
 
-## 1. Objetivo
+Este documento contém uma lista de funcionalidades que podem ser adicionadas ao boilerplate para torná-lo mais completo e abrangente para projetos de API.
 
-Construir uma engine robusta, modular e open source para geração, validação e transmissão de Notas Fiscais Eletrônicas (NF-e), suportando:
+## Recursos Prioritários
 
-* Entradas em XML (base64) ou dados estruturados.
-* Modo **síncrono** (retorna NF autorizada) ou **assíncrono** (retorna protocolo e consulta posterior).
-* Persistência em Postgres e bucket de objetos.
-* Alta performance com Laravel Octane e filas Horizon.
-* Tratativa completa de erros conforme Nota Técnica SEFAZ.
+### 1. Sistema de Notificações Completo
 
----
+- **Notificações via Email**: Implementar templates personalizáveis
+- **Notificações via SMS**: Integração com serviços como Twilio ou Vonage
+- **Notificações Push**: Suporte para dispositivos móveis via Firebase
+- **Notificações em Tempo Real**: WebSockets com Laravel Echo e Pusher/Redis
+- **Centro de Notificações**: API para gerenciar preferências de notificação
 
-## 2. Visão Geral do Fluxo
+### 2. Sistema de Versionamento de API
 
-1. **Recepção da Requisição**: POST `/v1/nfe` com payload:
+- Implementar versionamento de rotas (ex: `/api/v1/auth/login`)
+- Suporte à depreciação gradual de endpoints
+- Documentação específica por versão
+- Middleware para controle de versão via header
 
-   ```json
-   {
-     "tipo": "xml" | "dados",
-     "conteudo": "<xml_base64>" | { /* dados */ },
-     "modo": "sync" | "async",
-     "idempotency_key": "string_opcional"
-   }
-   ```
-2. **Persistência Inicial**:
+### 3. Multitenant Architecture
 
-    * Gravar em `nfe_requests`:
+- Separação de dados por cliente/tenant
+- Middleware para identificação automática de tenant
+- Migrations isoladas por tenant
+- Configurações específicas por tenant
 
-        * id, tipo, payload\_raw, xml\_base64 (se houver), modo, status `received`, idempotency\_key, timestamps.
-3. **Geração ou Validação de XML**:
+### 4. Microserviços-Ready
 
-    * Se `tipo: dados`, chamar `GenerateNfeXmlAction` para montar o XML e assinar via NFPHP.
-    * Validar campos fiscais (alíquotas, CNPJ, CFOP) em `ValidateNfeAction`, usando Laravel Form Requests ou DTOs.
-    * Em caso de erro de validação, marcar status `validation_error`, salvar mensagens e retornar 400.
-4. **Envio à SEFAZ**:
+- Autenticação distribuída
+- Sistema de mensagens/eventos entre serviços
+- Clientes de API para comunicação entre serviços
+- Service discovery
 
-    * Se `modo: sync`: `SendToSefazSyncJob` envia e aguarda retorno.
-    * Se `modo: async`: `SendToSefazAsyncJob` enfileira e retorna protocolo imediato.
-5. **Tratamento de Resposta**:
+### 5. Exportação/Importação de Dados
 
-    * **Sync**: atualizar `nfe_requests` com `status = authorized` ou `rejected`, protocolo, xml\_autorizado e chave de acesso.
-    * **Async**: após callback ou polling, atualizar `nfe_requests` conforme retorno.
-6. **Armazenamento em Bucket**:
+- Exportação para diversos formatos (CSV, Excel, PDF)
+- Importação com validação
+- Jobs em background para processamentos pesados
+- Relatórios customizados
 
-    * Salvar todas as versões do XML no bucket (S3/GCS) em `{cnpj}/{ano}/{mes}/{chave}.xml`.
-7. **Reprocessamento e DLQ**:
+### 6. Internacionalização Avançada
 
-    * Configurar retries em Horizon com backoff.
-    * Em falhas temporárias (timeout, instabilidade), reenqueue; após limite, mover para `failed_nfe_jobs` e status `dlq`.
-8. **Logs e Eventos**:
+- Suporte a múltiplos idiomas
+- Detecção automática de idioma
+- Tradução dinâmica de conteúdo
+- Formatos específicos por região (datas, números, moedas)
 
-    * Registrar em `nfe_events` cada mudança de status com payload detalhado.
-    * Integrar com Laravel Telescope ou Sentry para monitoramento em produção.
+### 7. LogViewer e Monitoramento
 
----
+- Interface para explorar logs
+- Alertas para erros críticos
+- Monitoramento de performance
+- Integração com serviços de APM (New Relic, Datadog)
 
-## 3. Modelagem de Banco de Dados
+### 8. OAuth2 e Single Sign-On
 
-### Tabela `nfe_requests`
+- Integração com OAuth2 (Google, Facebook, Microsoft)
+- Suporte a JWT customizado
+- Sistema SSO para múltiplos serviços
 
-| Campo            | Tipo          | Descrição                                       |
-| ---------------- | ------------- | ----------------------------------------------- |
-| id               | UUID          | PK                                              |
-| tipo             | varchar(10)   | `xml` ou `dados`                                |
-| payload\_raw     | jsonb         | Dados brutos da requisição                      |
-| xml\_base64      | text nullable | XML em base64 (se fornecido)                    |
-| modo             | varchar(6)    | `sync` ou `async`                               |
-| status           | varchar(20)   | `received`, `validation_error`, `pending`, etc. |
-| protocolo        | varchar(50)   | Protocolo SEFAZ (async) ou nulo                 |
-| xml\_autorizado  | text nullable | XML autorizado em base64                        |
-| chave\_acesso    | varchar(44)   | Chave de acesso extraída do XML autorizado      |
-| tentativas       | integer       | Número de tentativas                            |
-| error\_code      | varchar(10)   | Código de erro SEFAZ ou interno                 |
-| error\_message   | text nullable | Descrição detalhada do erro                     |
-| idempotency\_key | varchar(100)  | Chave de idempotência                           |
-| created\_at      | timestamp     |                                                 |
-| updated\_at      | timestamp     |                                                 |
+### 9. Geolocalização e Detecção de Localidade
 
-### Tabela `nfe_events`
+- Funções para geolocalização
+- Customização de conteúdo baseado em região
+- Restrições geográficas
 
-| Campo            | Tipo        | Descrição                            |
-| ---------------- | ----------- | ------------------------------------ |
-| id               | UUID        | PK                                   |
-| nfe\_request\_id | UUID FK     | Referência a `nfe_requests`          |
-| evento           | varchar(50) | Ex: `xml_generated`, `sent`, `error` |
-| detalhes         | jsonb       | Payload de resposta ou erro          |
-| created\_at      | timestamp   |                                      |
+### 10. Melhorias de Segurança
 
----
+- MFA expandido (SMS, apps, biometria) ✅
+- Rate limiting avançado por endpoint/usuário ✅
+- Regras de senha personalizáveis
+- Análise de vulnerabilidades
+- Detecção de tentativas de invasão
 
-## 4. Tratativa de Erros
+### 11. API Gateway e Cache
 
-1. **Configuração**: `config/nfe_errors.php` mapeia códigos SEFAZ:
+- Implementação de API Gateway para roteamento
+- Cache inteligente de respostas
+- ETags para otimização de tráfego
+- Rate limiting granular e ajustável ✅
 
-   ```php
-   return [
-     '100' => ['tipo' => 'autorizada', 'reprocesso' => false],
-     '150' => ['tipo' => 'rejeicao',   'reprocesso' => false],
-     '999' => ['tipo' => 'temporario', 'reprocesso' => true],
-     // ... NTs adicionais
-   ];
-   ```
-2. **Exceções Customizadas**:
+### 12. Documentação In-Code Automatizada
 
-    * `ValidationException`, `SefazTemporaryException`, `SefazPermanentException`.
-3. **Fluxo de Reprocesso**:
+- Geração automática de documentação OpenAPI 3.0
+- Playground para testes (como Swagger UI)
+- Exemplos funcionais para cada endpoint
 
-    * Temporários → `retryAfter()` com backoff incremental.
-    * Permanentes → lançar `SefazPermanentException` para falhar sem reprocessar.
-4. **Timeout**:
+### 13. Jobs e Filas Avançadas
 
-    * Guzzle timeouts devem gerar `SefazTemporaryException`.
+- Retry policies customizáveis
+- Gerenciamento de filas com prioridades
+- Dashboard para monitoramento de jobs
+- Cancelamento de jobs em execução
 
----
+### 14. Sistema de Plugins/Módulos
 
-## 5. APIs
+- Arquitetura para adicionar módulos
+- Auto-discovery de recursos
+- Gerenciamento de dependências entre módulos
 
-### POST `/v1/nfe`
+## Ideias para o Futuro
 
-* **Request**:
-
-  ```json
-  {
-    "tipo": "xml" | "dados",
-    "conteudo": string | object,
-    "modo": "sync" | "async",
-    "idempotency_key": "string_opcional"
-  }
-  ```
-* **Response Sync** (200):
-
-  ```json
-  {
-    "status": "authorized",
-    "protocolo": "123456789",
-    "xml": "<xml_base64_autorizado>",
-    "chave_acesso": "43210987654321..."
-  }
-  ```
-* **Response Erro** (4xx):
-
-  ```json
-  { "error_code": "150", "message": "Alíquota inválida" }
-  ```
-* **Response Async** (202):
-
-  ```json
-  { "status": "pending", "protocolo": "123456789" }
-  ```
-
----
-
-## 6. Pacotes & Ferramentas Sugeridos
-
-| Finalidade                   | Pacote / Biblioteca                              |
-| ---------------------------- | ------------------------------------------------ |
-| NF-e (NFPHP)                 | `nfephp-org/nfephp`, `eduardokum/laravel-nfephp` |
-| DTOs e validação estruturada | `spatie/data-transfer-object`                    |
-| Filas e DLQ                  | Laravel Horizon (Redis/SQS)                      |
-| Alta performance             | Laravel Octane, RoadRunner                       |
-| Observabilidade              | Laravel Telescope, Sentry                        |
-| Auditoria de eventos         | `spatie/laravel-activitylog`                     |
-| Idempotência e Throttling    | Middleware próprio, `graham-campbell/throttle`   |
-
-> **Nota**: Para enums use nativos do PHP 8.4, ex.:
->
-> ```php
-> enum NfeStatus: string {
->     case RECEIVED = 'received';
->     case VALIDATION_ERROR = 'validation_error';
->     case PENDING = 'pending';
->     case AUTHORIZED = 'authorized';
->     case REJECTED = 'rejected';
->     case DLQ = 'dlq';
-> }
-> ```
-
----
-
-## 7. Checklist & Próximos Passos
-
-* [ ] Definir DTOs e contratos de request/response
-* [ ] Criar migrations para `nfe_requests` e `nfe_events`
-* [ ] Implementar Actions/Jobs para geração, validação e envio (sync/async)
-* [ ] Configurar Horizon e DLQ (Redis/SQS)
-* [ ] Popular `config/nfe_errors.php` com NT SEFAZ
-* [ ] Adicionar testes unitários e de integração (sucesso, rejeição, timeout)
-* [ ] Testar homologação com SEFAZ via `laravel-nfephp`
-
----
-
-## 8. Status SEFAZ e Mensagens Amigáveis
-
-Consultar o Manual de Emissão de NF-e (Nota Técnica atualizada) para listar todos os códigos de retorno possíveis. Abaixo, mapeamento dos principais:
-
-| Código | Status Técnico          | Mensagem Amigável                          |
-| ------ | ----------------------- | ------------------------------------------ |
-| 100    | Autorizado              | Nota fiscal autorizada com sucesso.        |
-| 101    | Cancelamento            | Nota fiscal cancelada.                     |
-| 102    | Inutilização            | Número de NF-e inutilizado.                |
-| 135    | Evento registrado       | Evento registrado com sucesso.             |
-| 138    | Cancelamento homologado | Cancelamento homologado pela SEFAZ.        |
-| 204    | Lote recebido           | Lote de NF-e recebido pela SEFAZ.          |
-| 224    | Lote processado         | Lote de NF-e processado com sucesso.       |
-| 539    | Uso Denegado            | Uso denegado: verifique a legislação.      |
-| 592    | Duplicidade de NF-e     | Nota fiscal já existente no sistema.       |
-| 598    | Rejeição por duplicação | NF-e rejeitada por duplicidade.            |
-| 609    | Falha de schema XML     | Estrutura do XML inválida.                 |
-| 611    | Conteúdo divergente     | Dados do contribuinte divergentes.         |
-| 614    | CFOP inválido           | Código fiscal de operação inválido.        |
-| 615    | Inscrição estadual      | IE do destinatário inválida.               |
-| 616    | Serie inválida          | Série informada não permitida.             |
-| 617    | Chave inválida          | Chave de acesso inválida ou inconsistente. |
-| 631    | NF-e não localizada     | Nota fiscal não localizada para consulta.  |
-| 302    | Serviço indisponível    | SEFAZ temporariamente indisponível.        |
-| 999    | Erro interno            | Erro interno: tente novamente mais tarde.  |
-
-> **Obs.**: Para catalogar todos os códigos, consulte a Nota Técnica NF-e mais recente (disponível no portal da NF-e) e preencha `config/nfe_errors.php` com descrições e flags de reprocesso correspondentes.
-
----
-
-Com isso, teremos um mapeamento completo para exibir mensagens claras ao usuário final e definir quais códigos devem reprocessar ou falhar imediatamente.
+1. Suporte a GraphQL
+2. WebAssembly para processamento no cliente
+3. Machine Learning para detecção de anomalias
+4. Integração com blockchain para auditoria
+5. Suporte a gRPC para comunicação de alta performance
+6. Edge Computing com deploy distribuído
+7. Sistema de pagamentos e assinaturas integrado
+8. Geração de código por IA para acelerar desenvolvimento

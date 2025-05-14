@@ -1,6 +1,8 @@
 <?php declare(strict_types = 1);
 
 use App\Exceptions\CustomNotFoundException;
+use App\Http\Middleware\Auth\EnsureTotpVerified;
+use App\Http\Middleware\RateLimit\{EndpointRateLimiter, TenantRateLimiter};
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Application;
@@ -23,7 +25,11 @@ return Application::configure(basePath: dirname(__DIR__))
         }
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            'totp.verify'        => EnsureTotpVerified::class,
+            'tenant.ratelimit'   => TenantRateLimiter::class,
+            'endpoint.ratelimit' => EndpointRateLimiter::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->renderable(fn (NotFoundHttpException $e): JsonResponse => CustomNotFoundException::fromNotFoundHttpException($e)->render(request()));

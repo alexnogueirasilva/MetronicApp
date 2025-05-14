@@ -11,7 +11,8 @@ it('logs out the user and deletes the current token', function (): void {
     $token = $user->createToken('test-device');
 
     deleteJson(route('auth.logout'), [], [
-        'Authorization' => 'Bearer ' . $token->plainTextToken,
+        'Authorization'   => 'Bearer ' . $token->plainTextToken,
+        'Idempotency-Key' => Str::uuid(),
     ])
         ->assertOk()
         ->assertJson([
@@ -32,7 +33,7 @@ it('does not call delete if token is a transient token', function (): void {
     actingAs($user);
 
     // Roda o logout
-    deleteJson(route('auth.logout'))
+    deleteJson(route('auth.logout'), [], ['Idempotency-Key' => Str::uuid()])
         ->assertOk()
         ->assertJson(['message' => 'Logged out successfully.']);
 });

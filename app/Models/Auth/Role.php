@@ -4,12 +4,13 @@ declare(strict_types = 1);
 namespace App\Models\Auth;
 
 use App\Models\User;
+use App\Observers\Auth\RoleObserver;
 use Database\Factories\Auth\RoleFactory;
 use DevactionLabs\FilterablePackage\Traits\Filterable;
-use Illuminate\Database\Eloquent\{Collection, Model};
+use Illuminate\Database\Eloquent\{Attributes\ObservedBy, Collection, Model};
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\{BelongsToMany, HasMany};
+use Illuminate\Database\Eloquent\Relations\{BelongsToMany};
 use Illuminate\Support\Carbon;
 
 /**
@@ -22,6 +23,8 @@ use Illuminate\Support\Carbon;
  * @property Carbon $updated_at
  * @property-read Permission[]|Collection $permissions
  */
+
+#[ObservedBy(RoleObserver::class)]
 class Role extends Model
 {
     use Filterable;
@@ -38,11 +41,11 @@ class Role extends Model
     }
 
     /**
-     * @return HasMany<User, $this>
+     * @return BelongsToMany<User, $this>
      */
-    public function users(): HasMany
+    public function users(): BelongsToMany
     {
-        return $this->hasMany(User::class);
+        return $this->belongsToMany(User::class, 'role_user');
     }
 
     /**
