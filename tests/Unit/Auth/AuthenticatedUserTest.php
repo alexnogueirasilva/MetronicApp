@@ -1,18 +1,13 @@
 <?php declare(strict_types = 1);
 
 use App\Models\User;
-use App\Traits\Auth\AuthenticatedUser;
 use Illuminate\Support\Facades\{Auth, Cache};
+use Tests\Unit\Auth\DummyAuthClass;
 
 beforeEach(function (): void {
     Cache::flush();
 });
-
-// Dummy class pra testar o trait isoladamente
-class DummyAuthClass
-{
-    use AuthenticatedUser;
-}
+uses(\App\Traits\Auth\AuthenticatedUser::class);
 
 it('returns authenticated user without cache', function (): void {
     $user = User::factory()->create();

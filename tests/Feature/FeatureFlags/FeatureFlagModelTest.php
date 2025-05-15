@@ -1,117 +1,95 @@
 <?php declare(strict_types = 1);
 
-namespace Tests\Feature\FeatureFlags;
-
 use App\Enums\FeatureFlagType;
 use App\Models\{FeatureFlag, Tenant, User};
+use App\Providers\FeatureFlagServiceProvider;
+use Laravel\Pennant\Feature;
 
-class FeatureFlagModelTest extends FeatureFlagTestCase
-{
-    public function test_feature_flag_id_is_string(): void
-    {
-        $feature = FeatureFlag::factory()->create();
+// Setup similar to FeatureFlagTestCase
+beforeEach(function (): void {
+    config(['pennant.default' => 'array']);
+    app()->register(FeatureFlagServiceProvider::class);
+    Feature::purge();
+    Feature::resolveScopeUsing(static function (?string $driver = null) {
+        return null;
+    });
+});
 
-        // In tests, we might get an auto-incrementing ID if migrations aren't run
-        // or we might get a ULID if they are
-        $this->assertTrue(
-            is_string($feature->id) || is_numeric($feature->id),
-            'ID should be a string or numeric value, got: ' . gettype($feature->id)
-        );
-    }
+test('feature flag id is string', function () {
+    $feature = FeatureFlag::factory()->create();
 
-    public function test_feature_flag_can_be_created_with_default_factory(): void
-    {
-        $feature = FeatureFlag::factory()->create();
+    expect(is_string($feature->id) || is_numeric($feature->id))->toBeTrue('ID should be a string or numeric value, got: ' . gettype($feature->id));
+});
+test('feature flag can be created with default factory', function () {
+    $feature = FeatureFlag::factory()->create();
 
-        $this->assertDatabaseHas('feature_flag_metadata', [
-            'feature_name' => $feature->feature_name,
-            'display_name' => $feature->display_name,
-        ]);
+    $this->assertDatabaseHas('feature_flag_metadata', [
+        'feature_name' => $feature->feature_name,
+        'display_name' => $feature->display_name,
+    ]);
 
-        $this->assertInstanceOf(FeatureFlagType::class, $feature->type);
-    }
+    expect($feature->type)->toBeInstanceOf(FeatureFlagType::class);
+});
+test('feature flag has relationships with tenants and users', function () {
+    $feature = FeatureFlag::factory()->perTenant()->create();
+    $tenant  = Tenant::factory()->create();
+    $user    = User::factory()->create();
 
-    public function test_feature_flag_has_relationships_with_tenants_and_users(): void
-    {
-        $feature = FeatureFlag::factory()->perTenant()->create();
-        $tenant  = Tenant::factory()->create();
-        $user    = User::factory()->create();
+    $feature->tenants()->attach($tenant, ['value' => true]);
+    $feature->users()->attach($user, ['value' => false]);
 
-        // Attach tenant and user to feature
-        $feature->tenants()->attach($tenant, ['value' => true]);
-        $feature->users()->attach($user, ['value' => false]);
+    expect($feature->tenants)->toHaveCount(1)
+        ->and($feature->users)->toHaveCount(1)
+        ->and($feature->tenants->first()->id)->toEqual($tenant->id)
+        ->and($feature->users->first()->id)->toEqual($user->id)
+        ->and((int)$feature->tenants->first()->pivot->value)->toBe(1)
+        ->and((int)$feature->users->first()->pivot->value)->toBe(0);
 
-        // Test relationships
-        $this->assertCount(1, $feature->tenants);
-        $this->assertCount(1, $feature->users);
-        $this->assertEquals($tenant->id, $feature->tenants->first()->id);
-        $this->assertEquals($user->id, $feature->users->first()->id);
+});
+test('is within date range method', function () {
+    $featureNoDate = FeatureFlag::factory()->create([
+        'starts_at' => null,
+        'ends_at'   => null,
+    ]);
+    expect($featureNoDate->isWithinDateRange())->toBeTrue();
 
-        // Test pivot data
-        // Note: directly checking boolean values in pivot fails in some DB systems
-        $this->assertSame(1, (int)$feature->tenants->first()->pivot->value);
-        $this->assertSame(0, (int)$feature->users->first()->pivot->value);
-    }
+    $featureFutureStart = FeatureFlag::factory()->create([
+        'starts_at' => now()->addDays(5),
+        'ends_at'   => null,
+    ]);
+    expect($featureFutureStart->isWithinDateRange())->toBeFalse();
 
-    public function test_is_within_date_range_method(): void
-    {
-        // Feature with no date constraints
-        $featureNoDate = FeatureFlag::factory()->create([
-            'starts_at' => null,
-            'ends_at'   => null,
-        ]);
-        $this->assertTrue($featureNoDate->isWithinDateRange());
+    $featurePastEnd = FeatureFlag::factory()->create([
+        'starts_at' => null,
+        'ends_at'   => now()->subDays(5),
+    ]);
+    expect($featurePastEnd->isWithinDateRange())->toBeFalse();
 
-        // Feature with future start date
-        $featureFutureStart = FeatureFlag::factory()->create([
-            'starts_at' => now()->addDays(5),
-            'ends_at'   => null,
-        ]);
-        $this->assertFalse($featureFutureStart->isWithinDateRange());
+    $featureActive = FeatureFlag::factory()->create([
+        'starts_at' => now()->subDays(5),
+        'ends_at'   => now()->addDays(5),
+    ]);
+    expect($featureActive->isWithinDateRange())->toBeTrue();
+});
+test('is compatible with environment method', function () {
+    $currentEnv = 'testing';
+    app()->detectEnvironment(fn () => $currentEnv);
 
-        // Feature with past end date
-        $featurePastEnd = FeatureFlag::factory()->create([
-            'starts_at' => null,
-            'ends_at'   => now()->subDays(5),
-        ]);
-        $this->assertFalse($featurePastEnd->isWithinDateRange());
+    $featureNonEnv = FeatureFlag::factory()->global()->create();
+    expect($featureNonEnv->isCompatibleWithEnvironment())->toBeTrue();
 
-        // Feature with active date range
-        $featureActive = FeatureFlag::factory()->create([
-            'starts_at' => now()->subDays(5),
-            'ends_at'   => now()->addDays(5),
-        ]);
-        $this->assertTrue($featureActive->isWithinDateRange());
-    }
+    $featureMatching = FeatureFlag::factory()->environment([$currentEnv])->create();
+    expect($featureMatching->isCompatibleWithEnvironment())->toBeTrue();
 
-    public function test_is_compatible_with_environment_method(): void
-    {
-        // Set test environment
-        $currentEnv = 'testing';
-        app()->detectEnvironment(fn () => $currentEnv);
+    $featureNonMatching = FeatureFlag::factory()->environment(['production'])->create();
+    expect($featureNonMatching->isCompatibleWithEnvironment())->toBeFalse();
 
-        // Feature not environment-specific
-        $featureNonEnv = FeatureFlag::factory()->global()->create();
-        $this->assertTrue($featureNonEnv->isCompatibleWithEnvironment());
+    $featureMultiple = FeatureFlag::factory()->environment(['production', $currentEnv, 'staging'])->create();
+    expect($featureMultiple->isCompatibleWithEnvironment())->toBeTrue();
+});
+test('get pennant name method', function () {
+    $featureName = 'custom_feature_name';
+    $feature     = FeatureFlag::factory()->create(['feature_name' => $featureName]);
 
-        // Feature with matching environment
-        $featureMatching = FeatureFlag::factory()->environment([$currentEnv])->create();
-        $this->assertTrue($featureMatching->isCompatibleWithEnvironment());
-
-        // Feature with non-matching environment
-        $featureNonMatching = FeatureFlag::factory()->environment(['production'])->create();
-        $this->assertFalse($featureNonMatching->isCompatibleWithEnvironment());
-
-        // Feature with multiple environments including current
-        $featureMultiple = FeatureFlag::factory()->environment(['production', $currentEnv, 'staging'])->create();
-        $this->assertTrue($featureMultiple->isCompatibleWithEnvironment());
-    }
-
-    public function test_get_pennant_name_method(): void
-    {
-        $featureName = 'custom_feature_name';
-        $feature     = FeatureFlag::factory()->create(['feature_name' => $featureName]);
-
-        $this->assertEquals($featureName, $feature->getPennantName());
-    }
-}
+    expect($feature->getPennantName())->toEqual($featureName);
+});
