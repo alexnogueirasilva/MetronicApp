@@ -50,7 +50,7 @@ class TenantRateLimiter
         $this->limiter->hit($key, $decaySeconds);
 
         /** @var int $attempts */
-        $attempts = $this->limiter->attempts($key);
+        $attempts = toInteger($this->limiter->attempts($key));
 
         /** @var SymfonyResponse $response */
         $response = $next($request);
@@ -110,9 +110,8 @@ class TenantRateLimiter
     protected function calculateRemainingAttempts(string $key, int $maxAttempts, ?int $attempts = null): int
     {
         if ($attempts === null) {
-            /** @var int $limiterAttempts */
-            $limiterAttempts = $this->limiter->attempts($key);
-            $attempts        = $limiterAttempts;
+            // Garantir que o valor retornado por attempts() seja um inteiro
+            $attempts = toInteger($this->limiter->attempts($key));
         }
 
         return $maxAttempts - $attempts;
@@ -139,7 +138,7 @@ class TenantRateLimiter
         return $this->addHeaders(
             $response,
             $maxAttempts,
-            $this->calculateRemainingAttempts($key, $maxAttempts)
+            $this->calculateRemainingAttempts($key, $maxAttempts, toInteger($this->limiter->attempts($key)))
         );
     }
 
