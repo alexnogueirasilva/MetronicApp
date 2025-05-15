@@ -2,11 +2,11 @@
 
 namespace App\Http\Middleware\Auth;
 
+use App\Events\ImpersonationActionPerformed;
 use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use OwenIt\Auditing\Models\Audit;
 use Symfony\Component\HttpFoundation\Response;
 
 class ImpersonationMiddleware
@@ -52,24 +52,15 @@ class ImpersonationMiddleware
                 'impersonation_id' => $impersonation->id,
             ]);
 
-            // Registrar a ação no log de auditoria
-            Audit::create([
-                'user_type'      => $user::class,
-                'user_id'        => $user->id,
-                'event'          => 'impersonated-action',
-                'auditable_type' => $user::class,
-                'auditable_id'   => $user->id,
-                'old_values'     => [],
-                'new_values'     => [
-                    'impersonator_id'  => $impersonation->impersonator_id,
-                    'impersonation_id' => $impersonation->id,
-                    'action'           => $request->method(),
-                    'url'              => $request->fullUrl(),
-                    'ip'               => $request->ip(),
-                ],
-                'ip_address' => $request->ip(),
-                'user_agent' => $request->userAgent(),
-            ]);
+            // Disparar evento para auditoria assíncrona
+            event(new ImpersonationActionPerformed(
+                user: $user,
+                impersonation: $impersonation,
+                action: $request->method(),
+                url: $request->fullUrl(),
+                ip: (string) $request->ip(),
+                userAgent: $request->userAgent()
+            ));
         }
 
         return $next($request);

@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\{Builder, Model};
+use Illuminate\Database\Eloquent\{Builder, Concerns\HasUlids, Model};
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\{Carbon, Str};
 use OwenIt\Auditing\Auditable as AuditableTrait;
 use OwenIt\Auditing\Contracts\Auditable;
 
 /**
- * @property int $id
- * @property int $impersonator_id
- * @property int $impersonated_id
+ * @property string $id
+ * @property string $impersonator_id
+ * @property string $impersonated_id
  * @property ?Carbon $ended_at
  * @property Carbon $created_at
  * @property Carbon $updated_at
@@ -21,6 +21,14 @@ use OwenIt\Auditing\Contracts\Auditable;
 class Impersonation extends Model implements Auditable
 {
     use AuditableTrait;
+    use HasUlids;
+
+    /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = false;
 
     /**
      * The attributes that aren't mass assignable.
@@ -30,6 +38,20 @@ class Impersonation extends Model implements Auditable
     protected $guarded = [];
 
     /**
+     * The primary key for the model.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'id';
+
+    /**
+     * The "type" of the primary key ID.
+     *
+     * @var string
+     */
+    protected $keyType = 'string';
+
+    /**
      * The attributes that should be cast.
      *
      * @var array<string, string>
@@ -37,6 +59,20 @@ class Impersonation extends Model implements Auditable
     protected $casts = [
         'ended_at' => 'datetime',
     ];
+
+    /**
+     * Boot function from Laravel.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function (Impersonation $model): void {
+            if (empty($model->{$model->getKeyName()})) {
+                $model->{$model->getKeyName()} = (string) Str::ulid();
+            }
+        });
+    }
 
     /**
      * Get the impersonator user.
