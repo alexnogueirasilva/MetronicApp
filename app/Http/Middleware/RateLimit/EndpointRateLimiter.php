@@ -200,8 +200,8 @@ class EndpointRateLimiter
      */
     protected function calculateRemainingAttempts(string $key, int $maxAttempts): int
     {
-        /** @var int $attempts */
-        $attempts = $this->limiter->attempts($key);
+        // Garantir que o valor retornado por attempts() seja um inteiro
+        $attempts = toInteger($this->limiter->attempts($key));
 
         return $maxAttempts - $attempts;
     }
