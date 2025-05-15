@@ -8,11 +8,13 @@ use App\Models\Traits\HasRole;
 use Database\Factories\UserFactory;
 use DevactionLabs\FilterablePackage\Traits\Filterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\{BelongsTo, BelongsToMany};
+use Illuminate\Database\Eloquent\Relations\{BelongsTo, BelongsToMany, HasMany};
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\{Carbon};
 use Laravel\Sanctum\HasApiTokens;
+use OwenIt\Auditing\Auditable as AuditableTrait;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * @property string $id
@@ -30,8 +32,10 @@ use Laravel\Sanctum\HasApiTokens;
  * @property Carbon $updated_at
  * @property-read ?Tenant $tenant
  * @property-read FeatureFlag[] $featureFlags
+ * @property-read Impersonation[] $impersonations
+ * @property-read Impersonation[] $beingImpersonated
  */
-class User extends Authenticatable
+class User extends Authenticatable implements Auditable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory;
@@ -39,6 +43,7 @@ class User extends Authenticatable
     use HasApiTokens;
     use HasRole;
     use Filterable;
+    use AuditableTrait;
 
     /**
      * The attributes that should be hidden for serialization.
@@ -99,8 +104,71 @@ class User extends Authenticatable
     {
         return "user:{$this->id}:ratelimit";
     }
+
     /**
-     * Get the attributes that should be cast.
+     * Get impersonations started by this user.
+     *
+     * @return HasMany<Impersonation, User>
+     */
+    public function impersonations(): HasMany
+    {
+        /** @var HasMany<Impersonation, User> */
+        return $this->hasMany(Impersonation::class, 'impersonator_id');
+    }
+
+    /**
+     * Get impersonations where this user is being impersonated.
+     *
+     * @return HasMany<Impersonation, User>
+     */
+    public function beingImpersonated(): HasMany
+    {
+        /** @var HasMany<Impersonation, User> */
+        return $this->hasMany(Impersonation::class, 'impersonated_id');
+    }
+
+    /**
+     * Check if this user is currently impersonating another user.
+     */
+    public function isImpersonating(): bool
+    {
+        return $this->impersonations()->active()->exists();
+    }
+
+    /**
+     * Get the current active impersonation.
+     */
+    public function activeImpersonation(): ?Impersonation
+    {
+        return $this->impersonations()->active()->first();
+    }
+
+    /**
+     * Check if this user is currently being impersonated.
+     */
+    public function isBeingImpersonated(): bool
+    {
+        return $this->beingImpersonated()->active()->exists();
+    }
+
+    /**
+     * Get the current active impersonation where this user is being impersonated.
+     */
+    public function activeBeingImpersonated(): ?Impersonation
+    {
+        return $this->beingImpersonated()->active()->first();
+    }
+
+    /**
+     * Check if this user is an admin (based on role).
+     */
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('admin');
+    }
+
+    /**
+     * The attributes that should be cast.
      *
      * @return array<string, string>
      */
@@ -113,5 +181,4 @@ class User extends Authenticatable
             'totp_verified'     => 'bool',
         ];
     }
-
 }

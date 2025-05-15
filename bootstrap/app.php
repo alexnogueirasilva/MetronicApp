@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 
 use App\Exceptions\CustomNotFoundException;
-use App\Http\Middleware\Auth\EnsureTotpVerified;
+use App\Http\Middleware\Auth\{EnsureTotpVerified};
 use App\Http\Middleware\RateLimit\{EndpointRateLimiter, TenantRateLimiter};
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
