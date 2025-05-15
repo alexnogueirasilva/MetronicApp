@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <filter id="drop-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="2" dy="2" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.2"/>
+      </feComponentTransfer>
+      <feMerge> 
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/> 
+      </feMerge>
+    </filter>
+  </defs>
+  <style>
+    text { font-family: Arial, sans-serif; }
+    .title { font-size: 24px; font-weight: bold; fill: #333; }
+    .subtitle { font-size: 16px; fill: #555; }
+    .module { font-size: 14px; font-weight: bold; fill: white; }
+    .group-title { font-size: 16px; font-weight: bold; fill: #333; }
+    .feature { font-size: 12px; fill: #333; }
+    .code { font-family: "Courier New", monospace; font-size: 11px; fill: #555; }
+  </style>
+  
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f8f9fa" rx="10" ry="10"/>
+  
+  <!-- Title -->
+  <text x="400" y="40" text-anchor="middle" class="title">Sistema de Feature Flags Avançado</text>
+  <text x="400" y="65" text-anchor="middle" class="subtitle">Usando Laravel Pennant com extensões personalizadas</text>
+  
+  <!-- Flag Types Box -->
+  <rect x="40" y="90" width="350" height="220" rx="8" ry="8" fill="#fff" stroke="#ddd" stroke-width="1"/>
+  <text x="215" y="110" text-anchor="middle" class="group-title">Tipos de Feature Flags</text>
+  
+  <!-- Flag Types -->
+  <rect x="60" y="125" width="140" height="30" rx="4" ry="4" fill="#4a6bff" filter="url(#drop-shadow)"/>
+  <text x="130" y="145" text-anchor="middle" fill="white">Global</text>
+  
+  <rect x="60" y="165" width="140" height="30" rx="4" ry="4" fill="#ff4a6b" filter="url(#drop-shadow)"/>
+  <text x="130" y="185" text-anchor="middle" fill="white">Por Tenant</text>
+  
+  <rect x="60" y="205" width="140" height="30" rx="4" ry="4" fill="#4aff6b" filter="url(#drop-shadow)"/>
+  <text x="130" y="225" text-anchor="middle" fill="white">Por Usuário</text>
+  
+  <rect x="60" y="245" width="140" height="30" rx="4" ry="4" fill="#ff9f4a" filter="url(#drop-shadow)"/>
+  <text x="130" y="265" text-anchor="middle" fill="white">Porcentagem</text>
+  
+  <rect x="230" y="125" width="140" height="30" rx="4" ry="4" fill="#9f4aff" filter="url(#drop-shadow)"/>
+  <text x="300" y="145" text-anchor="middle" fill="white">Período</text>
+  
+  <rect x="230" y="165" width="140" height="30" rx="4" ry="4" fill="#4a9fff" filter="url(#drop-shadow)"/>
+  <text x="300" y="185" text-anchor="middle" fill="white">Ambiente</text>
+  
+  <rect x="230" y="205" width="140" height="30" rx="4" ry="4" fill="#ff4acf" filter="url(#drop-shadow)"/>
+  <text x="300" y="225" text-anchor="middle" fill="white">Teste A/B</text>
+  
+  <!-- Architecture Box -->
+  <rect x="410" y="90" width="350" height="220" rx="8" ry="8" fill="#fff" stroke="#ddd" stroke-width="1"/>
+  <text x="585" y="110" text-anchor="middle" class="group-title">Arquitetura</text>
+  
+  <!-- Architecture Flow -->
+  <rect x="430" y="130" width="310" height="40" rx="5" ry="5" fill="#efefff" stroke="#4a6bff" stroke-width="1"/>
+  <text x="585" y="155" text-anchor="middle">Pennant Core (Laravel Feature Flag System)</text>
+  
+  <polygon points="585,180 580,170 590,170" fill="#555"/>
+  <line x1="585" y1="170" x2="585" y2="180" stroke="#555" stroke-width="1"/>
+  
+  <rect x="430" y="190" width="310" height="40" rx="5" ry="5" fill="#efefff" stroke="#4a6bff" stroke-width="1"/>
+  <text x="585" y="215" text-anchor="middle">Extended Feature Flag Manager</text>
+  
+  <polygon points="585,240 580,230 590,230" fill="#555"/>
+  <line x1="585" y1="230" x2="585" y2="240" stroke="#555" stroke-width="1"/>
+  
+  <rect x="430" y="250" width="140" height="40" rx="5" ry="5" fill="#efefff" stroke="#4a6bff" stroke-width="1"/>
+  <text x="500" y="275" text-anchor="middle">Actions</text>
+  
+  <rect x="600" y="250" width="140" height="40" rx="5" ry="5" fill="#efefff" stroke="#4a6bff" stroke-width="1"/>
+  <text x="670" y="275" text-anchor="middle">Models</text>
+  
+  <!-- Usage Example Box -->
+  <rect x="40" y="330" width="720" height="160" rx="8" ry="8" fill="#fff" stroke="#ddd" stroke-width="1"/>
+  <text x="400" y="350" text-anchor="middle" class="group-title">Exemplos de Uso</text>
+  
+  <!-- Code Examples -->
+  <rect x="60" y="370" width="340" height="100" rx="4" ry="4" fill="#f5f5f5" stroke="#ddd" stroke-width="1"/>
+  <text x="70" y="385" class="code">// Criar feature flag</text>
+  <text x="70" y="400" class="code">$flagAction->createPerTenant(</text>
+  <text x="70" y="415" class="code">    key: 'premium-features',</text>
+  <text x="70" y="430" class="code">    name: 'Recursos Premium',</text>
+  <text x="70" y="445" class="code">    defaultValue: false</text>
+  <text x="70" y="460" class="code">);</text>
+  
+  <rect x="410" y="370" width="340" height="100" rx="4" ry="4" fill="#f5f5f5" stroke="#ddd" stroke-width="1"/>
+  <text x="420" y="385" class="code">// Verificar se feature está ativa</text>
+  <text x="420" y="400" class="code">if (Feature::for($tenant)->active('premium-features')) {</text>
+  <text x="420" y="415" class="code">    // Mostrar recursos premium</text>
+  <text x="420" y="430" class="code">}</text>
+  <text x="420" y="445" class="code"></text>
+  <text x="420" y="460" class="code">// Template: @feature('new-feature') ... @endfeature</text>
+  
+  <!-- Database Schema Box -->
+  <rect x="40" y="510" width="720" height="70" rx="8" ry="8" fill="#fff" stroke="#ddd" stroke-width="1"/>
+  <text x="400" y="530" text-anchor="middle" class="group-title">Tabelas do Banco de Dados</text>
+  
+  <!-- Database Tables -->
+  <rect x="60" y="545" width="205" height="25" rx="3" ry="3" fill="#eee" stroke="#ccc" stroke-width="1"/>
+  <text x="162" y="562" text-anchor="middle">feature_flags</text>
+  
+  <rect x="280" y="545" width="205" height="25" rx="3" ry="3" fill="#eee" stroke="#ccc" stroke-width="1"/>
+  <text x="382" y="562" text-anchor="middle">feature_flag_tenant</text>
+  
+  <rect x="500" y="545" width="205" height="25" rx="3" ry="3" fill="#eee" stroke="#ccc" stroke-width="1"/>
+  <text x="602" y="562" text-anchor="middle">feature_flag_user</text>
+</svg>

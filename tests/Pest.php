@@ -1,6 +1,8 @@
 <?php declare(strict_types = 1);
 
+use App\Models\{FeatureFlag, Tenant, User};
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Pennant\Feature;
 use Tests\TestCase;
 
 /*
@@ -17,6 +19,101 @@ use Tests\TestCase;
 pest()->extend(TestCase::class)
   ->use(RefreshDatabase::class)
     ->in('Feature', 'Unit');
+
+function createUserWithTenant(): User
+{
+    $tenant = Tenant::factory()->create();
+
+    return User::factory()->create(['tenant_id' => $tenant->id]);
+}
+
+function createGlobalFeature(
+    string $featureName = null,
+    bool $defaultValue = true,
+    bool $isActive = true
+): FeatureFlag {
+    return FeatureFlag::factory()->global($defaultValue)->create([
+        'feature_name' => $featureName ?? 'feature_' . uniqid('', true),
+        'is_active'    => $isActive,
+    ]);
+}
+
+function createTenantFeature(
+    string $featureName = null,
+    bool $defaultValue = false,
+    bool $isActive = true
+): FeatureFlag {
+    return FeatureFlag::factory()->perTenant($defaultValue)->create([
+        'feature_name' => $featureName ?? 'tenant_feature_' . uniqid('', true),
+        'is_active'    => $isActive,
+    ]);
+}
+
+function createUserFeature(
+    string $featureName = null,
+    bool $defaultValue = false,
+    bool $isActive = true
+): FeatureFlag {
+    return FeatureFlag::factory()->perUser($defaultValue)->create([
+        'feature_name' => $featureName ?? 'user_feature_' . uniqid('', true),
+        'is_active'    => $isActive,
+    ]);
+}
+
+function createPercentageFeature(
+    int $percentage = 50,
+    string $featureName = null,
+    bool $defaultValue = false,
+    bool $isActive = true
+): FeatureFlag {
+    return FeatureFlag::factory()->percentage($percentage)->create([
+        'feature_name'  => $featureName ?? 'percentage_feature_' . uniqid('', true),
+        'default_value' => $defaultValue,
+        'is_active'     => $isActive,
+    ]);
+}
+
+function createABTestFeature(
+    array $variants = null,
+    string $defaultVariant = null,
+    string $featureName = null,
+    bool $isActive = true
+): FeatureFlag {
+    return FeatureFlag::factory()->abTest($variants, $defaultVariant)->create([
+        'feature_name' => $featureName ?? 'ab_test_feature_' . uniqid('', true),
+        'is_active'    => $isActive,
+    ]);
+}
+
+function setFeatureForTenant(
+    FeatureFlag $feature,
+    Tenant $tenant,
+    bool $value = true,
+    DateTimeInterface $expiresAt = null
+): void {
+    $feature->tenants()->attach($tenant, [
+        'value'      => $value,
+        'expires_at' => $expiresAt,
+    ]);
+
+    // Set the flag in Pennant too
+    Feature::for($tenant)->activate($feature->feature_name, $value);
+}
+
+function setFeatureForUser(
+    FeatureFlag $feature,
+    User $user,
+    bool $value = true,
+    DateTimeInterface $expiresAt = null
+): void {
+    $feature->users()->attach($user, [
+        'value'      => $value,
+        'expires_at' => $expiresAt,
+    ]);
+
+    // Set the flag in Pennant too
+    Feature::for($user)->activate($feature->feature_name, $value);
+}
 
 /*
 |--------------------------------------------------------------------------

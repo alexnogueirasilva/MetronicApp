@@ -7,6 +7,79 @@
 [![Redis](https://img.shields.io/badge/Redis-Support-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io)
 [![PestPHP](https://img.shields.io/badge/PestPHP-3.8-8A2BE2?style=for-the-badge&logo=php&logoColor=white)](https://pestphp.com)
 
+<p align="center">
+  <img src="./public/img/overview/architecture.svg" alt="MetronicApp Architecture" width="800">
+</p>
+
+## 📊 Análise Técnica do Projeto
+
+### Visão Geral da Arquitetura
+O MetronicApp é um boilerplate avançado para APIs RESTful em Laravel, seguindo uma arquitetura moderna com camadas bem definidas e componentes isolados. O sistema utiliza padrões como Actions, DTOs, e Resources para manter o código limpo e testável.
+
+### Sistema de Rate Limiting Avançado
+O projeto implementa um sistema sofisticado de rate limiting através de dois middlewares principais:
+
+#### EndpointRateLimiter
+- Aplica limites específicos por tipo de endpoint
+- Define multiplicadores para endpoints sensíveis (login: 0.2x o limite normal)
+- Adapta o tempo de decaimento conforme a sensibilidade
+- Usa pattern matching para identificar tipos de endpoints
+- Adiciona cabeçalhos de rate limit nas respostas HTTP
+
+#### TenantRateLimiter
+- Gerencia limites baseados no plano de assinatura do tenant
+- Permite configuração de limites personalizados
+- Ignora limites para tenants com plano ilimitado
+- Implementa limites para usuários anônimos baseados em IP
+
+### Sistema de Autenticação Multi-método
+O sistema oferece múltiplos métodos de autenticação com alta segurança:
+
+#### Login Tradicional
+- Autenticação com email/senha
+- Tokens API via Laravel Sanctum
+
+#### OTP (One-Time Password)
+- Códigos numéricos de 6 dígitos
+- Envio por email via filas prioritárias
+- Expiração em 10 minutos
+- Verificação de uso único
+
+#### Magic Links
+- Login sem senha via links seguros
+- Tokens com expiração
+- Envio por email
+
+#### TOTP (Time-based OTP)
+- Implementação de 2FA com biblioteca spomky-labs/otphp
+- QR codes para Google Authenticator/Authy
+- Middleware EnsureTotpVerified para rotas protegidas
+
+### Sistema de Controle de Acesso (RBAC)
+- Modelo Role com relacionamento many-to-many com Permission
+- Trait HasRole para gerenciar permissões
+- Cache otimizado para verificações
+- Observer para manter o sistema de cache atualizado
+- Controllers para gerenciamento de roles e permissões
+
+### Multi-tenancy
+- Associação de usuários a um tenant (relação one-to-many)
+- Planos de assinatura via enum PlanType
+- Limites de API baseados no plano
+- Configurações específicas por tenant
+- Funcionalidades como períodos de trial
+
+### Geolocalização
+- Serviço que consulta o ip-api.com para obter localização
+- DTO imutável com propriedades ip, city e country
+- Tratamento de erros e valores inválidos
+- Timeout configurado para evitar atrasos
+
+### Sistema de Filas com Horizon
+- Filas separadas por domínio (auth, notificações, processamento)
+- Supervisores dedicados para cada tipo de tarefa
+- Monitoramento e métricas via dashboard
+
 ## 🚀 Visão Geral
 
 MetronicApp é um boilerplate completo para desenvolvimento de APIs RESTful com Laravel. Focado em alta performance, segurança e escalabilidade, ele fornece uma estrutura de base sólida para projetos profissionais.
