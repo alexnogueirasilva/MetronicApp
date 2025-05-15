@@ -1,106 +1,87 @@
 <?php declare(strict_types = 1);
-
-namespace Tests\Unit\Models;
-
 use App\Enums\PlanType;
 use App\Models\{Tenant, User};
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
-class TenantTest extends TestCase
-{
-    use RefreshDatabase;
+uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-    public function test_tenant_has_users_relationship(): void
-    {
-        // Criar tenant e usuários associados
-        $tenant = Tenant::factory()->create();
-        $users  = User::factory()->count(3)->create(['tenant_id' => $tenant->id]);
+test('tenant has users relationship', function () {
+    // Criar tenant e usuários associados
+    $tenant = Tenant::factory()->create();
+    $users  = User::factory()->count(3)->create(['tenant_id' => $tenant->id]);
 
-        // Verificar que a relação está funcionando
-        $this->assertCount(3, $tenant->users);
-        $this->assertInstanceOf(User::class, $tenant->users->first());
-    }
+    // Verificar que a relação está funcionando
+    expect($tenant->users)->toHaveCount(3);
+    expect($tenant->users->first())->toBeInstanceOf(User::class);
+});
+test('on trial returns correct value', function () {
+    // Tenant sem data de trial
+    $noTrialTenant = Tenant::factory()->create(['trial_ends_at' => null]);
+    expect($noTrialTenant->onTrial())->toBeFalse();
 
-    public function test_on_trial_returns_correct_value(): void
-    {
-        // Tenant sem data de trial
-        $noTrialTenant = Tenant::factory()->create(['trial_ends_at' => null]);
-        $this->assertFalse($noTrialTenant->onTrial());
+    // Tenant com trial expirado
+    $expiredTrialTenant = Tenant::factory()->create([
+        'trial_ends_at' => now()->subDays(1),
+    ]);
+    expect($expiredTrialTenant->onTrial())->toBeFalse();
 
-        // Tenant com trial expirado
-        $expiredTrialTenant = Tenant::factory()->create([
-            'trial_ends_at' => now()->subDays(1),
-        ]);
-        $this->assertFalse($expiredTrialTenant->onTrial());
+    // Tenant com trial ativo
+    $activeTrialTenant = Tenant::factory()->create([
+        'trial_ends_at' => now()->addDays(10),
+    ]);
+    expect($activeTrialTenant->onTrial())->toBeTrue();
+});
+test('get rate limit per minute', function () {
+    // Tenant com plano FREE sem limite personalizado
+    $freeTenant = Tenant::factory()->create(['plan' => PlanType::FREE]);
+    expect($freeTenant->getRateLimitPerMinute())->toEqual(30);
 
-        // Tenant com trial ativo
-        $activeTrialTenant = Tenant::factory()->create([
-            'trial_ends_at' => now()->addDays(10),
-        ]);
-        $this->assertTrue($activeTrialTenant->onTrial());
-    }
+    // Tenant com plano PROFESSIONAL sem limite personalizado
+    $proTenant = Tenant::factory()->create(['plan' => PlanType::PROFESSIONAL]);
+    expect($proTenant->getRateLimitPerMinute())->toEqual(300);
 
-    public function test_get_rate_limit_per_minute(): void
-    {
-        // Tenant com plano FREE sem limite personalizado
-        $freeTenant = Tenant::factory()->create(['plan' => PlanType::FREE]);
-        $this->assertEquals(30, $freeTenant->getRateLimitPerMinute());
+    // Tenant com limite personalizado
+    $customTenant = Tenant::factory()->create([
+        'plan'     => PlanType::BASIC,
+        'settings' => ['custom_rate_limit' => 100],
+    ]);
+    expect($customTenant->getRateLimitPerMinute())->toEqual(100);
+});
+test('get max concurrent requests', function () {
+    // Tenant com plano FREE sem limite personalizado
+    $freeTenant = Tenant::factory()->create(['plan' => PlanType::FREE]);
+    expect($freeTenant->getMaxConcurrentRequests())->toEqual(5);
 
-        // Tenant com plano PROFESSIONAL sem limite personalizado
-        $proTenant = Tenant::factory()->create(['plan' => PlanType::PROFESSIONAL]);
-        $this->assertEquals(300, $proTenant->getRateLimitPerMinute());
+    // Tenant com plano ENTERPRISE sem limite personalizado
+    $enterpriseTenant = Tenant::factory()->create(['plan' => PlanType::ENTERPRISE]);
+    expect($enterpriseTenant->getMaxConcurrentRequests())->toEqual(50);
 
-        // Tenant com limite personalizado
-        $customTenant = Tenant::factory()->create([
-            'plan'     => PlanType::BASIC,
-            'settings' => ['custom_rate_limit' => 100],
-        ]);
-        $this->assertEquals(100, $customTenant->getRateLimitPerMinute());
-    }
+    // Tenant com limite personalizado
+    $customTenant = Tenant::factory()->create([
+        'plan'     => PlanType::BASIC,
+        'settings' => ['max_concurrent_requests' => 25],
+    ]);
+    expect($customTenant->getMaxConcurrentRequests())->toEqual(25);
+});
+test('get rate limit cache key', function () {
+    $tenant = Tenant::factory()->create(['id' => 123]);
+    expect($tenant->getRateLimitCacheKey())->toEqual('tenant:123:ratelimit');
+});
+test('tenant casts attributes correctly', function () {
+    $tenant = Tenant::factory()->create([
+        'is_active'     => 1,
+        'plan'          => PlanType::BASIC,
+        'settings'      => ['foo' => 'bar'],
+        'trial_ends_at' => '2023-12-31 23:59:59',
+    ]);
 
-    public function test_get_max_concurrent_requests(): void
-    {
-        // Tenant com plano FREE sem limite personalizado
-        $freeTenant = Tenant::factory()->create(['plan' => PlanType::FREE]);
-        $this->assertEquals(5, $freeTenant->getMaxConcurrentRequests());
+    expect($tenant->is_active)->toBeBool();
+    expect($tenant->is_active)->toBeTrue();
 
-        // Tenant com plano ENTERPRISE sem limite personalizado
-        $enterpriseTenant = Tenant::factory()->create(['plan' => PlanType::ENTERPRISE]);
-        $this->assertEquals(50, $enterpriseTenant->getMaxConcurrentRequests());
+    expect($tenant->plan)->toBeInstanceOf(PlanType::class);
+    expect($tenant->plan)->toEqual(PlanType::BASIC);
 
-        // Tenant com limite personalizado
-        $customTenant = Tenant::factory()->create([
-            'plan'     => PlanType::BASIC,
-            'settings' => ['max_concurrent_requests' => 25],
-        ]);
-        $this->assertEquals(25, $customTenant->getMaxConcurrentRequests());
-    }
+    expect($tenant->settings)->toBeArray();
+    expect($tenant->settings['foo'])->toEqual('bar');
 
-    public function test_get_rate_limit_cache_key(): void
-    {
-        $tenant = Tenant::factory()->create(['id' => 123]);
-        $this->assertEquals('tenant:123:ratelimit', $tenant->getRateLimitCacheKey());
-    }
-
-    public function test_tenant_casts_attributes_correctly(): void
-    {
-        $tenant = Tenant::factory()->create([
-            'is_active'     => 1,
-            'plan'          => PlanType::BASIC,
-            'settings'      => ['foo' => 'bar'],
-            'trial_ends_at' => '2023-12-31 23:59:59',
-        ]);
-
-        $this->assertIsBool($tenant->is_active);
-        $this->assertTrue($tenant->is_active);
-
-        $this->assertInstanceOf(PlanType::class, $tenant->plan);
-        $this->assertEquals(PlanType::BASIC, $tenant->plan);
-
-        $this->assertIsArray($tenant->settings);
-        $this->assertEquals('bar', $tenant->settings['foo']);
-
-        $this->assertInstanceOf(\Carbon\CarbonImmutable::class, $tenant->trial_ends_at);
-    }
-}
+    expect($tenant->trial_ends_at)->toBeInstanceOf(\Carbon\CarbonImmutable::class);
+});

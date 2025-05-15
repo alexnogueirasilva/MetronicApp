@@ -49,8 +49,7 @@ class TenantRateLimiter
 
         $this->limiter->hit($key, $decaySeconds);
 
-        /** @var int $attempts */
-        $attempts = $this->limiter->attempts($key);
+        $attempts = toInteger($this->limiter->attempts($key));
 
         /** @var SymfonyResponse $response */
         $response = $next($request);

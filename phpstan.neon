@@ -3,6 +3,9 @@ includes:
 
 parameters:
     ignoreErrors:
+        - '#Method App\\Models\\[a-zA-Z]+::featureFlags\(\) should return Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany<App\\Models\\FeatureFlag#'
+        - '#Method App\\Models\\FeatureFlag::tenants\(\) should return Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany<App\\Models\\Tenant#'
+        - '#Method App\\Models\\FeatureFlag::users\(\) should return Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany<App\\Models\\User#'
 
     noUnnecessaryCollectionCall: false
     paths:

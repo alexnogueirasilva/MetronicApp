@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\{AuthMeController,
     OtpController,
     ResetPasswordController};
 use App\Http\Controllers\TenantController;
+use App\Http\Controllers\User\UserController;
 use Illuminate\Support\Facades\Route;
 use Infinitypaul\Idempotency\Middleware\EnsureIdempotency;
 
@@ -41,6 +42,12 @@ Route::middleware(['endpoint.ratelimit'])->group(static function (): void {
 
     Route::middleware(['auth:sanctum', 'totp.verify', 'tenant.ratelimit', EnsureIdempotency::class])->group(static function (): void {
         Route::apiResource('tenant', TenantController::class);
+
+        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
+        Route::post('/users', [UserController::class, 'store'])->name('users.store');
+        Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 
         Route::group([
             'prefix' => 'acl',
