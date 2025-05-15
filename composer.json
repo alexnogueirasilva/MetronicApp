@@ -23,6 +23,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
         "league/flysystem-aws-s3-v3": "^3.29",
+        "owen-it/laravel-auditing": "^14.0",
         "scalar/laravel": "^0.2.0",
         "spomky-labs/otphp": "^11.3"
     },

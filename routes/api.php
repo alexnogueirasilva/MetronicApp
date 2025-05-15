@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\{AuthMeController,
     ConfirmTotpController,
     DisableOtpController,
     ForgotPasswordController,
+    ImpersonationController,
     LoginController,
     LogoutController,
     MagicLinkController,
@@ -38,6 +39,12 @@ Route::middleware(['endpoint.ratelimit'])->group(static function (): void {
         Route::post('/otp/totp/confirm', ConfirmTotpController::class)->name('otp.totp.confirm')->middleware('auth:sanctum');
         Route::post('/otp/disable', DisableOtpController::class)->name('otp.disable')->middleware('auth:sanctum');
 
+        // Rotas de impersonation
+        Route::middleware(['auth:sanctum', 'totp.verify'])->group(function (): void {
+            Route::post('/impersonate/stop', [ImpersonationController::class, 'stop'])->name('impersonate.stop');
+            Route::get('/impersonate/history', [ImpersonationController::class, 'history'])->name('impersonate.history');
+            Route::post('/impersonate/{user}', [ImpersonationController::class, 'start'])->name('impersonate.start');
+        });
     });
 
     Route::middleware(['auth:sanctum', 'totp.verify', 'tenant.ratelimit', EnsureIdempotency::class])->group(static function (): void {
