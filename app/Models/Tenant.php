@@ -7,7 +7,7 @@ use Database\Factories\TenantFactory;
 use DevactionLabs\FilterablePackage\Traits\Filterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\{BelongsToMany, HasMany};
 use Illuminate\Support\Carbon;
 
 /**
@@ -21,6 +21,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property-read User[] $users
+ * @property-read FeatureFlag[] $featureFlags
  *
  * @method static TenantFactory factory(...$parameters)
  */
@@ -40,6 +41,17 @@ class Tenant extends Model
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
+    }
+
+    /**
+     * Get the feature flags associated with this tenant.
+     *
+     * @return BelongsToMany<FeatureFlag>
+     */
+    // @phpstan-ignore-next-line
+    public function featureFlags(): BelongsToMany
+    {
+        return $this->belongsToMany(FeatureFlag::class)->withPivot('value', 'expires_at');
     }
 
     /**

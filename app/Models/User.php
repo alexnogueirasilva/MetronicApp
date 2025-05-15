@@ -29,6 +29,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property-read ?Tenant $tenant
+ * @property-read FeatureFlag[] $featureFlags
  */
 class User extends Authenticatable
 {
@@ -66,6 +67,17 @@ class User extends Authenticatable
     {
         /** @var BelongsTo<Tenant, User> */
         return $this->belongsTo(Tenant::class);
+    }
+
+    /**
+     * Get the feature flags associated with this user.
+     *
+     * @return BelongsToMany<FeatureFlag>
+     */
+    // @phpstan-ignore-next-line
+    public function featureFlags(): BelongsToMany
+    {
+        return $this->belongsToMany(FeatureFlag::class)->withPivot('value', 'expires_at');
     }
 
     /**
