@@ -15,7 +15,10 @@ class LoginAction
     {
         $user = User::query()->where('email', $dto->email)->firstOrFail();
 
-        if (!Hash::check($dto->password, $user->password)) {
+        // Ensure password is a string
+        $password = $user->password ?? '';
+
+        if (!Hash::check($dto->password, $password)) {
             return response()->json(['message' => 'The provided credentials are incorrect.'], Response::HTTP_UNAUTHORIZED);
         }
 
