@@ -1,4 +1,5 @@
-<?php declare(strict_types = 1);
+<?php
+declare(strict_types = 1);
 
 namespace App\Models;
 
@@ -39,13 +40,13 @@ use OwenIt\Auditing\Contracts\Auditable;
  */
 class User extends Authenticatable implements Auditable
 {
+    use AuditableTrait;
+    use Filterable;
+    use HasApiTokens;
     /** @use HasFactory<UserFactory> */
     use HasFactory;
-    use Notifiable;
-    use HasApiTokens;
     use HasRole;
-    use Filterable;
-    use AuditableTrait;
+    use Notifiable;
 
     /**
      * The attributes that should be hidden for serialization.
@@ -62,12 +63,11 @@ class User extends Authenticatable implements Auditable
     /**
      * Find or create a user based on OAuth data
      *
-     * @param array<string, string|null> $userData User data from OAuth provider
+     * @param  array<string, string|null>  $userData
      */
     public static function findOrCreateSocialUser(string $provider, string $providerId, array $userData): self
     {
-        // First try to find the user by provider and provider_id
-        $user = self::where('provider', $provider)
+        $user = self::query()->where('provider', $provider)
             ->where('provider_id', $providerId)
             ->first();
 
@@ -75,11 +75,9 @@ class User extends Authenticatable implements Auditable
             return $user;
         }
 
-        // Then try to find by email
-        $user = self::where('email', $userData['email'])->first();
+        $user = self::query()->where('email', $userData['email'])->first();
 
         if ($user) {
-            // Update user with provider information
             $user->update([
                 'provider'    => $provider,
                 'provider_id' => $providerId,
@@ -89,14 +87,13 @@ class User extends Authenticatable implements Auditable
             return $user;
         }
 
-        // Create a new user if not found
-        return self::create([
+        return self::query()->create([
             'name'              => $userData['name'],
             'email'             => $userData['email'],
             'avatar'            => $userData['avatar'] ?? null,
             'provider'          => $provider,
             'provider_id'       => $providerId,
-            'email_verified_at' => now(), // Email is verified by the provider
+            'email_verified_at' => now(),
         ]);
     }
 

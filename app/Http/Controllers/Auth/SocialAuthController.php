@@ -29,7 +29,6 @@ class SocialAuthController extends Controller
             return redirect()->back()->with('error', 'Provedor de autenticação inválido.');
         }
 
-        // API flow
         if (request()->expectsJson() || request()->is('api/*')) {
             $driver      = SocialiteHelper::getTypedDriver($provider)->stateless();
             $redirectUrl = $driver->redirect()->getTargetUrl();
@@ -42,7 +41,6 @@ class SocialAuthController extends Controller
             ]);
         }
 
-        // Web flow
         $driver      = SocialiteHelper::getTypedDriver($provider)->stateless();
         $redirectUrl = $driver->redirect()->getTargetUrl();
 
