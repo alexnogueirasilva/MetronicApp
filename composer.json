@@ -21,8 +21,10 @@
         "laravel/octane": "^2.9",
         "laravel/pennant": "^1.16",
         "laravel/sanctum": "^4.0",
+        "laravel/socialite": "^5.20",
         "laravel/tinker": "^2.10.1",
         "league/flysystem-aws-s3-v3": "^3.29",
+        "owen-it/laravel-auditing": "^14.0",
         "scalar/laravel": "^0.2.0",
         "spomky-labs/otphp": "^11.3"
     },

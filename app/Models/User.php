@@ -8,11 +8,13 @@ use App\Models\Traits\HasRole;
 use Database\Factories\UserFactory;
 use DevactionLabs\FilterablePackage\Traits\Filterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\{BelongsTo, BelongsToMany};
+use Illuminate\Database\Eloquent\Relations\{BelongsTo, BelongsToMany, HasMany};
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\{Carbon};
 use Laravel\Sanctum\HasApiTokens;
+use OwenIt\Auditing\Auditable as AuditableTrait;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * @property string $id
@@ -20,9 +22,11 @@ use Laravel\Sanctum\HasApiTokens;
  * @property string $name
  * @property string $email
  * @property string $avatar
- * @property string $password
+ * @property ?string $password
  * @property ?string $remember_token
  * @property ?Carbon $email_verified_at
+ * @property ?string $provider
+ * @property ?string $provider_id
  * @property ?string $totp_secret
  * @property ?string $otp_method
  * @property bool $totp_verified
@@ -30,8 +34,10 @@ use Laravel\Sanctum\HasApiTokens;
  * @property Carbon $updated_at
  * @property-read ?Tenant $tenant
  * @property-read FeatureFlag[] $featureFlags
+ * @property-read Impersonation[] $impersonations
+ * @property-read Impersonation[] $beingImpersonated
  */
-class User extends Authenticatable
+class User extends Authenticatable implements Auditable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory;
@@ -39,6 +45,7 @@ class User extends Authenticatable
     use HasApiTokens;
     use HasRole;
     use Filterable;
+    use AuditableTrait;
 
     /**
      * The attributes that should be hidden for serialization.
@@ -48,7 +55,50 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'provider',
+        'provider_id',
     ];
+
+    /**
+     * Find or create a user based on OAuth data
+     *
+     * @param array<string, string|null> $userData User data from OAuth provider
+     */
+    public static function findOrCreateSocialUser(string $provider, string $providerId, array $userData): self
+    {
+        // First try to find the user by provider and provider_id
+        $user = self::where('provider', $provider)
+            ->where('provider_id', $providerId)
+            ->first();
+
+        if ($user) {
+            return $user;
+        }
+
+        // Then try to find by email
+        $user = self::where('email', $userData['email'])->first();
+
+        if ($user) {
+            // Update user with provider information
+            $user->update([
+                'provider'    => $provider,
+                'provider_id' => $providerId,
+                'avatar'      => $userData['avatar'] ?? $user->avatar,
+            ]);
+
+            return $user;
+        }
+
+        // Create a new user if not found
+        return self::create([
+            'name'              => $userData['name'],
+            'email'             => $userData['email'],
+            'avatar'            => $userData['avatar'] ?? null,
+            'provider'          => $provider,
+            'provider_id'       => $providerId,
+            'email_verified_at' => now(), // Email is verified by the provider
+        ]);
+    }
 
     /**
      * @return BelongsToMany<Role, $this>
@@ -61,20 +111,18 @@ class User extends Authenticatable
     /**
      * Get the tenant that the user belongs to.
      *
-     * @return BelongsTo<Tenant, User>
+     * @return BelongsTo<Tenant, $this>
      */
     public function tenant(): BelongsTo
     {
-        /** @var BelongsTo<Tenant, User> */
         return $this->belongsTo(Tenant::class);
     }
 
     /**
      * Get the feature flags associated with this user.
      *
-     * @return BelongsToMany<FeatureFlag>
+     * @return BelongsToMany<FeatureFlag, User>
      */
-    // @phpstan-ignore-next-line
     public function featureFlags(): BelongsToMany
     {
         return $this->belongsToMany(FeatureFlag::class)->withPivot('value', 'expires_at');
@@ -85,11 +133,7 @@ class User extends Authenticatable
      */
     public function getRateLimitPerMinute(): int
     {
-        // Check if user has a custom rate limit in their settings
-        // This would be implemented in a settings feature
-
-        // If no custom limit, delegate to the tenant's rate limit
-        return $this->tenant?->getRateLimitPerMinute() ?? 30; // Default to 30 if no tenant
+        return $this->tenant?->getRateLimitPerMinute() ?? 30;
     }
 
     /**
@@ -99,8 +143,71 @@ class User extends Authenticatable
     {
         return "user:{$this->id}:ratelimit";
     }
+
     /**
-     * Get the attributes that should be cast.
+     * Check if this user is currently impersonating another user.
+     */
+    public function isImpersonating(): bool
+    {
+        return $this->impersonations()->active()->exists();
+    }
+
+    /**
+     * Get impersonations started by this user.
+     *
+     * @return HasMany<Impersonation, User>
+     */
+    public function impersonations(): HasMany
+    {
+        /** @var HasMany<Impersonation, User> */
+        return $this->hasMany(Impersonation::class, 'impersonator_id');
+    }
+
+    /**
+     * Get the current active impersonation.
+     */
+    public function activeImpersonation(): ?Impersonation
+    {
+        return $this->impersonations()->active()->first();
+    }
+
+    /**
+     * Check if this user is currently being impersonated.
+     */
+    public function isBeingImpersonated(): bool
+    {
+        return $this->beingImpersonated()->active()->exists();
+    }
+
+    /**
+     * Get impersonations where this user is being impersonated.
+     *
+     * @return HasMany<Impersonation, User>
+     */
+    public function beingImpersonated(): HasMany
+    {
+        /** @var HasMany<Impersonation, User> */
+        return $this->hasMany(Impersonation::class, 'impersonated_id');
+    }
+
+    /**
+     * Get the current active impersonation where this user is being impersonated.
+     */
+    public function activeBeingImpersonated(): ?Impersonation
+    {
+        return $this->beingImpersonated()->active()->first();
+    }
+
+    /**
+     * Check if this user is an admin (based on role).
+     */
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('admin');
+    }
+
+    /**
+     * The attributes that should be cast.
      *
      * @return array<string, string>
      */
@@ -113,5 +220,4 @@ class User extends Authenticatable
             'totp_verified'     => 'bool',
         ];
     }
-
 }
