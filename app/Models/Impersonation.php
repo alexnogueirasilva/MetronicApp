@@ -1,4 +1,5 @@
-<?php declare(strict_types = 1);
+<?php
+declare(strict_types = 1);
 
 namespace App\Models;
 
@@ -63,11 +64,11 @@ class Impersonation extends Model implements Auditable
     /**
      * Boot function from Laravel.
      */
-    protected static function boot()
+    protected static function boot(): void
     {
         parent::boot();
 
-        static::creating(function (Impersonation $model): void {
+        static::creating(static function (Impersonation $model): void {
             if (empty($model->{$model->getKeyName()})) {
                 $model->{$model->getKeyName()} = (string) Str::ulid();
             }
@@ -110,7 +111,7 @@ class Impersonation extends Model implements Auditable
      * @param Builder<Impersonation> $query
      * @return Builder<Impersonation>
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
         return $query->whereNull('ended_at');
     }

@@ -3,6 +3,7 @@
 use App\Events\ImpersonationActionPerformed;
 use App\Models\{Auth\Permission, Auth\Role, Impersonation, User};
 use Illuminate\Support\Facades\{DB, Event};
+use Illuminate\Support\Str;
 
 use function Pest\Laravel\{actingAs};
 
@@ -48,7 +49,7 @@ it('allows admin to impersonate another user', function () {
 
     // Iniciar impersonation
     $response = actingAs($admin)
-        ->postJson("/v1/auth/impersonate/{$user->id}");
+        ->postJson("/api/v1/auth/impersonate/{$user->id}");
 
     $response->assertOk();
     $response->assertJsonStructure([
@@ -74,7 +75,7 @@ it('prevents admin from impersonating themselves', function () {
 
     // Tentar impersonar a si mesmo
     $response = actingAs($admin)
-        ->postJson("/v1/auth/impersonate/{$admin->id}");
+        ->postJson("/api/v1/auth/impersonate/{$admin->id}");
 
     $response->assertStatus(400);
     $response->assertJsonFragment([
@@ -92,7 +93,7 @@ it('prevents non-admin from impersonating users', function () {
 
     // Tentar impersonar outro usuário
     $response = actingAs($user1)
-        ->postJson("/v1/auth/impersonate/{$user2->id}");
+        ->postJson("/api/v1/auth/impersonate/{$user2->id}");
 
     $response->assertStatus(403);
 });
@@ -108,14 +109,14 @@ it('allows admin to stop impersonation', function () {
 
     // Criar impersonation
     $impersonation = Impersonation::create([
-        'id'              => (string) \Illuminate\Support\Str::ulid(),
+        'id'              => (string) Str::ulid(),
         'impersonator_id' => $admin->id,
         'impersonated_id' => $user->id,
     ]);
 
     // Encerrar impersonation
     $response = actingAs($admin)
-        ->postJson('/v1/auth/impersonate/stop');
+        ->postJson('/api/v1/auth/impersonate/stop');
 
     $response->assertOk();
 
@@ -136,13 +137,13 @@ it('shows impersonation history for admin', function () {
 
     // Criar impersonations
     Impersonation::create([
-        'id'              => (string) \Illuminate\Support\Str::ulid(),
+        'id'              => (string) Str::ulid(),
         'impersonator_id' => $admin->id,
         'impersonated_id' => $user1->id,
     ]);
 
     Impersonation::create([
-        'id'              => (string) \Illuminate\Support\Str::ulid(),
+        'id'              => (string) Str::ulid(),
         'impersonator_id' => $admin->id,
         'impersonated_id' => $user2->id,
         'ended_at'        => now(),
@@ -150,7 +151,7 @@ it('shows impersonation history for admin', function () {
 
     // Obter histórico
     $response = actingAs($admin)
-        ->getJson('/v1/auth/impersonate/history');
+        ->getJson('/api/v1/auth/impersonate/history');
 
     $response->assertOk();
     $response->assertJsonCount(2, 'impersonations');
@@ -167,7 +168,7 @@ it('dispatches audit event during impersonation', function () {
 
     // Criar impersonation
     $impersonation = Impersonation::create([
-        'id'              => (string) \Illuminate\Support\Str::ulid(),
+        'id'              => (string) Str::ulid(),
         'impersonator_id' => $admin->id,
         'impersonated_id' => $user->id,
     ]);
@@ -180,7 +181,7 @@ it('dispatches audit event during impersonation', function () {
         user: $user,
         impersonation: $impersonation,
         action: 'GET',
-        url: '/v1/users',
+        url: '/api/v1/users',
         ip: '127.0.0.1',
         userAgent: 'PHPUnit'
     ));
@@ -190,6 +191,6 @@ it('dispatches audit event during impersonation', function () {
         return $event->user->is($user) &&
                $event->impersonation->is($impersonation) &&
                $event->action === 'GET' &&
-               $event->url === '/v1/users';
+               $event->url === '/api/v1/users';
     });
 });

@@ -22,9 +22,11 @@ use OwenIt\Auditing\Contracts\Auditable;
  * @property string $name
  * @property string $email
  * @property string $avatar
- * @property string $password
+ * @property ?string $password
  * @property ?string $remember_token
  * @property ?Carbon $email_verified_at
+ * @property ?string $provider
+ * @property ?string $provider_id
  * @property ?string $totp_secret
  * @property ?string $otp_method
  * @property bool $totp_verified
@@ -53,7 +55,50 @@ class User extends Authenticatable implements Auditable
     protected $hidden = [
         'password',
         'remember_token',
+        'provider',
+        'provider_id',
     ];
+
+    /**
+     * Find or create a user based on OAuth data
+     *
+     * @param array<string, string|null> $userData User data from OAuth provider
+     */
+    public static function findOrCreateSocialUser(string $provider, string $providerId, array $userData): self
+    {
+        // First try to find the user by provider and provider_id
+        $user = self::where('provider', $provider)
+            ->where('provider_id', $providerId)
+            ->first();
+
+        if ($user) {
+            return $user;
+        }
+
+        // Then try to find by email
+        $user = self::where('email', $userData['email'])->first();
+
+        if ($user) {
+            // Update user with provider information
+            $user->update([
+                'provider'    => $provider,
+                'provider_id' => $providerId,
+                'avatar'      => $userData['avatar'] ?? $user->avatar,
+            ]);
+
+            return $user;
+        }
+
+        // Create a new user if not found
+        return self::create([
+            'name'              => $userData['name'],
+            'email'             => $userData['email'],
+            'avatar'            => $userData['avatar'] ?? null,
+            'provider'          => $provider,
+            'provider_id'       => $providerId,
+            'email_verified_at' => now(), // Email is verified by the provider
+        ]);
+    }
 
     /**
      * @return BelongsToMany<Role, $this>
@@ -66,20 +111,18 @@ class User extends Authenticatable implements Auditable
     /**
      * Get the tenant that the user belongs to.
      *
-     * @return BelongsTo<Tenant, User>
+     * @return BelongsTo<Tenant, $this>
      */
     public function tenant(): BelongsTo
     {
-        /** @var BelongsTo<Tenant, User> */
         return $this->belongsTo(Tenant::class);
     }
 
     /**
      * Get the feature flags associated with this user.
      *
-     * @return BelongsToMany<FeatureFlag>
+     * @return BelongsToMany<FeatureFlag, User>
      */
-    // @phpstan-ignore-next-line
     public function featureFlags(): BelongsToMany
     {
         return $this->belongsToMany(FeatureFlag::class)->withPivot('value', 'expires_at');
@@ -90,11 +133,7 @@ class User extends Authenticatable implements Auditable
      */
     public function getRateLimitPerMinute(): int
     {
-        // Check if user has a custom rate limit in their settings
-        // This would be implemented in a settings feature
-
-        // If no custom limit, delegate to the tenant's rate limit
-        return $this->tenant?->getRateLimitPerMinute() ?? 30; // Default to 30 if no tenant
+        return $this->tenant?->getRateLimitPerMinute() ?? 30;
     }
 
     /**
@@ -106,6 +145,14 @@ class User extends Authenticatable implements Auditable
     }
 
     /**
+     * Check if this user is currently impersonating another user.
+     */
+    public function isImpersonating(): bool
+    {
+        return $this->impersonations()->active()->exists();
+    }
+
+    /**
      * Get impersonations started by this user.
      *
      * @return HasMany<Impersonation, User>
@@ -114,25 +161,6 @@ class User extends Authenticatable implements Auditable
     {
         /** @var HasMany<Impersonation, User> */
         return $this->hasMany(Impersonation::class, 'impersonator_id');
-    }
-
-    /**
-     * Get impersonations where this user is being impersonated.
-     *
-     * @return HasMany<Impersonation, User>
-     */
-    public function beingImpersonated(): HasMany
-    {
-        /** @var HasMany<Impersonation, User> */
-        return $this->hasMany(Impersonation::class, 'impersonated_id');
-    }
-
-    /**
-     * Check if this user is currently impersonating another user.
-     */
-    public function isImpersonating(): bool
-    {
-        return $this->impersonations()->active()->exists();
     }
 
     /**
@@ -149,6 +177,17 @@ class User extends Authenticatable implements Auditable
     public function isBeingImpersonated(): bool
     {
         return $this->beingImpersonated()->active()->exists();
+    }
+
+    /**
+     * Get impersonations where this user is being impersonated.
+     *
+     * @return HasMany<Impersonation, User>
+     */
+    public function beingImpersonated(): HasMany
+    {
+        /** @var HasMany<Impersonation, User> */
+        return $this->hasMany(Impersonation::class, 'impersonated_id');
     }
 
     /**
