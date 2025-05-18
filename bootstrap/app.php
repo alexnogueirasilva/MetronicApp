@@ -30,7 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
                 if (file_exists($versionFilePath)) {
                     Route::middleware('api')
-                        ->prefix("{$version}")
+                        ->prefix((string)($version))
                         ->group($versionFilePath);
                 }
             }
