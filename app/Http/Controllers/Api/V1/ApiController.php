@@ -28,6 +28,11 @@ class ApiController extends Controller
             'data'    => $data,
             'meta'    => [
                 'api_version' => $this->apiVersion,
+                'idempotency' => [
+                    'enabled'     => config('idempotency.enabled', true),
+                    'header_name' => config('idempotency.header_name', 'Idempotency-Key'),
+                    'format'      => 'UUID (e.g., 123e4567-e89b-12d3-a456-426614174000)',
+                ],
             ],
         ], $status);
     }
@@ -45,6 +50,11 @@ class ApiController extends Controller
             'errors'  => $errors,
             'meta'    => [
                 'api_version' => $this->apiVersion,
+                'idempotency' => [
+                    'enabled'     => config('idempotency.enabled', true),
+                    'header_name' => config('idempotency.header_name', 'Idempotency-Key'),
+                    'format'      => 'UUID (e.g., 123e4567-e89b-12d3-a456-426614174000)',
+                ],
             ],
         ], $status);
     }

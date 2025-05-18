@@ -16,7 +16,6 @@ use App\Http\Controllers\Auth\{AuthMeController,
 use App\Http\Controllers\TenantController;
 use App\Http\Controllers\User\UserController;
 use Illuminate\Support\Facades\Route;
-use Infinitypaul\Idempotency\Middleware\EnsureIdempotency;
 
 Route::get('/version', [VersionController::class, 'index'])->name('version');
 
@@ -59,7 +58,7 @@ Route::middleware(['endpoint.ratelimit'])->group(static function (): void {
         });
     });
 
-    Route::middleware(['auth:sanctum', 'totp.verify', 'tenant.ratelimit', EnsureIdempotency::class])->group(static function (): void {
+    Route::middleware(['auth:sanctum', 'totp.verify', 'tenant.ratelimit'])->group(static function (): void {
         Route::apiResource('tenant', TenantController::class);
 
         Route::get('/users', [UserController::class, 'index'])->name('users.index');

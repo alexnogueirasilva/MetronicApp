@@ -125,10 +125,10 @@ return [
     */
     'telemetry' => [
         // Enable or disable telemetry for idempotency operations
-        'enabled' => env('IDEMPOTENCY_TELEMETRY_ENABLED', true),
+        'enabled' => env('IDEMPOTENCY_TELEMETRY_ENABLED', false),
 
         // Default driver to use for telemetry
-        'driver' => env('IDEMPOTENCY_TELEMETRY_DRIVER', 'null'),
+        'driver' => env('IDEMPOTENCY_TELEMETRY_DRIVER', null),
 
         // Available telemetry drivers and their configurations
         'custom_driver_class' => null,

@@ -58,6 +58,10 @@ class RouteServiceProvider extends ServiceProvider
         $versions = is_array($versions) ? $versions : ['v1'];
         $prefix   = is_string($prefix) ? $prefix : 'api';
 
+        Route::middleware(['api', 'api.version'])
+            ->prefix($prefix)
+            ->group(base_path('routes/api.php'));
+
         foreach ($versions as $version) {
             $version         = toString($version);
             $versionFilePath = base_path("routes/api/{$version}.php");
@@ -69,10 +73,6 @@ class RouteServiceProvider extends ServiceProvider
                     ->group($versionFilePath);
             }
         }
-
-        Route::middleware(['api', 'api.version'])
-            ->prefix($prefix)
-            ->group(base_path('routes/api.php'));
     }
 
     /**
