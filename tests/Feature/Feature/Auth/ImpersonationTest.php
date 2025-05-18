@@ -38,18 +38,14 @@ beforeEach(function () {
     Event::fake([ImpersonationActionPerformed::class]);
 });
 
-// Teste para iniciar impersonation
 it('allows admin to impersonate another user', function () {
-    // Criar usuário admin
     $admin = User::factory()->create();
     $admin->assignRole('admin');
 
-    // Criar usuário para ser impersonado
     $user = User::factory()->create();
 
-    // Iniciar impersonation
     $response = actingAs($admin)
-        ->postJson("/api/v1/auth/impersonate/{$user->id}");
+        ->postJson(route('auth.impersonate.start', $user->id));
 
     $response->assertOk();
     $response->assertJsonStructure([
@@ -59,7 +55,6 @@ it('allows admin to impersonate another user', function () {
         'impersonation_id',
     ]);
 
-    // Verificar que impersonation foi criado no banco
     $this->assertDatabaseHas('impersonations', [
         'impersonator_id' => $admin->id,
         'impersonated_id' => $user->id,
@@ -67,15 +62,12 @@ it('allows admin to impersonate another user', function () {
     ]);
 });
 
-// Teste para não permitir impersonação a si mesmo
 it('prevents admin from impersonating themselves', function () {
-    // Criar usuário admin
     $admin = User::factory()->create();
     $admin->assignRole('admin');
 
-    // Tentar impersonar a si mesmo
     $response = actingAs($admin)
-        ->postJson("/api/v1/auth/impersonate/{$admin->id}");
+        ->postJson(route('auth.impersonate.start', $admin->id));
 
     $response->assertStatus(400);
     $response->assertJsonFragment([
@@ -83,114 +75,92 @@ it('prevents admin from impersonating themselves', function () {
     ]);
 });
 
-// Teste para verificar que apenas admins podem impersonar
 it('prevents non-admin from impersonating users', function () {
-    // Criar usuário não-admin
     $user1 = User::factory()->create();
 
-    // Criar usuário para ser impersonado
     $user2 = User::factory()->create();
 
-    // Tentar impersonar outro usuário
     $response = actingAs($user1)
-        ->postJson("/api/v1/auth/impersonate/{$user2->id}");
+        ->postJson(route('auth.impersonate.start', $user2->id));
 
     $response->assertStatus(403);
 });
 
-// Teste para terminar impersonation
 it('allows admin to stop impersonation', function () {
-    // Criar usuário admin
     $admin = User::factory()->create();
     $admin->assignRole('admin');
 
-    // Criar usuário para ser impersonado
     $user = User::factory()->create();
 
-    // Criar impersonation
-    $impersonation = Impersonation::create([
+    $impersonation = Impersonation::query()->create([
         'id'              => (string) Str::ulid(),
         'impersonator_id' => $admin->id,
         'impersonated_id' => $user->id,
     ]);
 
-    // Encerrar impersonation
     $response = actingAs($admin)
-        ->postJson('/api/v1/auth/impersonate/stop');
+        ->postJson(route('auth.impersonate.stop', $impersonation->id));
 
     $response->assertOk();
 
-    // Verificar que impersonation foi encerrada
     $impersonation->refresh();
     expect($impersonation->ended_at)->not->toBeNull();
 });
 
-// Teste para verificar histórico de impersonation
 it('shows impersonation history for admin', function () {
-    // Criar usuário admin
     $admin = User::factory()->create();
     $admin->assignRole('admin');
 
-    // Criar usuários para serem impersonados
     $user1 = User::factory()->create();
     $user2 = User::factory()->create();
 
-    // Criar impersonations
-    Impersonation::create([
+    Impersonation::query()->create([
         'id'              => (string) Str::ulid(),
         'impersonator_id' => $admin->id,
         'impersonated_id' => $user1->id,
     ]);
 
-    Impersonation::create([
+    Impersonation::query()->create([
         'id'              => (string) Str::ulid(),
         'impersonator_id' => $admin->id,
         'impersonated_id' => $user2->id,
         'ended_at'        => now(),
     ]);
 
-    // Obter histórico
     $response = actingAs($admin)
-        ->getJson('/api/v1/auth/impersonate/history');
+        ->getJson(route('auth.impersonate.history'));
 
     $response->assertOk();
     $response->assertJsonCount(2, 'impersonations');
 });
 
-// Teste para verificar que ações são auditadas durante impersonation
 it('dispatches audit event during impersonation', function () {
-    // Criar usuário admin
     $admin = User::factory()->create();
     $admin->assignRole('admin');
 
-    // Criar usuário para ser impersonado
     $user = User::factory()->create();
 
-    // Criar impersonation
-    $impersonation = Impersonation::create([
+    $impersonation = Impersonation::query()->create([
         'id'              => (string) Str::ulid(),
         'impersonator_id' => $admin->id,
         'impersonated_id' => $user->id,
     ]);
 
-    // Usar token de impersonation
     $token = $user->createToken('impersonation-token', ['impersonated'])->plainTextToken;
 
-    // Simular manualmente o evento que o middleware dispara
     event(new ImpersonationActionPerformed(
         user: $user,
         impersonation: $impersonation,
         action: 'GET',
-        url: '/api/v1/users',
+        url: '/v1/users',
         ip: '127.0.0.1',
         userAgent: 'PHPUnit'
     ));
 
-    // Verificar se o evento foi disparado
-    Event::assertDispatched(ImpersonationActionPerformed::class, function ($event) use ($user, $impersonation) {
+    Event::assertDispatched(ImpersonationActionPerformed::class, static function ($event) use ($user, $impersonation) {
         return $event->user->is($user) &&
                $event->impersonation->is($impersonation) &&
                $event->action === 'GET' &&
-               $event->url === '/api/v1/users';
+               $event->url === '/v1/users';
     });
 });

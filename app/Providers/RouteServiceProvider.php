@@ -58,8 +58,8 @@ class RouteServiceProvider extends ServiceProvider
         $versions = is_array($versions) ? $versions : ['v1'];
         $prefix   = is_string($prefix) ? $prefix : 'api';
 
+        // Rotas não versionadas - não incluir prefix 'api'
         Route::middleware(['api', 'api.version'])
-            ->prefix($prefix)
             ->group(base_path('routes/api.php'));
 
         foreach ($versions as $version) {

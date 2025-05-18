@@ -3,6 +3,18 @@
 return [
     /*
     |--------------------------------------------------------------------------
+    | Prefixo de URL da API
+    |--------------------------------------------------------------------------
+    |
+    | Define o prefixo usado nas URLs da API.
+    | Deixe em branco '' para nenhum prefixo (para uso com subdomínio api.exemplo.com)
+    | Ou use 'api' para formato tradicional exemplo.com/api/v1/...
+    |
+    */
+    'prefix' => env('API_PREFIX', ''),
+
+    /*
+    |--------------------------------------------------------------------------
     | Versão Padrão da API
     |--------------------------------------------------------------------------
     |

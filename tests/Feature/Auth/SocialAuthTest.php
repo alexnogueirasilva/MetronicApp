@@ -1,9 +1,13 @@
 <?php declare(strict_types = 1);
+
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\{GoogleProvider, User as SocialiteUser};
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+use function Pest\Laravel\{getJson, postJson};
+
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     // Configuração para mock do Socialite
@@ -16,8 +20,7 @@ it('returns oauth url for api flow', function () {
     $this->mock->shouldReceive('redirect')->andReturn($this->mock);
     $this->mock->shouldReceive('getTargetUrl')->andReturn('https://accounts.google.com/o/oauth2/auth?test=1');
 
-    // Fazer requisição para obter URL de autenticação
-    $response = $this->getJson('/api/v1/auth/social/google');
+    $response = getJson('/v1/auth/social/google');
 
     // Verificar resposta
     $response->assertStatus(200)
@@ -36,7 +39,7 @@ it('returns oauth url for api flow', function () {
 });
 it('handles invalid provider in api flow', function () {
     // Tentar com provedor inválido
-    $response = $this->getJson('/api/v1/auth/social/invalid-provider');
+    $response = getJson('/v1/auth/social/invalid-provider');
 
     // Verificar erro
     $response->assertStatus(400)
@@ -60,7 +63,7 @@ it('creates new user with social login', function () {
     $this->mock->shouldReceive('user')->andReturn($socialiteUser);
 
     // Fazer requisição de callback
-    $response = $this->postJson('/api/v1/auth/social/google/callback', [
+    $response = postJson(route('auth.social.callback', ['provider' => 'google']), [
         'code' => 'valid-auth-code',
     ]);
 
@@ -106,7 +109,7 @@ it('connects existing account by email', function () {
     $this->mock->shouldReceive('user')->andReturn($socialiteUser);
 
     // Fazer requisição de callback
-    $response = $this->postJson('/api/v1/auth/social/google/callback', [
+    $response = postJson(route('auth.social.callback', ['provider' => 'google']), [
         'code' => 'valid-auth-code',
     ]);
 
@@ -145,7 +148,7 @@ it('reuses existing social user', function () {
     $this->mock->shouldReceive('user')->andReturn($socialiteUser);
 
     // Fazer requisição de callback
-    $response = $this->postJson('/api/v1/auth/social/google/callback', [
+    $response = postJson(route('auth.social.callback', ['provider' => 'google']), [
         'code' => 'valid-auth-code',
     ]);
 
@@ -158,10 +161,10 @@ it('reuses existing social user', function () {
 it('handles errors in social callback', function () {
     // Mock para simular um erro
     $this->mock->shouldReceive('stateless')->andReturnSelf();
-    $this->mock->shouldReceive('user')->andThrow(new \Exception('Invalid credentials'));
+    $this->mock->shouldReceive('user')->andThrow(new Exception('Invalid credentials'));
 
     // Fazer requisição de callback
-    $response = $this->postJson('/api/v1/auth/social/google/callback', [
+    $response = postJson(route('auth.social.callback', ['provider' => 'google']), [
         'code' => 'invalid-code',
     ]);
 

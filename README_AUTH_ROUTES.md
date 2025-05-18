@@ -6,12 +6,17 @@ Este documento fornece uma visão geral das rotas de autenticação disponíveis
 
 A API utiliza um sistema de versionamento que permite múltiplas versões simultâneas. Para evitar loops de redirecionamento ao acessar via navegador, sempre especifique explicitamente a versão de uma destas formas:
 
-1. **URL Path**: Acesse sempre uma rota específica como `/api/v1/status` ou `/api/v1/version`
+1. **URL Path**: Acesse sempre uma rota específica como `/v1/status` ou `/v1/version` (em produção)
+   - Em ambientes de desenvolvimento pode ser `/api/v1/status` dependendo da configuração
 2. **Header**: Adicione o header `X-API-Version: v1` em suas requisições
 3. **Accept Header**: Utilize `Accept: application/vnd.api.v1+json` 
 4. **Query Parameter**: Adicione `?version=v1` à URL
 
-Para mais detalhes sobre o versionamento, consulte o arquivo [API_VERSIONING.md](API_VERSIONING.md).
+O prefixo da URL pode variar dependendo do ambiente:
+- Em produção com subdomínio: `https://api.exemplo.com.br/v1/status` (sem prefixo 'api/')
+- Em desenvolvimento local: `http://exemplo.test/api/v1/status` (com prefixo 'api/')
+
+A configuração é controlada pela variável de ambiente `API_PREFIX`. Para mais detalhes sobre o versionamento, consulte o arquivo [API_VERSIONING.md](API_VERSIONING.md).
 
 ## Configuração Sanctum
 
