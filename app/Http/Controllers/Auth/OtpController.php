@@ -16,6 +16,30 @@ class OtpController extends Controller
     use AuthenticatedUser;
 
     /**
+     * Request an OTP code via email
+     *
+     * This endpoint generates and sends a one-time password to the provided email address.
+     * The OTP code can be used for authentication or verification purposes.
+     *
+     * @group Auth
+     * @unauthenticated
+     *
+     * @bodyParam email string required The email address to send the OTP code to. Example: user@example.com
+     *
+     * @response {
+     *     "message": "Código enviado por e-mail."
+     * }
+     *
+     * @response 422 {
+     *     "message": "The given data was invalid.",
+     *     "errors": {
+     *         "email": [
+     *             "The email field is required.",
+     *             "The email must be a valid email address."
+     *         ]
+     *     }
+     * }
+     *
      * @throws RandomException
      * @throws JsonException
      */

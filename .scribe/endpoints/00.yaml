@@ -4,7 +4,7 @@ endpoints:
   -
     httpMethods:
       - GET
-    uri: api/v1/version
+    uri: v1/version
     metadata:
       groupName: Endpoints
       groupDescription: ''
@@ -39,61 +39,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer VaeEv5bh4PcdaD66g1fkZ38'
-    controller: null
-    method: null
-    route: null
-    custom: []
-  -
-    httpMethods:
-      - GET
-    uri: 'api/v1/auth/social/{provider}'
-    metadata:
-      groupName: Endpoints
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: ''
-      description: ''
-      authenticated: true
-      custom: []
-    headers:
-      Authorization: 'Bearer {YOUR_AUTH_KEY}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      provider:
-        name: provider
-        description: ''
-        required: true
-        example: ullam
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-    cleanUrlParameters:
-      provider: ullam
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        status: 400
-        content: '{"status":"error","message":"Provedor de autentica\u00e7\u00e3o n\u00e3o suportado."}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          vary: Origin
-        description: null
-        custom: []
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer V8deP5cv16f6EhkgbDa34aZ'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -101,7 +47,7 @@ endpoints:
   -
     httpMethods:
       - POST
-    uri: 'api/v1/auth/social/{provider}/callback'
+    uri: 'v1/auth/social/{provider}/callback'
     metadata:
       groupName: Endpoints
       groupDescription: ''
@@ -120,14 +66,14 @@ endpoints:
         name: provider
         description: ''
         required: true
-        example: deleniti
+        example: in
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      provider: deleniti
+      provider: in
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -138,74 +84,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 6gZ3e5cE186a4kVhdDbPavf'
-    controller: null
-    method: null
-    route: null
-    custom: []
-  -
-    httpMethods:
-      - GET
-    uri: 'api/v1/auth/social/{provider}/callback'
-    metadata:
-      groupName: Endpoints
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: ''
-      description: ''
-      authenticated: true
-      custom: []
-    headers:
-      Authorization: 'Bearer {YOUR_AUTH_KEY}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      provider:
-        name: provider
-        description: ''
-        required: true
-        example: repudiandae
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-    cleanUrlParameters:
-      provider: repudiandae
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        status: 302
-        content: |-
-          <!DOCTYPE html>
-          <html>
-              <head>
-                  <meta charset="UTF-8" />
-                  <meta http-equiv="refresh" content="0;url='http://metronicapp.test'" />
-
-                  <title>Redirecting to http://metronicapp.test</title>
-              </head>
-              <body>
-                  Redirecting to <a href="http://metronicapp.test">http://metronicapp.test</a>.
-              </body>
-          </html>
-        headers:
-          cache-control: 'no-cache, private'
-          location: 'http://metronicapp.test'
-          content-type: 'text/html; charset=utf-8'
-          vary: Origin
-        description: null
-        custom: []
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer PD6E6hVvaZ1eda3c4f5bkg8'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -213,14 +92,27 @@ endpoints:
   -
     httpMethods:
       - POST
-    uri: api/v1/auth/login
+    uri: v1/auth/login
     metadata:
       groupName: Endpoints
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: ''
-      description: ''
+      title: 'Autenticação de usuário com email e senha'
+      description: |-
+        Endpoint: POST /auth/login
+        Grupo: Auth
+        Autenticação: Não requerida
+
+        Parâmetros:
+        - email (string): Email do usuário
+        - password (string): Senha do usuário
+        - device (string, opcional): Nome do dispositivo
+
+        Respostas:
+        - 200: {"token": "string", "user": {...}}
+        - 401: {"message": "Credentials do not match"}
+        - 422: {"message": "The given data was invalid", "errors": {...}}
       authenticated: true
       custom: []
     headers:
@@ -236,7 +128,7 @@ endpoints:
         name: email
         description: 'Must be a valid email address. Must not be greater than 255 characters.'
         required: true
-        example: cnienow@example.net
+        example: fanny01@example.net
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -246,7 +138,7 @@ endpoints:
         name: password
         description: 'Must be at least 8 characters. Must not be greater than 255 characters.'
         required: true
-        example: '\-:blC{1qO8i$['''
+        example: 'M?I],MZ'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -256,57 +148,23 @@ endpoints:
         name: device
         description: 'Must not be greater than 255 characters.'
         required: false
-        example: alnuyzqgtlsvgwydpoe
+        example: vmgcbkwigoxmvjbbwfpwpv
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: true
         custom: []
     cleanBodyParameters:
-      email: cnienow@example.net
-      password: '\-:blC{1qO8i$['''
-      device: alnuyzqgtlsvgwydpoe
+      email: fanny01@example.net
+      password: 'M?I],MZ'
+      device: vmgcbkwigoxmvjbbwfpwpv
     fileParameters: []
     responses: []
     responseFields: []
     auth:
       - headers
       - Authorization
-      - 'Bearer ghk8Ev54dVfb6Z6aP13eDac'
-    controller: null
-    method: null
-    route: null
-    custom: []
-  -
-    httpMethods:
-      - DELETE
-    uri: api/v1/auth/logout
-    metadata:
-      groupName: Endpoints
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Handle the incoming request.'
-      description: ''
-      authenticated: true
-      custom: []
-    headers:
-      Authorization: 'Bearer {YOUR_AUTH_KEY}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses: []
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer baDav56Pde4cgV8ZfkE36h1'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -314,14 +172,23 @@ endpoints:
   -
     httpMethods:
       - GET
-    uri: api/v1/auth/me
+    uri: v1/auth/me
     metadata:
       groupName: Endpoints
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Handle the incoming request.'
-      description: ''
+      title: 'Retorna dados do usuário autenticado'
+      description: |-
+        Endpoint: GET /auth/me
+        Grupo: Auth
+        Autenticação: Requerida (Sanctum)
+        Middleware: totp.verify
+
+        Respostas:
+        - 200: Dados do usuário com suas roles e permissões
+        - 401: {"message": "Unauthenticated."}
+        - 403: {"message": "TOTP not verified."}
       authenticated: true
       custom: []
     headers:
@@ -337,11 +204,15 @@ endpoints:
     fileParameters: []
     responses:
       -
-        status: 401
-        content: '{"message":"Unauthenticated."}'
+        status: 200
+        content: '{"data":{"id":1,"name":"Alex Nogueira","email":"alex@devaction.com.br","avatar":"https:\/\/via.placeholder.com\/640x480.png\/00cc44?text=dignissimos","email_verified_at":"2025-05-11T22:54:36.000000Z","created_at":"2025-05-11T22:54:36.000000Z","updated_at":"2025-05-11T22:54:36.000000Z"}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
+          x-ratelimit-limit: '30'
+          x-ratelimit-remaining: '29'
+          retry-after: '60'
+          x-ratelimit-reset: '1747567182'
           vary: Origin
         description: null
         custom: []
@@ -349,7 +220,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 5v46cPakeE1bDV3hafZdg86'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -357,286 +228,7 @@ endpoints:
   -
     httpMethods:
       - POST
-    uri: api/v1/auth/forgot-password
-    metadata:
-      groupName: Endpoints
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Handle the incoming request.'
-      description: ''
-      authenticated: true
-      custom: []
-    headers:
-      Authorization: 'Bearer {YOUR_AUTH_KEY}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      email:
-        name: email
-        description: 'Must be a valid email address. Must not be greater than 255 characters.'
-        required: true
-        example: charlotte.jenkins@example.net
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-    cleanBodyParameters:
-      email: charlotte.jenkins@example.net
-    fileParameters: []
-    responses: []
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer vk4ghbfZ81DVdEa635Paec6'
-    controller: null
-    method: null
-    route: null
-    custom: []
-  -
-    httpMethods:
-      - POST
-    uri: api/v1/auth/reset-password
-    metadata:
-      groupName: Endpoints
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Handle the incoming request.'
-      description: ''
-      authenticated: true
-      custom: []
-    headers:
-      Authorization: 'Bearer {YOUR_AUTH_KEY}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      email:
-        name: email
-        description: ''
-        required: true
-        example: kallie87@example.net
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-      password:
-        name: password
-        description: 'Must be at least 8 characters.'
-        required: true
-        example: 'hn+PY:d'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-      token:
-        name: token
-        description: ''
-        required: true
-        example: vel
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-    cleanBodyParameters:
-      email: kallie87@example.net
-      password: 'hn+PY:d'
-      token: vel
-    fileParameters: []
-    responses: []
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer VZv4Dh186Pd6eaEbc5ag3kf'
-    controller: null
-    method: null
-    route: null
-    custom: []
-  -
-    httpMethods:
-      - POST
-    uri: api/v1/auth/magic-link
-    metadata:
-      groupName: Endpoints
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Solicita o envio de um magic link por email'
-      description: ''
-      authenticated: true
-      custom: []
-    headers:
-      Authorization: 'Bearer {YOUR_AUTH_KEY}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      email:
-        name: email
-        description: 'Must be a valid email address.'
-        required: true
-        example: hschmidt@example.org
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-    cleanBodyParameters:
-      email: hschmidt@example.org
-    fileParameters: []
-    responses: []
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer E5ZadgceP6861avVD4b3hkf'
-    controller: null
-    method: null
-    route: null
-    custom: []
-  -
-    httpMethods:
-      - POST
-    uri: api/v1/auth/magic-link/verify
-    metadata:
-      groupName: Endpoints
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Verifica um magic link e autentica o usuário'
-      description: ''
-      authenticated: true
-      custom: []
-    headers:
-      Authorization: 'Bearer {YOUR_AUTH_KEY}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses: []
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer ZadkeE638P51cVab4hDv6gf'
-    controller: null
-    method: null
-    route: null
-    custom: []
-  -
-    httpMethods:
-      - GET
-    uri: api/v1/auth/magic-link/verify
-    metadata:
-      groupName: Endpoints
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Verifica um magic link e autentica o usuário'
-      description: ''
-      authenticated: true
-      custom: []
-    headers:
-      Authorization: 'Bearer {YOUR_AUTH_KEY}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        status: 401
-        content: '{"message":"Link inv\u00e1lido ou expirado"}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          vary: Origin
-        description: null
-        custom: []
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 6f4ka5cbe3vdE8ghVZa61PD'
-    controller: null
-    method: null
-    route: null
-    custom: []
-  -
-    httpMethods:
-      - POST
-    uri: api/v1/auth/otp/request
-    metadata:
-      groupName: Endpoints
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: ''
-      description: ''
-      authenticated: true
-      custom: []
-    headers:
-      Authorization: 'Bearer {YOUR_AUTH_KEY}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      email:
-        name: email
-        description: 'Must be a valid email address. The <code>email</code> of an existing record in the users table.'
-        required: true
-        example: gpouros@example.com
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-    cleanBodyParameters:
-      email: gpouros@example.com
-    fileParameters: []
-    responses: []
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer a8D6a5be1ZEhkd4cgPvfV63'
-    controller: null
-    method: null
-    route: null
-    custom: []
-  -
-    httpMethods:
-      - POST
-    uri: api/v1/auth/otp/verify
+    uri: v1/auth/otp/verify
     metadata:
       groupName: Endpoints
       groupDescription: ''
@@ -659,7 +251,7 @@ endpoints:
         name: email
         description: 'Must be a valid email address.'
         required: true
-        example: hand.ricardo@example.net
+        example: imedhurst@example.org
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -669,22 +261,22 @@ endpoints:
         name: code
         description: 'Must be 6 digits.'
         required: true
-        example: '834457'
+        example: '987737'
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanBodyParameters:
-      email: hand.ricardo@example.net
-      code: '834457'
+      email: imedhurst@example.org
+      code: '987737'
     fileParameters: []
     responses: []
     responseFields: []
     auth:
       - headers
       - Authorization
-      - 'Bearer cfEavaZ36PdbgD5V4ke81h6'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -692,7 +284,7 @@ endpoints:
   -
     httpMethods:
       - POST
-    uri: api/v1/auth/otp/totp/setup
+    uri: v1/auth/otp/totp/setup
     metadata:
       groupName: Endpoints
       groupDescription: ''
@@ -718,7 +310,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer ac56vEfd1a4k3b8DegZhV6P'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -726,7 +318,7 @@ endpoints:
   -
     httpMethods:
       - POST
-    uri: api/v1/auth/otp/totp/verify
+    uri: v1/auth/otp/totp/verify
     metadata:
       groupName: Endpoints
       groupDescription: ''
@@ -749,21 +341,21 @@ endpoints:
         name: code
         description: 'Must be 6 digits.'
         required: true
-        example: '381370'
+        example: '889016'
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanBodyParameters:
-      code: '381370'
+      code: '889016'
     fileParameters: []
     responses: []
     responseFields: []
     auth:
       - headers
       - Authorization
-      - 'Bearer gkvb5aZPaD36VedEh61f8c4'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -771,7 +363,7 @@ endpoints:
   -
     httpMethods:
       - POST
-    uri: api/v1/auth/otp/totp/confirm
+    uri: v1/auth/otp/totp/confirm
     metadata:
       groupName: Endpoints
       groupDescription: ''
@@ -794,21 +386,21 @@ endpoints:
         name: code
         description: 'Must be 6 characters.'
         required: true
-        example: yjfwsh
+        example: sxpeck
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanBodyParameters:
-      code: yjfwsh
+      code: sxpeck
     fileParameters: []
     responses: []
     responseFields: []
     auth:
       - headers
       - Authorization
-      - 'Bearer d8Vba6ck6v5f1ZDa3EPeh4g'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -816,7 +408,7 @@ endpoints:
   -
     httpMethods:
       - POST
-    uri: api/v1/auth/otp/disable
+    uri: v1/auth/otp/disable
     metadata:
       groupName: Endpoints
       groupDescription: ''
@@ -842,7 +434,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 38PE4Dcked56f6h1ZvagbaV'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -850,172 +442,7 @@ endpoints:
   -
     httpMethods:
       - POST
-    uri: api/v1/auth/impersonate/stop
-    metadata:
-      groupName: Endpoints
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Termina a sessão de impersonation atual.'
-      description: ''
-      authenticated: true
-      custom: []
-    headers:
-      Authorization: 'Bearer {YOUR_AUTH_KEY}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses: []
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer aD4aehVf63ZEgvb58Pkc16d'
-    controller: null
-    method: null
-    route: null
-    custom: []
-  -
-    httpMethods:
-      - GET
-    uri: api/v1/auth/impersonate/history
-    metadata:
-      groupName: Endpoints
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Lista todas as sessões de impersonation ativas e históricas iniciadas pelo usuário.'
-      description: ''
-      authenticated: true
-      custom: []
-    headers:
-      Authorization: 'Bearer {YOUR_AUTH_KEY}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        status: 401
-        content: '{"message":"Unauthenticated."}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          vary: Origin
-        description: null
-        custom: []
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 51hav4EbaPdfZ836ekV6cgD'
-    controller: null
-    method: null
-    route: null
-    custom: []
-  -
-    httpMethods:
-      - POST
-    uri: 'api/v1/auth/impersonate/{user_id}'
-    metadata:
-      groupName: Endpoints
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Inicia uma sessão de impersonation.'
-      description: ''
-      authenticated: true
-      custom: []
-    headers:
-      Authorization: 'Bearer {YOUR_AUTH_KEY}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      user_id:
-        name: user_id
-        description: 'The ID of the user.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-    cleanUrlParameters:
-      user_id: 1
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses: []
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer Va85chdgb4ekDZ66Pva13Ef'
-    controller: null
-    method: null
-    route: null
-    custom: []
-  -
-    httpMethods:
-      - GET
-    uri: api/v1/tenant
-    metadata:
-      groupName: Endpoints
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Display a listing of tenants.'
-      description: ''
-      authenticated: true
-      custom: []
-    headers:
-      Authorization: 'Bearer {YOUR_AUTH_KEY}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        status: 401
-        content: '{"message":"Unauthenticated."}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          vary: Origin
-        description: null
-        custom: []
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer egZaEb1a4Dc6Vfk63dP85hv'
-    controller: null
-    method: null
-    route: null
-    custom: []
-  -
-    httpMethods:
-      - POST
-    uri: api/v1/tenant
+    uri: v1/tenant
     metadata:
       groupName: Endpoints
       groupDescription: ''
@@ -1038,7 +465,7 @@ endpoints:
         name: name
         description: 'Must not be greater than 255 characters.'
         required: true
-        example: zkipkhvjnbqvg
+        example: qy
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -1048,7 +475,7 @@ endpoints:
         name: domain
         description: 'Must not be greater than 255 characters.'
         required: false
-        example: ynzuaylhvhi
+        example: xtnecgtndkshdujlz
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -1058,7 +485,7 @@ endpoints:
         name: plan
         description: ''
         required: true
-        example: est
+        example: culpa
         type: string
         enumValues:
           - free
@@ -1083,7 +510,7 @@ endpoints:
         name: trial_ends_at
         description: 'Must be a valid date.'
         required: false
-        example: '2025-05-17T01:51:50'
+        example: '2025-05-18T11:18:42'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -1103,7 +530,7 @@ endpoints:
         name: settings.custom_rate_limit
         description: 'Must be at least 0.'
         required: false
-        example: 9
+        example: 2
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -1113,28 +540,28 @@ endpoints:
         name: settings.max_concurrent_requests
         description: 'Must be at least 0.'
         required: false
-        example: 63
+        example: 80
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: true
         custom: []
     cleanBodyParameters:
-      name: zkipkhvjnbqvg
-      domain: ynzuaylhvhi
-      plan: est
+      name: qy
+      domain: xtnecgtndkshdujlz
+      plan: culpa
       is_active: false
-      trial_ends_at: '2025-05-17T01:51:50'
+      trial_ends_at: '2025-05-18T11:18:42'
       settings:
-        custom_rate_limit: 9
-        max_concurrent_requests: 63
+        custom_rate_limit: 2
+        max_concurrent_requests: 80
     fileParameters: []
     responses: []
     responseFields: []
     auth:
       - headers
       - Authorization
-      - 'Bearer vcfkVha1E456dgZPD38abe6'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -1142,7 +569,7 @@ endpoints:
   -
     httpMethods:
       - GET
-    uri: 'api/v1/tenant/{id}'
+    uri: 'v1/tenant/{id}'
     metadata:
       groupName: Endpoints
       groupDescription: ''
@@ -1161,14 +588,14 @@ endpoints:
         name: id
         description: 'The ID of the tenant.'
         required: true
-        example: 4
+        example: 15
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      id: 4
+      id: 15
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -1176,8 +603,8 @@ endpoints:
     fileParameters: []
     responses:
       -
-        status: 401
-        content: '{"message":"Unauthenticated."}'
+        status: 404
+        content: '{"message":"Recurso n\u00e3o encontrado","developer_message":"Nenhum resultado encontrado para o modelo App\\Models\\Tenant com ID 15","exception":"Symfony\\Component\\HttpKernel\\Exception\\NotFoundHttpException","file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Foundation\/Exceptions\/Handler.php","line":639,"trace":[{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Foundation\/Exceptions\/Handler.php","line":587,"function":"prepareException","class":"Illuminate\\Foundation\\Exceptions\\Handler","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/nunomaduro\/collision\/src\/Adapters\/Laravel\/ExceptionHandler.php","line":54,"function":"render","class":"Illuminate\\Foundation\\Exceptions\\Handler","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Routing\/Pipeline.php","line":51,"function":"render","class":"NunoMaduro\\Collision\\Adapters\\Laravel\\ExceptionHandler","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Pipeline\/Pipeline.php","line":213,"function":"handleException","class":"Illuminate\\Routing\\Pipeline","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Auth\/Middleware\/Authenticate.php","line":63,"function":"{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():183}:184}","class":"Illuminate\\Pipeline\\Pipeline","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Pipeline\/Pipeline.php","line":208,"function":"handle","class":"Illuminate\\Auth\\Middleware\\Authenticate","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Pipeline\/Pipeline.php","line":126,"function":"{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():183}:184}","class":"Illuminate\\Pipeline\\Pipeline","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Routing\/Router.php","line":807,"function":"then","class":"Illuminate\\Pipeline\\Pipeline","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Routing\/Router.php","line":786,"function":"runRouteWithinStack","class":"Illuminate\\Routing\\Router","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Routing\/Router.php","line":750,"function":"runRoute","class":"Illuminate\\Routing\\Router","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Routing\/Router.php","line":739,"function":"dispatchToRoute","class":"Illuminate\\Routing\\Router","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Foundation\/Http\/Kernel.php","line":200,"function":"dispatch","class":"Illuminate\\Routing\\Router","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Pipeline\/Pipeline.php","line":169,"function":"{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():197}","class":"Illuminate\\Foundation\\Http\\Kernel","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/app\/Http\/Middleware\/Auth\/ImpersonationMiddleware.php","line":66,"function":"{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():167}","class":"Illuminate\\Pipeline\\Pipeline","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Pipeline\/Pipeline.php","line":208,"function":"handle","class":"App\\Http\\Middleware\\Auth\\ImpersonationMiddleware","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Foundation\/Http\/Middleware\/TransformsRequest.php","line":21,"function":"{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():183}:184}","class":"Illuminate\\Pipeline\\Pipeline","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Foundation\/Http\/Middleware\/ConvertEmptyStringsToNull.php","line":31,"function":"handle","class":"Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Pipeline\/Pipeline.php","line":208,"function":"handle","class":"Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Foundation\/Http\/Middleware\/TransformsRequest.php","line":21,"function":"{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():183}:184}","class":"Illuminate\\Pipeline\\Pipeline","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Foundation\/Http\/Middleware\/TrimStrings.php","line":51,"function":"handle","class":"Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Pipeline\/Pipeline.php","line":208,"function":"handle","class":"Illuminate\\Foundation\\Http\\Middleware\\TrimStrings","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Http\/Middleware\/ValidatePostSize.php","line":27,"function":"{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():183}:184}","class":"Illuminate\\Pipeline\\Pipeline","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Pipeline\/Pipeline.php","line":208,"function":"handle","class":"Illuminate\\Http\\Middleware\\ValidatePostSize","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Foundation\/Http\/Middleware\/PreventRequestsDuringMaintenance.php","line":109,"function":"{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():183}:184}","class":"Illuminate\\Pipeline\\Pipeline","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Pipeline\/Pipeline.php","line":208,"function":"handle","class":"Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Http\/Middleware\/HandleCors.php","line":61,"function":"{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():183}:184}","class":"Illuminate\\Pipeline\\Pipeline","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Pipeline\/Pipeline.php","line":208,"function":"handle","class":"Illuminate\\Http\\Middleware\\HandleCors","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Http\/Middleware\/TrustProxies.php","line":58,"function":"{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():183}:184}","class":"Illuminate\\Pipeline\\Pipeline","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Pipeline\/Pipeline.php","line":208,"function":"handle","class":"Illuminate\\Http\\Middleware\\TrustProxies","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Foundation\/Http\/Middleware\/InvokeDeferredCallbacks.php","line":22,"function":"{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():183}:184}","class":"Illuminate\\Pipeline\\Pipeline","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Pipeline\/Pipeline.php","line":208,"function":"handle","class":"Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Http\/Middleware\/ValidatePathEncoding.php","line":26,"function":"{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():183}:184}","class":"Illuminate\\Pipeline\\Pipeline","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Pipeline\/Pipeline.php","line":208,"function":"handle","class":"Illuminate\\Http\\Middleware\\ValidatePathEncoding","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Pipeline\/Pipeline.php","line":126,"function":"{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():183}:184}","class":"Illuminate\\Pipeline\\Pipeline","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Foundation\/Http\/Kernel.php","line":175,"function":"then","class":"Illuminate\\Pipeline\\Pipeline","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Foundation\/Http\/Kernel.php","line":144,"function":"sendRequestThroughRouter","class":"Illuminate\\Foundation\\Http\\Kernel","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/knuckleswtf\/scribe\/src\/Extracting\/Strategies\/Responses\/ResponseCalls.php","line":256,"function":"handle","class":"Illuminate\\Foundation\\Http\\Kernel","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/knuckleswtf\/scribe\/src\/Extracting\/Strategies\/Responses\/ResponseCalls.php","line":249,"function":"callLaravelRoute","class":"Knuckles\\Scribe\\Extracting\\Strategies\\Responses\\ResponseCalls","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/knuckleswtf\/scribe\/src\/Extracting\/Strategies\/Responses\/ResponseCalls.php","line":86,"function":"makeApiCall","class":"Knuckles\\Scribe\\Extracting\\Strategies\\Responses\\ResponseCalls","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/knuckleswtf\/scribe\/src\/Extracting\/Strategies\/Responses\/ResponseCalls.php","line":39,"function":"makeResponseCall","class":"Knuckles\\Scribe\\Extracting\\Strategies\\Responses\\ResponseCalls","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/knuckleswtf\/scribe\/src\/Extracting\/Extractor.php","line":240,"function":"__invoke","class":"Knuckles\\Scribe\\Extracting\\Strategies\\Responses\\ResponseCalls","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/knuckleswtf\/scribe\/src\/Extracting\/Extractor.php","line":165,"function":"iterateThroughStrategies","class":"Knuckles\\Scribe\\Extracting\\Extractor","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/knuckleswtf\/scribe\/src\/Extracting\/Extractor.php","line":97,"function":"fetchResponses","class":"Knuckles\\Scribe\\Extracting\\Extractor","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/knuckleswtf\/scribe\/src\/GroupedEndpoints\/GroupedEndpointsFromApp.php","line":125,"function":"processRoute","class":"Knuckles\\Scribe\\Extracting\\Extractor","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/knuckleswtf\/scribe\/src\/GroupedEndpoints\/GroupedEndpointsFromApp.php","line":72,"function":"extractEndpointsInfoFromLaravelApp","class":"Knuckles\\Scribe\\GroupedEndpoints\\GroupedEndpointsFromApp","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/knuckleswtf\/scribe\/src\/GroupedEndpoints\/GroupedEndpointsFromApp.php","line":50,"function":"extractEndpointsInfoAndWriteToDisk","class":"Knuckles\\Scribe\\GroupedEndpoints\\GroupedEndpointsFromApp","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/knuckleswtf\/scribe\/src\/Commands\/GenerateDocumentation.php","line":55,"function":"get","class":"Knuckles\\Scribe\\GroupedEndpoints\\GroupedEndpointsFromApp","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Container\/BoundMethod.php","line":36,"function":"handle","class":"Knuckles\\Scribe\\Commands\\GenerateDocumentation","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Container\/Util.php","line":43,"function":"{closure:Illuminate\\Container\\BoundMethod::call():35}","class":"Illuminate\\Container\\BoundMethod","type":"::"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Container\/BoundMethod.php","line":96,"function":"unwrapIfClosure","class":"Illuminate\\Container\\Util","type":"::"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Container\/BoundMethod.php","line":35,"function":"callBoundMethod","class":"Illuminate\\Container\\BoundMethod","type":"::"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Container\/Container.php","line":754,"function":"call","class":"Illuminate\\Container\\BoundMethod","type":"::"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Console\/Command.php","line":211,"function":"call","class":"Illuminate\\Container\\Container","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/symfony\/console\/Command\/Command.php","line":279,"function":"execute","class":"Illuminate\\Console\\Command","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Console\/Command.php","line":180,"function":"run","class":"Symfony\\Component\\Console\\Command\\Command","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/symfony\/console\/Application.php","line":1094,"function":"run","class":"Illuminate\\Console\\Command","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/symfony\/console\/Application.php","line":342,"function":"doRunCommand","class":"Symfony\\Component\\Console\\Application","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/symfony\/console\/Application.php","line":193,"function":"doRun","class":"Symfony\\Component\\Console\\Application","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Foundation\/Console\/Kernel.php","line":197,"function":"run","class":"Symfony\\Component\\Console\\Application","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/vendor\/laravel\/framework\/src\/Illuminate\/Foundation\/Application.php","line":1234,"function":"handle","class":"Illuminate\\Foundation\\Console\\Kernel","type":"->"},{"file":"\/home\/alex\/PhpstormProjects\/MetronicApp\/artisan","line":16,"function":"handleCommand","class":"Illuminate\\Foundation\\Application","type":"->"}]}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -1188,7 +615,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 31eZbvd6ac6akgDhVEP854f'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -1197,7 +624,7 @@ endpoints:
     httpMethods:
       - PUT
       - PATCH
-    uri: 'api/v1/tenant/{id}'
+    uri: 'v1/tenant/{id}'
     metadata:
       groupName: Endpoints
       groupDescription: ''
@@ -1216,14 +643,14 @@ endpoints:
         name: id
         description: 'The ID of the tenant.'
         required: true
-        example: 17
+        example: 20
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      id: 17
+      id: 20
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
@@ -1231,7 +658,7 @@ endpoints:
         name: name
         description: 'Must not be greater than 255 characters.'
         required: false
-        example: oyaaariupvu
+        example: abhkxxwf
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -1241,7 +668,7 @@ endpoints:
         name: domain
         description: 'Must not be greater than 255 characters.'
         required: false
-        example: krcbdxiesytmdynlrws
+        example: ajaqyyxcwurbzncrtdrmffi
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -1251,7 +678,7 @@ endpoints:
         name: plan
         description: ''
         required: false
-        example: libero
+        example: expedita
         type: string
         enumValues:
           - free
@@ -1276,7 +703,7 @@ endpoints:
         name: trial_ends_at
         description: 'Must be a valid date.'
         required: false
-        example: '2025-05-17T01:51:50'
+        example: '2025-05-18T11:18:42'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -1296,7 +723,7 @@ endpoints:
         name: settings.custom_rate_limit
         description: 'Must be at least 0.'
         required: false
-        example: 24
+        example: 2
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -1306,28 +733,28 @@ endpoints:
         name: settings.max_concurrent_requests
         description: 'Must be at least 0.'
         required: false
-        example: 70
+        example: 55
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: true
         custom: []
     cleanBodyParameters:
-      name: oyaaariupvu
-      domain: krcbdxiesytmdynlrws
-      plan: libero
+      name: abhkxxwf
+      domain: ajaqyyxcwurbzncrtdrmffi
+      plan: expedita
       is_active: true
-      trial_ends_at: '2025-05-17T01:51:50'
+      trial_ends_at: '2025-05-18T11:18:42'
       settings:
-        custom_rate_limit: 24
-        max_concurrent_requests: 70
+        custom_rate_limit: 2
+        max_concurrent_requests: 55
     fileParameters: []
     responses: []
     responseFields: []
     auth:
       - headers
       - Authorization
-      - 'Bearer c8ahagE1546DbkvefdZPV63'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -1335,7 +762,7 @@ endpoints:
   -
     httpMethods:
       - DELETE
-    uri: 'api/v1/tenant/{id}'
+    uri: 'v1/tenant/{id}'
     metadata:
       groupName: Endpoints
       groupDescription: ''
@@ -1354,14 +781,14 @@ endpoints:
         name: id
         description: 'The ID of the tenant.'
         required: true
-        example: 18
+        example: 13
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      id: 18
+      id: 13
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -1372,7 +799,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1ZcekD4EVf66d8haPgb3v5a'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -1380,14 +807,29 @@ endpoints:
   -
     httpMethods:
       - GET
-    uri: api/v1/users
+    uri: v1/users
     metadata:
       groupName: Endpoints
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display a listing of the users.'
-      description: ''
+      title: 'Lista todos os usuários do sistema'
+      description: |-
+        Endpoint: GET /users
+        Grupo: Users
+        Autenticação: Requerida (Sanctum)
+        Middleware: totp.verify, tenant.ratelimit
+
+        Filtros:
+        - page: Número da página para paginação
+        - per_page: Itens por página
+        - name: Filtrar por nome (correspondência parcial)
+        - email: Filtrar por email (correspondência parcial)
+
+        Respostas:
+        - 200: Lista paginada de usuários com seus papéis
+        - 401: {"message": "Unauthenticated."}
+        - 403: {"message": "Permission Denied."}
       authenticated: true
       custom: []
     headers:
@@ -1403,11 +845,15 @@ endpoints:
     fileParameters: []
     responses:
       -
-        status: 401
-        content: '{"message":"Unauthenticated."}'
+        status: 200
+        content: '{"data":[{"id":1,"name":"Alex Nogueira","email":"alex@devaction.com.br","avatar":"https:\/\/via.placeholder.com\/640x480.png\/00cc44?text=dignissimos","email_verified_at":"2025-05-11T22:54:36.000000Z","created_at":"2025-05-11T22:54:36.000000Z","updated_at":"2025-05-11T22:54:36.000000Z"}],"links":{"first":"http:\/\/metronicapp.test\/v1\/users?page=1","last":"http:\/\/metronicapp.test\/v1\/users?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/metronicapp.test\/v1\/users?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/metronicapp.test\/v1\/users","per_page":15,"to":1,"total":1}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
+          x-ratelimit-limit: '30; 30'
+          x-ratelimit-remaining: '29; 28'
+          retry-after: '60'
+          x-ratelimit-reset: '1747567182'
           vary: Origin
         description: null
         custom: []
@@ -1415,7 +861,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 66Pdf5h13agb48eVvaDZkcE'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -1423,14 +869,22 @@ endpoints:
   -
     httpMethods:
       - GET
-    uri: 'api/v1/users/{id}'
+    uri: 'v1/users/{id}'
     metadata:
       groupName: Endpoints
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display the specified user.'
-      description: ''
+      title: 'Exibe detalhes de um usuário específico'
+      description: |-
+        Endpoint: GET /users/{user}
+        Grupo: Users
+        Autenticação: Requerida (Sanctum)
+        Middleware: totp.verify, tenant.ratelimit
+
+        Respostas:
+        - 200: Detalhes do usuário
+        - 404: Usuário não encontrado
       authenticated: true
       custom: []
     headers:
@@ -1457,11 +911,15 @@ endpoints:
     fileParameters: []
     responses:
       -
-        status: 401
-        content: '{"message":"Unauthenticated."}'
+        status: 200
+        content: '{"data":{"id":1,"name":"Alex Nogueira","email":"alex@devaction.com.br","avatar":"https:\/\/via.placeholder.com\/640x480.png\/00cc44?text=dignissimos","email_verified_at":"2025-05-11T22:54:36.000000Z","created_at":"2025-05-11T22:54:36.000000Z","updated_at":"2025-05-11T22:54:36.000000Z"}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
+          x-ratelimit-limit: '30; 30'
+          x-ratelimit-remaining: '28; 27'
+          retry-after: '59'
+          x-ratelimit-reset: '1747567182'
           vary: Origin
         description: null
         custom: []
@@ -1469,7 +927,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer kabE3chP1645evDfa68VdgZ'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -1477,14 +935,28 @@ endpoints:
   -
     httpMethods:
       - POST
-    uri: api/v1/users
+    uri: v1/users
     metadata:
       groupName: Endpoints
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Store a newly created user in storage.'
-      description: ''
+      title: 'Cria um novo usuário'
+      description: |-
+        Endpoint: POST /users
+        Grupo: Users
+        Autenticação: Requerida (Sanctum)
+        Middleware: totp.verify, tenant.ratelimit
+
+        Parâmetros:
+        - name: Nome do usuário
+        - email: Email do usuário
+        - password: Senha do usuário
+        - password_confirmation: Confirmação da senha
+
+        Respostas:
+        - 201: Usuário criado com sucesso
+        - 422: Erros de validação
       authenticated: true
       custom: []
     headers:
@@ -1500,7 +972,7 @@ endpoints:
         name: name
         description: 'Must not be greater than 255 characters.'
         required: true
-        example: nltrveu
+        example: hbxnufeexbayzfab
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -1510,7 +982,7 @@ endpoints:
         name: email
         description: 'Must be a valid email address. Must not be greater than 255 characters.'
         required: true
-        example: jakubowski.burnice@example.net
+        example: hand.kody@example.com
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -1520,7 +992,7 @@ endpoints:
         name: password
         description: ''
         required: true
-        example: I9A<RF8L\L<
+        example: Rh5W/l3;V$N`\n
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -1540,24 +1012,24 @@ endpoints:
         name: avatar
         description: 'Must not be greater than 255 characters.'
         required: false
-        example: kyfhpxuivzwscz
+        example: eelzvxt
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: true
         custom: []
     cleanBodyParameters:
-      name: nltrveu
-      email: jakubowski.burnice@example.net
-      password: I9A<RF8L\L<
-      avatar: kyfhpxuivzwscz
+      name: hbxnufeexbayzfab
+      email: hand.kody@example.com
+      password: Rh5W/l3;V$N`\n
+      avatar: eelzvxt
     fileParameters: []
     responses: []
     responseFields: []
     auth:
       - headers
       - Authorization
-      - 'Bearer k43De8g6cb5a16hvVdPfEZa'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -1565,14 +1037,29 @@ endpoints:
   -
     httpMethods:
       - PUT
-    uri: 'api/v1/users/{id}'
+    uri: 'v1/users/{id}'
     metadata:
       groupName: Endpoints
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Update the specified user in storage.'
-      description: ''
+      title: 'Atualiza um usuário existente'
+      description: |-
+        Endpoint: PUT /users/{user}
+        Grupo: Users
+        Autenticação: Requerida (Sanctum)
+        Middleware: totp.verify, tenant.ratelimit
+
+        Parâmetros:
+        - name: Nome do usuário
+        - email: Email do usuário
+        - (opcional) password: Nova senha
+        - (opcional) password_confirmation: Confirmação da senha
+
+        Respostas:
+        - 200: Usuário atualizado com sucesso
+        - 404: Usuário não encontrado
+        - 422: Erros de validação
       authenticated: true
       custom: []
     headers:
@@ -1599,7 +1086,7 @@ endpoints:
         name: name
         description: 'Must not be greater than 255 characters.'
         required: false
-        example: ndvksxkupxvytkgb
+        example: mesztxy
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -1609,7 +1096,7 @@ endpoints:
         name: email
         description: 'Must be a valid email address. Must not be greater than 255 characters.'
         required: false
-        example: jaiden30@example.net
+        example: ywatsica@example.com
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -1619,7 +1106,7 @@ endpoints:
         name: password
         description: ''
         required: false
-        example: '#\S&6[x'
+        example: 'l,/^4rZU-F_9CCj[}b'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -1639,24 +1126,24 @@ endpoints:
         name: avatar
         description: 'Must not be greater than 255 characters.'
         required: false
-        example: hmephpmepvcwciiogpftqzze
+        example: xjoxeakixiokhp
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: true
         custom: []
     cleanBodyParameters:
-      name: ndvksxkupxvytkgb
-      email: jaiden30@example.net
-      password: '#\S&6[x'
-      avatar: hmephpmepvcwciiogpftqzze
+      name: mesztxy
+      email: ywatsica@example.com
+      password: 'l,/^4rZU-F_9CCj[}b'
+      avatar: xjoxeakixiokhp
     fileParameters: []
     responses: []
     responseFields: []
     auth:
       - headers
       - Authorization
-      - 'Bearer 4bchdkDV365f8aPgZ16vEae'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -1664,14 +1151,22 @@ endpoints:
   -
     httpMethods:
       - DELETE
-    uri: 'api/v1/users/{id}'
+    uri: 'v1/users/{id}'
     metadata:
       groupName: Endpoints
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Remove the specified user from storage.'
-      description: ''
+      title: 'Remove um usuário do sistema'
+      description: |-
+        Endpoint: DELETE /users/{user}
+        Grupo: Users
+        Autenticação: Requerida (Sanctum)
+        Middleware: totp.verify, tenant.ratelimit
+
+        Respostas:
+        - 204: Usuário removido com sucesso (No Content)
+        - 404: Usuário não encontrado
       authenticated: true
       custom: []
     headers:
@@ -1701,7 +1196,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 4ag3a66fv5eZdc8hEPDVbk1'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -1709,14 +1204,28 @@ endpoints:
   -
     httpMethods:
       - GET
-    uri: api/v1/acl/role
+    uri: v1/acl/role
     metadata:
       groupName: Endpoints
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display a listing of the resource.'
-      description: ''
+      title: 'Lista todos os papéis (roles) com suas permissões'
+      description: |-
+        Endpoint: GET /acl/role
+        Grupo: ACL
+        Autenticação: Requerida (Sanctum)
+        Middleware: totp.verify
+
+        Filtros:
+        - page: Número da página para paginação
+        - per_page: Itens por página
+        - name: Filtrar por nome (correspondência parcial)
+
+        Respostas:
+        - 200: Lista paginada de papéis com suas permissões
+        - 401: {"message": "Unauthenticated."}
+        - 403: {"message": "Permission Denied."}
       authenticated: true
       custom: []
     headers:
@@ -1732,11 +1241,15 @@ endpoints:
     fileParameters: []
     responses:
       -
-        status: 401
-        content: '{"message":"Unauthenticated."}'
+        status: 200
+        content: '{"data":[{"id":"01jv0rxct0txp7671khwhrg3sm","name":"Administrator","description":null,"created_at":"2025-05-11T22:54:36.000000Z","updated_at":"2025-05-11T22:54:36.000000Z","permissions":{"granted":[{"id":"01jv0rxcr5ycqryq1z54ybcw52","name":"workspace-settings:view"},{"id":"01jv0rxcr8kfdnpd3nppjs184h","name":"workspace-settings:modify"},{"id":"01jv0rxcrasht8530cptqgtg8w","name":"workspace-settings:publish"},{"id":"01jv0rxcrb9bqracc2rse1j85z","name":"workspace-settings:configure"},{"id":"01jv0rxcrdmc6b0x20wttnwv87","name":"billing-management:view"},{"id":"01jv0rxcreqp13kj2jnzd2jbnj","name":"billing-management:modify"},{"id":"01jv0rxcrgyn8vdv7xcqrrz406","name":"billing-management:publish"},{"id":"01jv0rxcrj4y7f7sh98xh9vrsf","name":"billing-management:configure"},{"id":"01jv0rxcrkr05qgrbsbt5nwp3s","name":"integration-setup:view"},{"id":"01jv0rxcrn9793xxgazjzqc0mh","name":"integration-setup:modify"},{"id":"01jv0rxcrpyx9n6jnr5wk9vn7d","name":"integration-setup:publish"},{"id":"01jv0rxcrr36eksh030b22e7ah","name":"integration-setup:configure"},{"id":"01jv0rxcrt46a792f7n9c5zyqy","name":"map-creation:view"},{"id":"01jv0rxcrw824a967p4hs6sm8m","name":"map-creation:modify"},{"id":"01jv0rxcrx1pxxkwgkjhn22z8g","name":"map-creation:publish"},{"id":"01jv0rxcrzv5v8b4k6tpbzkra9","name":"map-creation:configure"},{"id":"01jv0rxcs12jyca4eymkk1sftr","name":"data-export:view"},{"id":"01jv0rxcs2f2abgwdzmf0yc2hb","name":"data-export:modify"},{"id":"01jv0rxcs3rm5ds8kv2x9t9g98","name":"data-export:publish"},{"id":"01jv0rxcs5tghscz91n9gybd90","name":"data-export:configure"},{"id":"01jv0rxcs7ycdf554pfkcrcjdx","name":"user-roles:view"},{"id":"01jv0rxcs8jzp6yzf2js42pt5n","name":"user-roles:modify"},{"id":"01jv0rxcsakq1beyapc94me90w","name":"user-roles:publish"},{"id":"01jv0rxcscvbdbdtphz7dawxp1","name":"user-roles:configure"},{"id":"01jv0rxcsd108kec578eyp4112","name":"security-settings:view"},{"id":"01jv0rxcsfjm63x7kypmft0r00","name":"security-settings:modify"},{"id":"01jv0rxcsgngj7s6hm3dbzx5z4","name":"security-settings:publish"},{"id":"01jv0rxcsj6mxefqrkyjzz8vt5","name":"security-settings:configure"},{"id":"01jv0rxcsk65vf3jqk2jwaw9f8","name":"insights-access:view"},{"id":"01jv0rxcsn0f4kn5s2c6a0gr6q","name":"insights-access:modify"},{"id":"01jv0rxcspe2jpk9pykf9v1ptf","name":"insights-access:publish"},{"id":"01jv0rxcsr8dfr8jym9ghg2yaf","name":"insights-access:configure"},{"id":"01jv0rxcstt0hh3sxpcxzwe9y2","name":"merchant-list:view"},{"id":"01jv0rxcsv21we8f8cfh83bvpn","name":"merchant-list:modify"},{"id":"01jv0rxcsxqg65wjwfhw4zy8ce","name":"merchant-list:publish"},{"id":"01jv0rxcsyfgf9parc6pxfa92w","name":"merchant-list:configure"}],"revoked":[]}},{"id":"01jv0rxct2pr1jpdm7k7drc6sc","name":"Viewer","description":null,"created_at":"2025-05-11T22:54:36.000000Z","updated_at":"2025-05-11T22:54:36.000000Z","permissions":{"granted":[],"revoked":[{"id":"01jv0rxcr5ycqryq1z54ybcw52","name":"workspace-settings:view"},{"id":"01jv0rxcr8kfdnpd3nppjs184h","name":"workspace-settings:modify"},{"id":"01jv0rxcrasht8530cptqgtg8w","name":"workspace-settings:publish"},{"id":"01jv0rxcrb9bqracc2rse1j85z","name":"workspace-settings:configure"},{"id":"01jv0rxcrdmc6b0x20wttnwv87","name":"billing-management:view"},{"id":"01jv0rxcreqp13kj2jnzd2jbnj","name":"billing-management:modify"},{"id":"01jv0rxcrgyn8vdv7xcqrrz406","name":"billing-management:publish"},{"id":"01jv0rxcrj4y7f7sh98xh9vrsf","name":"billing-management:configure"},{"id":"01jv0rxcrkr05qgrbsbt5nwp3s","name":"integration-setup:view"},{"id":"01jv0rxcrn9793xxgazjzqc0mh","name":"integration-setup:modify"},{"id":"01jv0rxcrpyx9n6jnr5wk9vn7d","name":"integration-setup:publish"},{"id":"01jv0rxcrr36eksh030b22e7ah","name":"integration-setup:configure"},{"id":"01jv0rxcrt46a792f7n9c5zyqy","name":"map-creation:view"},{"id":"01jv0rxcrw824a967p4hs6sm8m","name":"map-creation:modify"},{"id":"01jv0rxcrx1pxxkwgkjhn22z8g","name":"map-creation:publish"},{"id":"01jv0rxcrzv5v8b4k6tpbzkra9","name":"map-creation:configure"},{"id":"01jv0rxcs12jyca4eymkk1sftr","name":"data-export:view"},{"id":"01jv0rxcs2f2abgwdzmf0yc2hb","name":"data-export:modify"},{"id":"01jv0rxcs3rm5ds8kv2x9t9g98","name":"data-export:publish"},{"id":"01jv0rxcs5tghscz91n9gybd90","name":"data-export:configure"},{"id":"01jv0rxcs7ycdf554pfkcrcjdx","name":"user-roles:view"},{"id":"01jv0rxcs8jzp6yzf2js42pt5n","name":"user-roles:modify"},{"id":"01jv0rxcsakq1beyapc94me90w","name":"user-roles:publish"},{"id":"01jv0rxcscvbdbdtphz7dawxp1","name":"user-roles:configure"},{"id":"01jv0rxcsd108kec578eyp4112","name":"security-settings:view"},{"id":"01jv0rxcsfjm63x7kypmft0r00","name":"security-settings:modify"},{"id":"01jv0rxcsgngj7s6hm3dbzx5z4","name":"security-settings:publish"},{"id":"01jv0rxcsj6mxefqrkyjzz8vt5","name":"security-settings:configure"},{"id":"01jv0rxcsk65vf3jqk2jwaw9f8","name":"insights-access:view"},{"id":"01jv0rxcsn0f4kn5s2c6a0gr6q","name":"insights-access:modify"},{"id":"01jv0rxcspe2jpk9pykf9v1ptf","name":"insights-access:publish"},{"id":"01jv0rxcsr8dfr8jym9ghg2yaf","name":"insights-access:configure"},{"id":"01jv0rxcstt0hh3sxpcxzwe9y2","name":"merchant-list:view"},{"id":"01jv0rxcsv21we8f8cfh83bvpn","name":"merchant-list:modify"},{"id":"01jv0rxcsxqg65wjwfhw4zy8ce","name":"merchant-list:publish"},{"id":"01jv0rxcsyfgf9parc6pxfa92w","name":"merchant-list:configure"}]}},{"id":"01jv0rxct39acytdmnh6s28jf5","name":"Remote Developer","description":null,"created_at":"2025-05-11T22:54:36.000000Z","updated_at":"2025-05-11T22:54:36.000000Z","permissions":{"granted":[],"revoked":[{"id":"01jv0rxcr5ycqryq1z54ybcw52","name":"workspace-settings:view"},{"id":"01jv0rxcr8kfdnpd3nppjs184h","name":"workspace-settings:modify"},{"id":"01jv0rxcrasht8530cptqgtg8w","name":"workspace-settings:publish"},{"id":"01jv0rxcrb9bqracc2rse1j85z","name":"workspace-settings:configure"},{"id":"01jv0rxcrdmc6b0x20wttnwv87","name":"billing-management:view"},{"id":"01jv0rxcreqp13kj2jnzd2jbnj","name":"billing-management:modify"},{"id":"01jv0rxcrgyn8vdv7xcqrrz406","name":"billing-management:publish"},{"id":"01jv0rxcrj4y7f7sh98xh9vrsf","name":"billing-management:configure"},{"id":"01jv0rxcrkr05qgrbsbt5nwp3s","name":"integration-setup:view"},{"id":"01jv0rxcrn9793xxgazjzqc0mh","name":"integration-setup:modify"},{"id":"01jv0rxcrpyx9n6jnr5wk9vn7d","name":"integration-setup:publish"},{"id":"01jv0rxcrr36eksh030b22e7ah","name":"integration-setup:configure"},{"id":"01jv0rxcrt46a792f7n9c5zyqy","name":"map-creation:view"},{"id":"01jv0rxcrw824a967p4hs6sm8m","name":"map-creation:modify"},{"id":"01jv0rxcrx1pxxkwgkjhn22z8g","name":"map-creation:publish"},{"id":"01jv0rxcrzv5v8b4k6tpbzkra9","name":"map-creation:configure"},{"id":"01jv0rxcs12jyca4eymkk1sftr","name":"data-export:view"},{"id":"01jv0rxcs2f2abgwdzmf0yc2hb","name":"data-export:modify"},{"id":"01jv0rxcs3rm5ds8kv2x9t9g98","name":"data-export:publish"},{"id":"01jv0rxcs5tghscz91n9gybd90","name":"data-export:configure"},{"id":"01jv0rxcs7ycdf554pfkcrcjdx","name":"user-roles:view"},{"id":"01jv0rxcs8jzp6yzf2js42pt5n","name":"user-roles:modify"},{"id":"01jv0rxcsakq1beyapc94me90w","name":"user-roles:publish"},{"id":"01jv0rxcscvbdbdtphz7dawxp1","name":"user-roles:configure"},{"id":"01jv0rxcsd108kec578eyp4112","name":"security-settings:view"},{"id":"01jv0rxcsfjm63x7kypmft0r00","name":"security-settings:modify"},{"id":"01jv0rxcsgngj7s6hm3dbzx5z4","name":"security-settings:publish"},{"id":"01jv0rxcsj6mxefqrkyjzz8vt5","name":"security-settings:configure"},{"id":"01jv0rxcsk65vf3jqk2jwaw9f8","name":"insights-access:view"},{"id":"01jv0rxcsn0f4kn5s2c6a0gr6q","name":"insights-access:modify"},{"id":"01jv0rxcspe2jpk9pykf9v1ptf","name":"insights-access:publish"},{"id":"01jv0rxcsr8dfr8jym9ghg2yaf","name":"insights-access:configure"},{"id":"01jv0rxcstt0hh3sxpcxzwe9y2","name":"merchant-list:view"},{"id":"01jv0rxcsv21we8f8cfh83bvpn","name":"merchant-list:modify"},{"id":"01jv0rxcsxqg65wjwfhw4zy8ce","name":"merchant-list:publish"},{"id":"01jv0rxcsyfgf9parc6pxfa92w","name":"merchant-list:configure"}]}},{"id":"01jv0rxct6xvwn3qnv03rnm43p","name":"Customer Support","description":null,"created_at":"2025-05-11T22:54:36.000000Z","updated_at":"2025-05-11T22:54:36.000000Z","permissions":{"granted":[],"revoked":[{"id":"01jv0rxcr5ycqryq1z54ybcw52","name":"workspace-settings:view"},{"id":"01jv0rxcr8kfdnpd3nppjs184h","name":"workspace-settings:modify"},{"id":"01jv0rxcrasht8530cptqgtg8w","name":"workspace-settings:publish"},{"id":"01jv0rxcrb9bqracc2rse1j85z","name":"workspace-settings:configure"},{"id":"01jv0rxcrdmc6b0x20wttnwv87","name":"billing-management:view"},{"id":"01jv0rxcreqp13kj2jnzd2jbnj","name":"billing-management:modify"},{"id":"01jv0rxcrgyn8vdv7xcqrrz406","name":"billing-management:publish"},{"id":"01jv0rxcrj4y7f7sh98xh9vrsf","name":"billing-management:configure"},{"id":"01jv0rxcrkr05qgrbsbt5nwp3s","name":"integration-setup:view"},{"id":"01jv0rxcrn9793xxgazjzqc0mh","name":"integration-setup:modify"},{"id":"01jv0rxcrpyx9n6jnr5wk9vn7d","name":"integration-setup:publish"},{"id":"01jv0rxcrr36eksh030b22e7ah","name":"integration-setup:configure"},{"id":"01jv0rxcrt46a792f7n9c5zyqy","name":"map-creation:view"},{"id":"01jv0rxcrw824a967p4hs6sm8m","name":"map-creation:modify"},{"id":"01jv0rxcrx1pxxkwgkjhn22z8g","name":"map-creation:publish"},{"id":"01jv0rxcrzv5v8b4k6tpbzkra9","name":"map-creation:configure"},{"id":"01jv0rxcs12jyca4eymkk1sftr","name":"data-export:view"},{"id":"01jv0rxcs2f2abgwdzmf0yc2hb","name":"data-export:modify"},{"id":"01jv0rxcs3rm5ds8kv2x9t9g98","name":"data-export:publish"},{"id":"01jv0rxcs5tghscz91n9gybd90","name":"data-export:configure"},{"id":"01jv0rxcs7ycdf554pfkcrcjdx","name":"user-roles:view"},{"id":"01jv0rxcs8jzp6yzf2js42pt5n","name":"user-roles:modify"},{"id":"01jv0rxcsakq1beyapc94me90w","name":"user-roles:publish"},{"id":"01jv0rxcscvbdbdtphz7dawxp1","name":"user-roles:configure"},{"id":"01jv0rxcsd108kec578eyp4112","name":"security-settings:view"},{"id":"01jv0rxcsfjm63x7kypmft0r00","name":"security-settings:modify"},{"id":"01jv0rxcsgngj7s6hm3dbzx5z4","name":"security-settings:publish"},{"id":"01jv0rxcsj6mxefqrkyjzz8vt5","name":"security-settings:configure"},{"id":"01jv0rxcsk65vf3jqk2jwaw9f8","name":"insights-access:view"},{"id":"01jv0rxcsn0f4kn5s2c6a0gr6q","name":"insights-access:modify"},{"id":"01jv0rxcspe2jpk9pykf9v1ptf","name":"insights-access:publish"},{"id":"01jv0rxcsr8dfr8jym9ghg2yaf","name":"insights-access:configure"},{"id":"01jv0rxcstt0hh3sxpcxzwe9y2","name":"merchant-list:view"},{"id":"01jv0rxcsv21we8f8cfh83bvpn","name":"merchant-list:modify"},{"id":"01jv0rxcsxqg65wjwfhw4zy8ce","name":"merchant-list:publish"},{"id":"01jv0rxcsyfgf9parc6pxfa92w","name":"merchant-list:configure"}]}},{"id":"01jv0rxct8d5ga2hqj97qvczkh","name":"Project Manager","description":null,"created_at":"2025-05-11T22:54:36.000000Z","updated_at":"2025-05-11T22:54:36.000000Z","permissions":{"granted":[],"revoked":[{"id":"01jv0rxcr5ycqryq1z54ybcw52","name":"workspace-settings:view"},{"id":"01jv0rxcr8kfdnpd3nppjs184h","name":"workspace-settings:modify"},{"id":"01jv0rxcrasht8530cptqgtg8w","name":"workspace-settings:publish"},{"id":"01jv0rxcrb9bqracc2rse1j85z","name":"workspace-settings:configure"},{"id":"01jv0rxcrdmc6b0x20wttnwv87","name":"billing-management:view"},{"id":"01jv0rxcreqp13kj2jnzd2jbnj","name":"billing-management:modify"},{"id":"01jv0rxcrgyn8vdv7xcqrrz406","name":"billing-management:publish"},{"id":"01jv0rxcrj4y7f7sh98xh9vrsf","name":"billing-management:configure"},{"id":"01jv0rxcrkr05qgrbsbt5nwp3s","name":"integration-setup:view"},{"id":"01jv0rxcrn9793xxgazjzqc0mh","name":"integration-setup:modify"},{"id":"01jv0rxcrpyx9n6jnr5wk9vn7d","name":"integration-setup:publish"},{"id":"01jv0rxcrr36eksh030b22e7ah","name":"integration-setup:configure"},{"id":"01jv0rxcrt46a792f7n9c5zyqy","name":"map-creation:view"},{"id":"01jv0rxcrw824a967p4hs6sm8m","name":"map-creation:modify"},{"id":"01jv0rxcrx1pxxkwgkjhn22z8g","name":"map-creation:publish"},{"id":"01jv0rxcrzv5v8b4k6tpbzkra9","name":"map-creation:configure"},{"id":"01jv0rxcs12jyca4eymkk1sftr","name":"data-export:view"},{"id":"01jv0rxcs2f2abgwdzmf0yc2hb","name":"data-export:modify"},{"id":"01jv0rxcs3rm5ds8kv2x9t9g98","name":"data-export:publish"},{"id":"01jv0rxcs5tghscz91n9gybd90","name":"data-export:configure"},{"id":"01jv0rxcs7ycdf554pfkcrcjdx","name":"user-roles:view"},{"id":"01jv0rxcs8jzp6yzf2js42pt5n","name":"user-roles:modify"},{"id":"01jv0rxcsakq1beyapc94me90w","name":"user-roles:publish"},{"id":"01jv0rxcscvbdbdtphz7dawxp1","name":"user-roles:configure"},{"id":"01jv0rxcsd108kec578eyp4112","name":"security-settings:view"},{"id":"01jv0rxcsfjm63x7kypmft0r00","name":"security-settings:modify"},{"id":"01jv0rxcsgngj7s6hm3dbzx5z4","name":"security-settings:publish"},{"id":"01jv0rxcsj6mxefqrkyjzz8vt5","name":"security-settings:configure"},{"id":"01jv0rxcsk65vf3jqk2jwaw9f8","name":"insights-access:view"},{"id":"01jv0rxcsn0f4kn5s2c6a0gr6q","name":"insights-access:modify"},{"id":"01jv0rxcspe2jpk9pykf9v1ptf","name":"insights-access:publish"},{"id":"01jv0rxcsr8dfr8jym9ghg2yaf","name":"insights-access:configure"},{"id":"01jv0rxcstt0hh3sxpcxzwe9y2","name":"merchant-list:view"},{"id":"01jv0rxcsv21we8f8cfh83bvpn","name":"merchant-list:modify"},{"id":"01jv0rxcsxqg65wjwfhw4zy8ce","name":"merchant-list:publish"},{"id":"01jv0rxcsyfgf9parc6pxfa92w","name":"merchant-list:configure"}]}},{"id":"01jv0rxcta61s9rwrhm72w7xyc","name":"Remote Designer","description":null,"created_at":"2025-05-11T22:54:36.000000Z","updated_at":"2025-05-11T22:54:36.000000Z","permissions":{"granted":[],"revoked":[{"id":"01jv0rxcr5ycqryq1z54ybcw52","name":"workspace-settings:view"},{"id":"01jv0rxcr8kfdnpd3nppjs184h","name":"workspace-settings:modify"},{"id":"01jv0rxcrasht8530cptqgtg8w","name":"workspace-settings:publish"},{"id":"01jv0rxcrb9bqracc2rse1j85z","name":"workspace-settings:configure"},{"id":"01jv0rxcrdmc6b0x20wttnwv87","name":"billing-management:view"},{"id":"01jv0rxcreqp13kj2jnzd2jbnj","name":"billing-management:modify"},{"id":"01jv0rxcrgyn8vdv7xcqrrz406","name":"billing-management:publish"},{"id":"01jv0rxcrj4y7f7sh98xh9vrsf","name":"billing-management:configure"},{"id":"01jv0rxcrkr05qgrbsbt5nwp3s","name":"integration-setup:view"},{"id":"01jv0rxcrn9793xxgazjzqc0mh","name":"integration-setup:modify"},{"id":"01jv0rxcrpyx9n6jnr5wk9vn7d","name":"integration-setup:publish"},{"id":"01jv0rxcrr36eksh030b22e7ah","name":"integration-setup:configure"},{"id":"01jv0rxcrt46a792f7n9c5zyqy","name":"map-creation:view"},{"id":"01jv0rxcrw824a967p4hs6sm8m","name":"map-creation:modify"},{"id":"01jv0rxcrx1pxxkwgkjhn22z8g","name":"map-creation:publish"},{"id":"01jv0rxcrzv5v8b4k6tpbzkra9","name":"map-creation:configure"},{"id":"01jv0rxcs12jyca4eymkk1sftr","name":"data-export:view"},{"id":"01jv0rxcs2f2abgwdzmf0yc2hb","name":"data-export:modify"},{"id":"01jv0rxcs3rm5ds8kv2x9t9g98","name":"data-export:publish"},{"id":"01jv0rxcs5tghscz91n9gybd90","name":"data-export:configure"},{"id":"01jv0rxcs7ycdf554pfkcrcjdx","name":"user-roles:view"},{"id":"01jv0rxcs8jzp6yzf2js42pt5n","name":"user-roles:modify"},{"id":"01jv0rxcsakq1beyapc94me90w","name":"user-roles:publish"},{"id":"01jv0rxcscvbdbdtphz7dawxp1","name":"user-roles:configure"},{"id":"01jv0rxcsd108kec578eyp4112","name":"security-settings:view"},{"id":"01jv0rxcsfjm63x7kypmft0r00","name":"security-settings:modify"},{"id":"01jv0rxcsgngj7s6hm3dbzx5z4","name":"security-settings:publish"},{"id":"01jv0rxcsj6mxefqrkyjzz8vt5","name":"security-settings:configure"},{"id":"01jv0rxcsk65vf3jqk2jwaw9f8","name":"insights-access:view"},{"id":"01jv0rxcsn0f4kn5s2c6a0gr6q","name":"insights-access:modify"},{"id":"01jv0rxcspe2jpk9pykf9v1ptf","name":"insights-access:publish"},{"id":"01jv0rxcsr8dfr8jym9ghg2yaf","name":"insights-access:configure"},{"id":"01jv0rxcstt0hh3sxpcxzwe9y2","name":"merchant-list:view"},{"id":"01jv0rxcsv21we8f8cfh83bvpn","name":"merchant-list:modify"},{"id":"01jv0rxcsxqg65wjwfhw4zy8ce","name":"merchant-list:publish"},{"id":"01jv0rxcsyfgf9parc6pxfa92w","name":"merchant-list:configure"}]}},{"id":"01jv0rxctbppvz7fgwrhmn5kb6","name":"HR Manager","description":null,"created_at":"2025-05-11T22:54:36.000000Z","updated_at":"2025-05-11T22:54:36.000000Z","permissions":{"granted":[],"revoked":[{"id":"01jv0rxcr5ycqryq1z54ybcw52","name":"workspace-settings:view"},{"id":"01jv0rxcr8kfdnpd3nppjs184h","name":"workspace-settings:modify"},{"id":"01jv0rxcrasht8530cptqgtg8w","name":"workspace-settings:publish"},{"id":"01jv0rxcrb9bqracc2rse1j85z","name":"workspace-settings:configure"},{"id":"01jv0rxcrdmc6b0x20wttnwv87","name":"billing-management:view"},{"id":"01jv0rxcreqp13kj2jnzd2jbnj","name":"billing-management:modify"},{"id":"01jv0rxcrgyn8vdv7xcqrrz406","name":"billing-management:publish"},{"id":"01jv0rxcrj4y7f7sh98xh9vrsf","name":"billing-management:configure"},{"id":"01jv0rxcrkr05qgrbsbt5nwp3s","name":"integration-setup:view"},{"id":"01jv0rxcrn9793xxgazjzqc0mh","name":"integration-setup:modify"},{"id":"01jv0rxcrpyx9n6jnr5wk9vn7d","name":"integration-setup:publish"},{"id":"01jv0rxcrr36eksh030b22e7ah","name":"integration-setup:configure"},{"id":"01jv0rxcrt46a792f7n9c5zyqy","name":"map-creation:view"},{"id":"01jv0rxcrw824a967p4hs6sm8m","name":"map-creation:modify"},{"id":"01jv0rxcrx1pxxkwgkjhn22z8g","name":"map-creation:publish"},{"id":"01jv0rxcrzv5v8b4k6tpbzkra9","name":"map-creation:configure"},{"id":"01jv0rxcs12jyca4eymkk1sftr","name":"data-export:view"},{"id":"01jv0rxcs2f2abgwdzmf0yc2hb","name":"data-export:modify"},{"id":"01jv0rxcs3rm5ds8kv2x9t9g98","name":"data-export:publish"},{"id":"01jv0rxcs5tghscz91n9gybd90","name":"data-export:configure"},{"id":"01jv0rxcs7ycdf554pfkcrcjdx","name":"user-roles:view"},{"id":"01jv0rxcs8jzp6yzf2js42pt5n","name":"user-roles:modify"},{"id":"01jv0rxcsakq1beyapc94me90w","name":"user-roles:publish"},{"id":"01jv0rxcscvbdbdtphz7dawxp1","name":"user-roles:configure"},{"id":"01jv0rxcsd108kec578eyp4112","name":"security-settings:view"},{"id":"01jv0rxcsfjm63x7kypmft0r00","name":"security-settings:modify"},{"id":"01jv0rxcsgngj7s6hm3dbzx5z4","name":"security-settings:publish"},{"id":"01jv0rxcsj6mxefqrkyjzz8vt5","name":"security-settings:configure"},{"id":"01jv0rxcsk65vf3jqk2jwaw9f8","name":"insights-access:view"},{"id":"01jv0rxcsn0f4kn5s2c6a0gr6q","name":"insights-access:modify"},{"id":"01jv0rxcspe2jpk9pykf9v1ptf","name":"insights-access:publish"},{"id":"01jv0rxcsr8dfr8jym9ghg2yaf","name":"insights-access:configure"},{"id":"01jv0rxcstt0hh3sxpcxzwe9y2","name":"merchant-list:view"},{"id":"01jv0rxcsv21we8f8cfh83bvpn","name":"merchant-list:modify"},{"id":"01jv0rxcsxqg65wjwfhw4zy8ce","name":"merchant-list:publish"},{"id":"01jv0rxcsyfgf9parc6pxfa92w","name":"merchant-list:configure"}]}}],"links":{"first":"http:\/\/metronicapp.test\/v1\/acl\/role?page=1","last":"http:\/\/metronicapp.test\/v1\/acl\/role?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/metronicapp.test\/v1\/acl\/role?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/metronicapp.test\/v1\/acl\/role","per_page":15,"to":7,"total":7}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
+          x-ratelimit-limit: '30; 30'
+          x-ratelimit-remaining: '27; 26'
+          retry-after: '59'
+          x-ratelimit-reset: '1747567182'
           vary: Origin
         description: null
         custom: []
@@ -1744,7 +1257,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 68ak135VbhcdDageEfvPZ64'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -1752,7 +1265,7 @@ endpoints:
   -
     httpMethods:
       - GET
-    uri: 'api/v1/acl/role/{id}'
+    uri: 'v1/acl/role/{id}'
     metadata:
       groupName: Endpoints
       groupDescription: ''
@@ -1771,14 +1284,14 @@ endpoints:
         name: id
         description: 'The ID of the role.'
         required: true
-        example: voluptas
+        example: molestiae
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      id: voluptas
+      id: molestiae
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -1786,11 +1299,15 @@ endpoints:
     fileParameters: []
     responses:
       -
-        status: 401
-        content: '{"message":"Unauthenticated."}'
+        status: 200
+        content: ''
         headers:
+          content-type: 'text/html; charset=UTF-8'
           cache-control: 'no-cache, private'
-          content-type: application/json
+          x-ratelimit-limit: '30; 30'
+          x-ratelimit-remaining: '26; 25'
+          retry-after: '59'
+          x-ratelimit-reset: '1747567182'
           vary: Origin
         description: null
         custom: []
@@ -1798,7 +1315,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer cPbgDe5Ek361Z4havV8fd6a'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -1806,7 +1323,7 @@ endpoints:
   -
     httpMethods:
       - POST
-    uri: api/v1/acl/role
+    uri: v1/acl/role
     metadata:
       groupName: Endpoints
       groupDescription: ''
@@ -1832,7 +1349,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 8akg5Zh3461DVvacfdePEb6'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -1840,7 +1357,7 @@ endpoints:
   -
     httpMethods:
       - PUT
-    uri: 'api/v1/acl/role/{id}'
+    uri: 'v1/acl/role/{id}'
     metadata:
       groupName: Endpoints
       groupDescription: ''
@@ -1859,14 +1376,14 @@ endpoints:
         name: id
         description: 'The ID of the role.'
         required: true
-        example: praesentium
+        example: et
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      id: praesentium
+      id: et
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -1877,7 +1394,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer g8vD6dZe5E3k41hc6aaVPbf'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -1885,7 +1402,7 @@ endpoints:
   -
     httpMethods:
       - DELETE
-    uri: 'api/v1/acl/role/{id}'
+    uri: 'v1/acl/role/{id}'
     metadata:
       groupName: Endpoints
       groupDescription: ''
@@ -1904,14 +1421,14 @@ endpoints:
         name: id
         description: 'The ID of the role.'
         required: true
-        example: porro
+        example: nemo
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      id: porro
+      id: nemo
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -1922,7 +1439,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer ve6Zgdb6c5aDhEVk3P18f4a'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -1930,14 +1447,28 @@ endpoints:
   -
     httpMethods:
       - GET
-    uri: api/v1/acl/permission
+    uri: v1/acl/permission
     metadata:
       groupName: Endpoints
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display a listing of the resource.'
-      description: ''
+      title: 'Lista todas as permissões do sistema'
+      description: |-
+        Endpoint: GET /acl/permission
+        Grupo: ACL
+        Autenticação: Requerida (Sanctum)
+        Middleware: totp.verify
+
+        Filtros:
+        - page: Número da página para paginação
+        - per_page: Itens por página
+        - name: Filtrar por nome (correspondência parcial)
+
+        Respostas:
+        - 200: Lista paginada de permissões
+        - 401: {"message": "Unauthenticated."}
+        - 403: {"message": "Permission Denied."}
       authenticated: true
       custom: []
     headers:
@@ -1953,11 +1484,15 @@ endpoints:
     fileParameters: []
     responses:
       -
-        status: 401
-        content: '{"message":"Unauthenticated."}'
+        status: 200
+        content: '{"data":[{"id":"01jv0rxcr5ycqryq1z54ybcw52","name":"workspace-settings:view","description":null,"created_at":"2025-05-11T22:54:36.000000Z","updated_at":"2025-05-11T22:54:36.000000Z"},{"id":"01jv0rxcr8kfdnpd3nppjs184h","name":"workspace-settings:modify","description":null,"created_at":"2025-05-11T22:54:36.000000Z","updated_at":"2025-05-11T22:54:36.000000Z"},{"id":"01jv0rxcrasht8530cptqgtg8w","name":"workspace-settings:publish","description":null,"created_at":"2025-05-11T22:54:36.000000Z","updated_at":"2025-05-11T22:54:36.000000Z"},{"id":"01jv0rxcrb9bqracc2rse1j85z","name":"workspace-settings:configure","description":null,"created_at":"2025-05-11T22:54:36.000000Z","updated_at":"2025-05-11T22:54:36.000000Z"},{"id":"01jv0rxcrdmc6b0x20wttnwv87","name":"billing-management:view","description":null,"created_at":"2025-05-11T22:54:36.000000Z","updated_at":"2025-05-11T22:54:36.000000Z"},{"id":"01jv0rxcreqp13kj2jnzd2jbnj","name":"billing-management:modify","description":null,"created_at":"2025-05-11T22:54:36.000000Z","updated_at":"2025-05-11T22:54:36.000000Z"},{"id":"01jv0rxcrgyn8vdv7xcqrrz406","name":"billing-management:publish","description":null,"created_at":"2025-05-11T22:54:36.000000Z","updated_at":"2025-05-11T22:54:36.000000Z"},{"id":"01jv0rxcrj4y7f7sh98xh9vrsf","name":"billing-management:configure","description":null,"created_at":"2025-05-11T22:54:36.000000Z","updated_at":"2025-05-11T22:54:36.000000Z"},{"id":"01jv0rxcrkr05qgrbsbt5nwp3s","name":"integration-setup:view","description":null,"created_at":"2025-05-11T22:54:36.000000Z","updated_at":"2025-05-11T22:54:36.000000Z"},{"id":"01jv0rxcrn9793xxgazjzqc0mh","name":"integration-setup:modify","description":null,"created_at":"2025-05-11T22:54:36.000000Z","updated_at":"2025-05-11T22:54:36.000000Z"},{"id":"01jv0rxcrpyx9n6jnr5wk9vn7d","name":"integration-setup:publish","description":null,"created_at":"2025-05-11T22:54:36.000000Z","updated_at":"2025-05-11T22:54:36.000000Z"},{"id":"01jv0rxcrr36eksh030b22e7ah","name":"integration-setup:configure","description":null,"created_at":"2025-05-11T22:54:36.000000Z","updated_at":"2025-05-11T22:54:36.000000Z"},{"id":"01jv0rxcrt46a792f7n9c5zyqy","name":"map-creation:view","description":null,"created_at":"2025-05-11T22:54:36.000000Z","updated_at":"2025-05-11T22:54:36.000000Z"},{"id":"01jv0rxcrw824a967p4hs6sm8m","name":"map-creation:modify","description":null,"created_at":"2025-05-11T22:54:36.000000Z","updated_at":"2025-05-11T22:54:36.000000Z"},{"id":"01jv0rxcrx1pxxkwgkjhn22z8g","name":"map-creation:publish","description":null,"created_at":"2025-05-11T22:54:36.000000Z","updated_at":"2025-05-11T22:54:36.000000Z"}],"links":{"first":"http:\/\/metronicapp.test\/v1\/acl\/permission?page=1","last":"http:\/\/metronicapp.test\/v1\/acl\/permission?page=3","prev":null,"next":"http:\/\/metronicapp.test\/v1\/acl\/permission?page=2"},"meta":{"current_page":1,"from":1,"last_page":3,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/metronicapp.test\/v1\/acl\/permission?page=1","label":"1","active":true},{"url":"http:\/\/metronicapp.test\/v1\/acl\/permission?page=2","label":"2","active":false},{"url":"http:\/\/metronicapp.test\/v1\/acl\/permission?page=3","label":"3","active":false},{"url":"http:\/\/metronicapp.test\/v1\/acl\/permission?page=2","label":"Next &raquo;","active":false}],"path":"http:\/\/metronicapp.test\/v1\/acl\/permission","per_page":15,"to":15,"total":36}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
+          x-ratelimit-limit: '30; 30'
+          x-ratelimit-remaining: '25; 24'
+          retry-after: '59'
+          x-ratelimit-reset: '1747567182'
           vary: Origin
         description: null
         custom: []
@@ -1965,7 +1500,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer gbda63465hVEkafvcZ8DPe1'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -1973,7 +1508,7 @@ endpoints:
   -
     httpMethods:
       - GET
-    uri: 'api/v1/acl/permission/{id}'
+    uri: 'v1/acl/permission/{id}'
     metadata:
       groupName: Endpoints
       groupDescription: ''
@@ -1992,14 +1527,14 @@ endpoints:
         name: id
         description: 'The ID of the permission.'
         required: true
-        example: aut
+        example: quae
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      id: aut
+      id: quae
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -2007,11 +1542,15 @@ endpoints:
     fileParameters: []
     responses:
       -
-        status: 401
-        content: '{"message":"Unauthenticated."}'
+        status: 200
+        content: ''
         headers:
+          content-type: 'text/html; charset=UTF-8'
           cache-control: 'no-cache, private'
-          content-type: application/json
+          x-ratelimit-limit: '30; 30'
+          x-ratelimit-remaining: '24; 23'
+          retry-after: '59'
+          x-ratelimit-reset: '1747567182'
           vary: Origin
         description: null
         custom: []
@@ -2019,7 +1558,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer gbPch1f6Ee4DVak5v638aZd'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -2027,7 +1566,7 @@ endpoints:
   -
     httpMethods:
       - POST
-    uri: api/v1/acl/permission
+    uri: v1/acl/permission
     metadata:
       groupName: Endpoints
       groupDescription: ''
@@ -2053,7 +1592,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 6de1gh63caZ5bPkDE4a8Vvf'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -2061,7 +1600,7 @@ endpoints:
   -
     httpMethods:
       - PUT
-    uri: 'api/v1/acl/permission/{id}'
+    uri: 'v1/acl/permission/{id}'
     metadata:
       groupName: Endpoints
       groupDescription: ''
@@ -2080,14 +1619,14 @@ endpoints:
         name: id
         description: 'The ID of the permission.'
         required: true
-        example: optio
+        example: totam
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      id: optio
+      id: totam
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -2098,7 +1637,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 4VedvkZ5acDPbaf6168E3gh'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null
@@ -2106,7 +1645,7 @@ endpoints:
   -
     httpMethods:
       - DELETE
-    uri: 'api/v1/acl/permission/{id}'
+    uri: 'v1/acl/permission/{id}'
     metadata:
       groupName: Endpoints
       groupDescription: ''
@@ -2125,14 +1664,14 @@ endpoints:
         name: id
         description: 'The ID of the permission.'
         required: true
-        example: amet
+        example: est
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      id: amet
+      id: est
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -2143,7 +1682,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer P53gv6ka1d68abeVcZEDh4f'
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
     controller: null
     method: null
     route: null

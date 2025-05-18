@@ -10,6 +10,23 @@ use Illuminate\Http\JsonResponse;
 
 class LoginController extends Controller
 {
+    /**
+     * Autenticação de usuário com email e senha
+     *
+     * Endpoint: POST /auth/login
+     * Grupo: Auth
+     * Autenticação: Não requerida
+     *
+     * Parâmetros:
+     * - email (string): Email do usuário
+     * - password (string): Senha do usuário
+     * - device (string, opcional): Nome do dispositivo
+     *
+     * Respostas:
+     * - 200: {"token": "string", "user": {...}}
+     * - 401: {"message": "Credentials do not match"}
+     * - 422: {"message": "The given data was invalid", "errors": {...}}
+     */
     public function __invoke(LoginRequest $request, LoginAction $action): JsonResponse
     {
         $dto = LoginDTO::fromRequest((array)$request->toDTO());

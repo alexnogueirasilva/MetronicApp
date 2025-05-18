@@ -11,7 +11,22 @@ use Illuminate\Http\Request;
 class RoleController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Lista todos os papéis (roles) com suas permissões
+     *
+     * Endpoint: GET /acl/role
+     * Grupo: ACL
+     * Autenticação: Requerida (Sanctum)
+     * Middleware: totp.verify
+     *
+     * Filtros:
+     * - page: Número da página para paginação
+     * - per_page: Itens por página
+     * - name: Filtrar por nome (correspondência parcial)
+     *
+     * Respostas:
+     * - 200: Lista paginada de papéis com suas permissões
+     * - 401: {"message": "Unauthenticated."}
+     * - 403: {"message": "Permission Denied."}
      */
     public function index(): RoleCollection
     {
