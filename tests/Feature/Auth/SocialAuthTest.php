@@ -10,19 +10,17 @@ use function Pest\Laravel\{getJson, postJson};
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    // Configuração para mock do Socialite
     $this->mock = Mockery::mock(GoogleProvider::class);
     Socialite::shouldReceive('driver')->with('google')->andReturn($this->mock);
 });
+
 it('returns oauth url for api flow', function () {
-    // Mock do método stateless() e redirect()
     $this->mock->shouldReceive('stateless')->andReturnSelf();
     $this->mock->shouldReceive('redirect')->andReturn($this->mock);
     $this->mock->shouldReceive('getTargetUrl')->andReturn('https://accounts.google.com/o/oauth2/auth?test=1');
 
     $response = getJson('/v1/auth/social/google');
 
-    // Verificar resposta
     $response->assertStatus(200)
         ->assertJsonStructure([
             'status',
@@ -37,19 +35,18 @@ it('returns oauth url for api flow', function () {
             ],
         ]);
 });
+
 it('handles invalid provider in api flow', function () {
-    // Tentar com provedor inválido
     $response = getJson('/v1/auth/social/invalid-provider');
 
-    // Verificar erro
     $response->assertStatus(400)
         ->assertJson([
             'status'  => 'error',
             'message' => 'Provedor de autenticação não suportado.',
         ]);
 });
+
 it('creates new user with social login', function () {
-    // Criar usuário socialite mock
     $socialiteUser = new SocialiteUser();
     $socialiteUser->map([
         'id'     => '123456789',
@@ -58,16 +55,13 @@ it('creates new user with social login', function () {
         'avatar' => 'https://example.com/avatar.jpg',
     ]);
 
-    // Mock do Socialite para retornar nosso usuário mock
     $this->mock->shouldReceive('stateless')->andReturnSelf();
     $this->mock->shouldReceive('user')->andReturn($socialiteUser);
 
-    // Fazer requisição de callback
     $response = postJson(route('auth.social.callback', ['provider' => 'google']), [
         'code' => 'valid-auth-code',
     ]);
 
-    // Verificar se usuário foi criado
     $this->assertDatabaseHas('users', [
         'email'       => 'testuser@gmail.com',
         'name'        => 'Test User',
@@ -75,7 +69,6 @@ it('creates new user with social login', function () {
         'provider_id' => '123456789',
     ]);
 
-    // Verificar resposta
     $response->assertStatus(200)
         ->assertJsonStructure([
             'status',
@@ -87,15 +80,14 @@ it('creates new user with social login', function () {
             ],
         ]);
 });
+
 it('connects existing account by email', function () {
-    // Criar usuário existente com mesmo email
     $existingUser = User::create([
         'name'     => 'Existing User',
         'email'    => 'testuser@gmail.com',
         'password' => bcrypt('password'),
     ]);
 
-    // Criar usuário socialite mock
     $socialiteUser = new SocialiteUser();
     $socialiteUser->map([
         'id'     => '123456789',
@@ -104,16 +96,13 @@ it('connects existing account by email', function () {
         'avatar' => 'https://example.com/avatar.jpg',
     ]);
 
-    // Mock do Socialite para retornar nosso usuário mock
     $this->mock->shouldReceive('stateless')->andReturnSelf();
     $this->mock->shouldReceive('user')->andReturn($socialiteUser);
 
-    // Fazer requisição de callback
     $response = postJson(route('auth.social.callback', ['provider' => 'google']), [
         'code' => 'valid-auth-code',
     ]);
 
-    // Verificar se o usuário existente foi atualizado em vez de criar um novo
     $this->assertDatabaseCount('users', 1);
     $this->assertDatabaseHas('users', [
         'id'          => $existingUser->id,
@@ -122,11 +111,10 @@ it('connects existing account by email', function () {
         'provider_id' => '123456789',
     ]);
 
-    // Verificar resposta
     $response->assertStatus(200);
 });
+
 it('reuses existing social user', function () {
-    // Criar usuário social existente
     $existingUser = User::create([
         'name'        => 'Social User',
         'email'       => 'socialuser@gmail.com',
@@ -134,7 +122,6 @@ it('reuses existing social user', function () {
         'provider_id' => '123456789',
     ]);
 
-    // Criar usuário socialite mock
     $socialiteUser = new SocialiteUser();
     $socialiteUser->map([
         'id'     => '123456789',
@@ -143,32 +130,25 @@ it('reuses existing social user', function () {
         'avatar' => 'https://example.com/avatar.jpg',
     ]);
 
-    // Mock do Socialite para retornar nosso usuário mock
     $this->mock->shouldReceive('stateless')->andReturnSelf();
     $this->mock->shouldReceive('user')->andReturn($socialiteUser);
 
-    // Fazer requisição de callback
     $response = postJson(route('auth.social.callback', ['provider' => 'google']), [
         'code' => 'valid-auth-code',
     ]);
 
-    // Verificar se nenhum novo usuário foi criado
     $this->assertDatabaseCount('users', 1);
 
-    // Verificar resposta
     $response->assertStatus(200);
 });
 it('handles errors in social callback', function () {
-    // Mock para simular um erro
     $this->mock->shouldReceive('stateless')->andReturnSelf();
     $this->mock->shouldReceive('user')->andThrow(new Exception('Invalid credentials'));
 
-    // Fazer requisição de callback
     $response = postJson(route('auth.social.callback', ['provider' => 'google']), [
         'code' => 'invalid-code',
     ]);
 
-    // Verificar resposta de erro
     $response->assertStatus(500)
         ->assertJson([
             'status'  => 'error',

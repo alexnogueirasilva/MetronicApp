@@ -1,4 +1,5 @@
-<?php declare(strict_types = 1);
+<?php
+declare(strict_types = 1);
 
 namespace App\Actions\FeatureFlags;
 
@@ -8,13 +9,11 @@ use App\Services\FeatureFlags\FeatureFlagManager;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 
-class CreateFeatureFlagAction
+readonly class CreateFeatureFlagAction
 {
     public function __construct(
-        private readonly FeatureFlagManager $featureFlagManager,
-    ) {
-        //
-    }
+        private FeatureFlagManager $featureFlagManager,
+    ) {}
 
     /**
      * Cria um novo feature flag global
@@ -34,6 +33,46 @@ class CreateFeatureFlagAction
             defaultValue: $defaultValue,
             isActive: $isActive,
         );
+    }
+
+    /**
+     * @param  array<string, mixed>|null  $parameters
+     */
+    private function create(
+        string $key,
+        string $name,
+        FeatureFlagType $type,
+        ?string $description = null,
+        bool $defaultValue = false,
+        bool $isActive = true,
+        ?array $parameters = null,
+        ?Carbon $startsAt = null,
+        ?Carbon $endsAt = null,
+    ): FeatureFlag {
+        $existingFeature = FeatureFlag::query()->where('key', $key)->first();
+
+        if ($existingFeature) {
+            throw new InvalidArgumentException("Feature flag with key '{$key}' already exists.");
+        }
+
+        /** @var FeatureFlag $feature */
+        $feature = FeatureFlag::query()->create([
+            'key'           => $key,
+            'name'          => $name,
+            'description'   => $description,
+            'type'          => $type,
+            'parameters'    => $parameters,
+            'default_value' => $defaultValue,
+            'is_active'     => $isActive,
+            'starts_at'     => $startsAt,
+            'ends_at'       => $endsAt,
+        ]);
+
+        if ($isActive) {
+            $this->featureFlagManager->registerFeature($feature);
+        }
+
+        return $feature;
     }
 
     /**
@@ -101,6 +140,10 @@ class CreateFeatureFlagAction
     }
 
     /**
+     * Cria um novo feature flag por ambiente
+     */
+
+    /**
      * Cria um novo feature flag por período
      */
     public function createDateRange(
@@ -125,10 +168,11 @@ class CreateFeatureFlagAction
     }
 
     /**
-     * Cria um novo feature flag por ambiente
+     * Cria um novo feature flag para teste A/B
      */
+
     /**
-     * @param array<string> $environments List of environment names
+     * @param  array<string>  $environments  List of environment names
      */
     public function createEnvironment(
         string $key,
@@ -152,10 +196,11 @@ class CreateFeatureFlagAction
     }
 
     /**
-     * Cria um novo feature flag para teste A/B
+     * Método genérico para criar um feature flag
      */
+
     /**
-     * @param array<string, float> $variants Map of variant names to weights
+     * @param  array<string, float>  $variants  Map of variant names to weights
      */
     public function createABTest(
         string $key,
@@ -179,49 +224,5 @@ class CreateFeatureFlagAction
             isActive: $isActive,
             parameters: $parameters,
         );
-    }
-
-    /**
-     * Método genérico para criar um feature flag
-     */
-    /**
-     * @param array<string, mixed>|null $parameters
-     */
-    private function create(
-        string $key,
-        string $name,
-        FeatureFlagType $type,
-        ?string $description = null,
-        bool $defaultValue = false,
-        bool $isActive = true,
-        ?array $parameters = null,
-        ?Carbon $startsAt = null,
-        ?Carbon $endsAt = null,
-    ): FeatureFlag {
-        // Verifica se já existe um feature flag com esta key
-        $existingFeature = FeatureFlag::where('key', $key)->first();
-
-        if ($existingFeature) {
-            throw new InvalidArgumentException("Feature flag with key '{$key}' already exists.");
-        }
-
-        /** @var FeatureFlag $feature */
-        $feature = FeatureFlag::create([
-            'key'           => $key,
-            'name'          => $name,
-            'description'   => $description,
-            'type'          => $type,
-            'parameters'    => $parameters,
-            'default_value' => $defaultValue,
-            'is_active'     => $isActive,
-            'starts_at'     => $startsAt,
-            'ends_at'       => $endsAt,
-        ]);
-
-        if ($isActive) {
-            $this->featureFlagManager->registerFeature($feature);
-        }
-
-        return $feature;
     }
 }

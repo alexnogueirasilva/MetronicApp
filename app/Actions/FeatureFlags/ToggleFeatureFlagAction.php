@@ -1,4 +1,5 @@
-<?php declare(strict_types = 1);
+<?php
+declare(strict_types = 1);
 
 namespace App\Actions\FeatureFlags;
 
@@ -8,13 +9,11 @@ use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use Laravel\Pennant\Feature;
 
-class ToggleFeatureFlagAction
+readonly class ToggleFeatureFlagAction
 {
     public function __construct(
-        private readonly FeatureFlagManager $featureFlagManager,
-    ) {
-        //
-    }
+        private FeatureFlagManager $featureFlagManager,
+    ) {}
 
     /**
      * Ativa ou desativa um feature flag para todos (global)
@@ -29,6 +28,21 @@ class ToggleFeatureFlagAction
 
         Feature::activate($key, $value);
         $this->featureFlagManager->clearFeatureCache($key);
+    }
+
+    /**
+     * Obtém um feature flag pelo seu key, lançando exceção se não existir
+     */
+    private function getFeatureByKey(string $key): FeatureFlag
+    {
+        /** @var FeatureFlag|null $feature */
+        $feature = FeatureFlag::where('key', $key)->first();
+
+        if (!$feature) {
+            throw new InvalidArgumentException("Feature flag with key '{$key}' not found.");
+        }
+
+        return $feature;
     }
 
     /**
@@ -86,6 +100,10 @@ class ToggleFeatureFlagAction
     }
 
     /**
+     * Atualiza os ambientes para um feature flag
+     */
+
+    /**
      * Atualiza as datas de início e término de um feature flag
      */
     public function updateDateRange(string $key, ?Carbon $startsAt = null, ?Carbon $endsAt = null): void
@@ -102,10 +120,11 @@ class ToggleFeatureFlagAction
     }
 
     /**
-     * Atualiza os ambientes para um feature flag
+     * Atualiza as variantes de um teste A/B
      */
+
     /**
-     * @param array<string> $environments
+     * @param  array<string>  $environments
      */
     public function updateEnvironments(string $key, array $environments): void
     {
@@ -123,10 +142,7 @@ class ToggleFeatureFlagAction
     }
 
     /**
-     * Atualiza as variantes de um teste A/B
-     */
-    /**
-     * @param array<string, float> $variants
+     * @param  array<string, float>  $variants
      */
     public function updateABTest(string $key, array $variants, ?string $defaultVariant = null): void
     {
@@ -145,20 +161,5 @@ class ToggleFeatureFlagAction
 
         $this->featureFlagManager->clearFeatureCache($key);
         $this->featureFlagManager->registerFeature($feature);
-    }
-
-    /**
-     * Obtém um feature flag pelo seu key, lançando exceção se não existir
-     */
-    private function getFeatureByKey(string $key): FeatureFlag
-    {
-        /** @var FeatureFlag|null $feature */
-        $feature = FeatureFlag::where('key', $key)->first();
-
-        if (!$feature) {
-            throw new InvalidArgumentException("Feature flag with key '{$key}' not found.");
-        }
-
-        return $feature;
     }
 }
