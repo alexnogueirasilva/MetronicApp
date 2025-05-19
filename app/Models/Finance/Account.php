@@ -3,6 +3,7 @@
 namespace App\Models\Finance;
 
 use Database\Factories\Finance\AccountFactory;
+use DevactionLabs\FilterablePackage\Traits\Filterable;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -25,4 +26,5 @@ class Account extends Model
 {
     use HasFactory;
     use HasUlids;
+    use Filterable;
 }
