@@ -14,13 +14,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create default tenant
         $tenant = Tenant::factory()->create([
             'name'   => 'DevAction',
             'domain' => 'devaction.com.br',
         ]);
 
-        // Create default admin user
         User::factory()->create([
             'tenant_id' => $tenant->id,
             'name'      => 'Alex Nogueira',
@@ -30,7 +28,6 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             RolePermissionSeeder::class,
-            TenantSeeder::class,
         ]);
     }
 }

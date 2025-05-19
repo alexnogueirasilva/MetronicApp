@@ -13,7 +13,6 @@ class TenantSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create a default tenant for development
         Tenant::factory()->create([
             'name'      => 'DevAction',
             'domain'    => 'devaction.com.br',
@@ -21,7 +20,6 @@ class TenantSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        // Create sample tenants with different plans
         Tenant::factory()->free()->create([
             'name' => 'Free Tenant',
         ]);
@@ -34,7 +32,6 @@ class TenantSeeder extends Seeder
             'name' => 'Enterprise Tenant',
         ]);
 
-        // Create a tenant with custom rate limit
         Tenant::factory()->withCustomRateLimit(500)->create([
             'name' => 'Custom Rate Limit Tenant',
         ]);

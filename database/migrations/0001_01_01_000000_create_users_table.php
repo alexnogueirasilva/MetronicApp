@@ -18,7 +18,7 @@ return new class() extends Migration {
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('totp_secret')->nullable();
-            $table->enum('otp_method', ['email', 'totp'])->nullable()->default(null);
+            $table->string('otp_method')->nullable()->default(null);
             $table->boolean('totp_verified')->default(false);
             $table->rememberToken();
             $table->timestamps();

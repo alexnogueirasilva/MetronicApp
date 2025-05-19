@@ -13,7 +13,10 @@ class LoginAction
 {
     public function execute(LoginDTO $dto): JsonResponse
     {
-        $user = User::query()->where('email', $dto->email)->firstOrFail();
+        $user = User::query()
+            ->where('email', $dto->email)
+            ->with(['role.permissions'])
+            ->firstOrFail();
 
         // Ensure password is a string
         $password = $user->password ?? '';

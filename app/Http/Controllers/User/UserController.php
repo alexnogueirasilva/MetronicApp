@@ -34,6 +34,7 @@ class UserController extends Controller
     public function index(): UserCollection
     {
         $users = User::query()
+            ->with(['role.permissions'])
             ->filtrable([
                 Filter::like('name', 'name'),
                 Filter::like('email', 'email'),
@@ -64,6 +65,7 @@ class UserController extends Controller
     public function store(StoreUserRequest $request): JsonResponse
     {
         $user = User::create($request->validated());
+        $user->load(['role.permissions']);
 
         return (new UserResource($user))
             ->response()
@@ -84,7 +86,7 @@ class UserController extends Controller
      */
     public function show(string $user): UserResource
     {
-        $userModel = User::findOrFail($user);
+        $userModel = User::with(['role.permissions'])->findOrFail($user);
 
         return new UserResource($userModel);
     }
@@ -112,6 +114,7 @@ class UserController extends Controller
     {
         $userModel = User::findOrFail($user);
         $userModel->update($request->validated());
+        $userModel->load(['role.permissions']);
 
         return new UserResource($userModel);
     }
