@@ -13,8 +13,10 @@ trait AuthenticatedUser
      */
     public function getAuthenticatedUser(bool $useCache = true): User
     {
-
-        $user = User::query()->where('id', auth()->id())->first();
+        $user = User::query()
+            ->where('id', auth()->id())
+            ->with(['role.permissions'])
+            ->first();
 
         if (!$user) {
             throw new RuntimeException('Usuário não encontrado.');

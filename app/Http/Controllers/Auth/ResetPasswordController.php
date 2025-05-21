@@ -15,7 +15,36 @@ use JsonException;
 class ResetPasswordController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Reset user password
+     *
+     * This endpoint allows a user to reset their password using a reset token.
+     * It will validate the token and email, and then update the user's password.
+     * A notification will be sent to confirm the password was changed.
+     *
+     * @group Auth
+     * @unauthenticated
+     *
+     * @bodyParam email string required Base64 URL-safe encoded email address. Example: dXNlckBleGFtcGxlLmNvbQ
+     * @bodyParam token string required The password reset token sent to the user's email. Example: 67d54c7c2a0d69c48f722eade81b1d24c7cde73b25e8784669a4061b770782fa
+     * @bodyParam password string required The new password. Must be at least 8 characters. Example: new-password123
+     * @bodyParam password_confirmation string required Must match the password field. Example: new-password123
+     *
+     * @response {
+     *     "message": "Your password has been reset!"
+     * }
+     *
+     * @response 422 {
+     *     "message": "E-mail inválido ou corrompido."
+     * }
+     *
+     * @response 422 {
+     *     "message": "The given data was invalid.",
+     *     "errors": {
+     *         "token": ["This password reset token is invalid."],
+     *         "password": ["The password must be at least 8 characters."]
+     *     }
+     * }
+     *
      * @throws JsonException
      */
     public function __invoke(ResetPasswordRequest $request): JsonResponse

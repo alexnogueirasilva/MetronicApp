@@ -43,7 +43,7 @@ return new class() extends Migration {
         Schema::create('feature_flag_user', function (Blueprint $table): void {
             $table->id();
             $table->string('feature_name');
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignUlid('user_id')->constrained()->cascadeOnDelete();
             $table->boolean('value')->default(false);
             $table->timestamp('expires_at')->nullable();
             $table->timestamps();

@@ -13,6 +13,7 @@ use App\Http\Controllers\Auth\{AuthMeController,
     OtpController,
     ResetPasswordController,
     SocialAuthController};
+use App\Http\Controllers\Finance\AccountController;
 use App\Http\Controllers\TenantController;
 use App\Http\Controllers\User\UserController;
 use Illuminate\Support\Facades\Route;
@@ -84,6 +85,13 @@ Route::middleware(['endpoint.ratelimit'])->group(static function (): void {
             Route::put('/permission/{id}', [PermissionController::class, 'update'])->name('permission.update');
             Route::delete('/permission/{id}', [PermissionController::class, 'destroy'])->name('permission.destroy');
         });
+    });
+
+    Route::group([
+        'prefix' => 'finance',
+        'as'     => 'finance.',
+    ], static function (): void {
+        Route::apiResource('accounts', AccountController::class);
     });
 
 });

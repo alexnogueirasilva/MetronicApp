@@ -102,7 +102,7 @@ return [
     | Useful for bypassing idempotency in certain environments like testing.
     |
     */
-    'enabled' => env('IDEMPOTENCY_ENABLED', false),
+    'enabled' => env('IDEMPOTENCY_ENABLED', true),
 
     /*
     |--------------------------------------------------------------------------
@@ -125,13 +125,13 @@ return [
     */
     'telemetry' => [
         // Enable or disable telemetry for idempotency operations
-        'enabled' => env('IDEMPOTENCY_TELEMETRY_ENABLED', true),
+        'enabled' => env('IDEMPOTENCY_TELEMETRY_ENABLED', false),
 
         // Default driver to use for telemetry
-        'driver' => env('IDEMPOTENCY_TELEMETRY_DRIVER', 'null'),
+        'driver' => env('IDEMPOTENCY_TELEMETRY_DRIVER', 'custom'),
 
         // Available telemetry drivers and their configurations
-        'custom_driver_class' => null,
+        'custom_driver_class' => \App\Support\NullTelemetryDriver::class,
     ],
 
     /*

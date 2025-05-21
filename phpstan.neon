@@ -6,7 +6,7 @@ parameters:
         - '#Method App\\Models\\[a-zA-Z]+::featureFlags\(\) should return Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany<App\\Models\\FeatureFlag#'
         - '#Method App\\Models\\FeatureFlag::tenants\(\) should return Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany<App\\Models\\Tenant#'
         - '#Method App\\Models\\FeatureFlag::users\(\) should return Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany<App\\Models\\User#'
-
+        - '#Class .* uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types: TFactory#'
     noUnnecessaryCollectionCall: false
     paths:
         - app

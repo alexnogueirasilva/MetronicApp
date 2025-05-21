@@ -9,7 +9,20 @@ use Illuminate\Http\JsonResponse;
 class LogoutController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Log out the authenticated user
+     *
+     * This endpoint revokes the current authentication token and logs out the user.
+     *
+     * @group Auth
+     * @authenticated
+     *
+     * @response {
+     *     "message": "Logged out successfully."
+     * }
+     *
+     * @response 401 {
+     *     "message": "Unauthenticated."
+     * }
      */
     public function __invoke(LogoutAction $action): JsonResponse
     {

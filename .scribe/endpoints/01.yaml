@@ -1,0 +1,1018 @@
+name: Auth
+description: ''
+endpoints:
+  -
+    httpMethods:
+      - GET
+    uri: 'v1/auth/social/{provider}'
+    metadata:
+      groupName: Auth
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Redirect to social authentication provider'
+      description: |-
+        This endpoint redirects the user to the specified social authentication provider.
+        Currently supported providers: google.
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      provider:
+        name: provider
+        description: 'The social authentication provider.'
+        required: true
+        example: google
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      provider: google
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "status": "success",
+              "message": "URL de redirecionamento para autenticação.",
+              "data": {
+                  "url": "https://accounts.google.com/o/oauth2/auth?client_id=..."
+              },
+              "meta": {
+                  "api_version": "v1"
+              }
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 400
+        content: |-
+          {
+              "status": "error",
+              "message": "Provedor de autenticação não suportado."
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: 'v1/auth/social/{provider}/callback'
+    metadata:
+      groupName: Auth
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Handle social authentication callback'
+      description: |-
+        This endpoint processes the callback from the social authentication provider
+        and logs in the user if authentication is successful.
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      provider:
+        name: provider
+        description: 'The social authentication provider.'
+        required: true
+        example: google
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      provider: google
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "user": {
+                  "id": "123e4567-e89b-12d3-a456-426614174000",
+                  "name": "John Doe",
+                  "email": "john@example.com",
+                  "email_verified_at": "2025-05-10T12:00:00.000000Z",
+                  "created_at": "2025-05-01T10:00:00.000000Z",
+                  "updated_at": "2025-05-10T12:00:00.000000Z"
+              },
+              "token": "2|laravel_sanctum_token_hash"
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 500
+        content: |-
+          {
+              "message": "Falha na autenticação social. Ocorreu um erro ao processar a requisição."
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - DELETE
+    uri: v1/auth/logout
+    metadata:
+      groupName: Auth
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Log out the authenticated user'
+      description: 'This endpoint revokes the current authentication token and logs out the user.'
+      authenticated: true
+      custom: []
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "message": "Logged out successfully."
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 401
+        content: |-
+          {
+              "message": "Unauthenticated."
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: v1/auth/forgot-password
+    metadata:
+      groupName: Auth
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Request password reset email'
+      description: |-
+        This endpoint sends a password reset link to the provided email address,
+        if it exists in the system. For security reasons, it always returns success
+        even if the email is not registered.
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      email:
+        name: email
+        description: 'The email address to send the reset link to.'
+        required: true
+        example: user@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      email: user@example.com
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "message": "If your email is registered, you will receive a password reset link."
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 422
+        content: |-
+          {
+              "message": "The given data was invalid.",
+              "errors": {
+                  "email": [
+                      "The email field is required.",
+                      "The email must be a valid email address."
+                  ]
+              }
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: v1/auth/reset-password
+    metadata:
+      groupName: Auth
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Reset user password'
+      description: |-
+        This endpoint allows a user to reset their password using a reset token.
+        It will validate the token and email, and then update the user's password.
+        A notification will be sent to confirm the password was changed.
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      email:
+        name: email
+        description: 'Base64 URL-safe encoded email address.'
+        required: true
+        example: dXNlckBleGFtcGxlLmNvbQ
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      password:
+        name: password
+        description: 'The new password. Must be at least 8 characters.'
+        required: true
+        example: new-password123
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      token:
+        name: token
+        description: "The password reset token sent to the user's email."
+        required: true
+        example: 67d54c7c2a0d69c48f722eade81b1d24c7cde73b25e8784669a4061b770782fa
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      password_confirmation:
+        name: password_confirmation
+        description: 'Must match the password field.'
+        required: true
+        example: new-password123
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      email: dXNlckBleGFtcGxlLmNvbQ
+      password: new-password123
+      token: 67d54c7c2a0d69c48f722eade81b1d24c7cde73b25e8784669a4061b770782fa
+      password_confirmation: new-password123
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "message": "Your password has been reset!"
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 422
+        content: |-
+          {
+              "message": "E-mail inválido ou corrompido."
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 422
+        content: |-
+          {
+              "message": "The given data was invalid.",
+              "errors": {
+                  "token": ["This password reset token is invalid."],
+                  "password": ["The password must be at least 8 characters."]
+              }
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: v1/auth/magic-link
+    metadata:
+      groupName: Auth
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Request a magic link for passwordless login'
+      description: |-
+        This endpoint generates and sends a magic link to the provided email address.
+        For security reasons, it always returns success even if the email is not registered.
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      email:
+        name: email
+        description: 'The email address to send the magic link to.'
+        required: true
+        example: user@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      email: user@example.com
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "message": "Se o e-mail estiver cadastrado, você receberá um link de acesso em breve."
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 422
+        content: |-
+          {
+              "message": "The given data was invalid.",
+              "errors": {
+                  "email": [
+                      "The email field is required.",
+                      "The email must be a valid email address."
+                  ]
+              }
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: v1/auth/magic-link/verify
+    metadata:
+      groupName: Auth
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Verify a magic link and authenticate user'
+      description: |-
+        This endpoint validates a magic link token and authenticates the user if successful.
+        It supports both GET and POST methods to accommodate different verification flows.
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      email:
+        name: email
+        description: 'When using GET method, the email address.'
+        required: false
+        example: user@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      token:
+        name: token
+        description: 'When using GET method, the magic link token.'
+        required: false
+        example: 9a52c417d4b8bcb1be1e9969
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      expires:
+        name: expires
+        description: 'When using GET method, the expiration timestamp.'
+        required: false
+        example: 1715000000
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      signature:
+        name: signature
+        description: 'When using GET method, the verification signature.'
+        required: false
+        example: a9b8c7d6e5f4g3h2i1j
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanQueryParameters:
+      email: user@example.com
+      token: 9a52c417d4b8bcb1be1e9969
+      expires: 1715000000
+      signature: a9b8c7d6e5f4g3h2i1j
+    bodyParameters:
+      email:
+        name: email
+        description: 'The email address associated with the magic link.'
+        required: true
+        example: user@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      token:
+        name: token
+        description: 'The magic link token to verify.'
+        required: true
+        example: 9a52c417d4b8bcb1be1e9969
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      email: user@example.com
+      token: 9a52c417d4b8bcb1be1e9969
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "token": "2|laravel_sanctum_token_hash",
+              "message": "Login realizado com sucesso",
+              "user": {
+                  "id": "123e4567-e89b-12d3-a456-426614174000",
+                  "name": "John Doe",
+                  "email": "john@example.com",
+                  "email_verified_at": "2025-05-10T12:00:00.000000Z",
+                  "created_at": "2025-05-01T10:00:00.000000Z",
+                  "updated_at": "2025-05-10T12:00:00.000000Z",
+                  "roles": [
+                      {
+                          "id": 1,
+                          "name": "admin"
+                      }
+                  ]
+              }
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 401
+        content: |-
+          {
+              "message": "Link inválido ou expirado"
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 500
+        content: |-
+          {
+              "message": "Ocorreu um erro ao processar a solicitação"
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: v1/auth/magic-link/verify
+    metadata:
+      groupName: Auth
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Verify a magic link and authenticate user'
+      description: |-
+        This endpoint validates a magic link token and authenticates the user if successful.
+        It supports both GET and POST methods to accommodate different verification flows.
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      email:
+        name: email
+        description: 'When using GET method, the email address.'
+        required: false
+        example: user@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      token:
+        name: token
+        description: 'When using GET method, the magic link token.'
+        required: false
+        example: 9a52c417d4b8bcb1be1e9969
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      expires:
+        name: expires
+        description: 'When using GET method, the expiration timestamp.'
+        required: false
+        example: 1715000000
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      signature:
+        name: signature
+        description: 'When using GET method, the verification signature.'
+        required: false
+        example: a9b8c7d6e5f4g3h2i1j
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanQueryParameters:
+      email: user@example.com
+      token: 9a52c417d4b8bcb1be1e9969
+      expires: 1715000000
+      signature: a9b8c7d6e5f4g3h2i1j
+    bodyParameters:
+      email:
+        name: email
+        description: 'The email address associated with the magic link.'
+        required: true
+        example: user@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      token:
+        name: token
+        description: 'The magic link token to verify.'
+        required: true
+        example: 9a52c417d4b8bcb1be1e9969
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      email: user@example.com
+      token: 9a52c417d4b8bcb1be1e9969
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "token": "2|laravel_sanctum_token_hash",
+              "message": "Login realizado com sucesso",
+              "user": {
+                  "id": "123e4567-e89b-12d3-a456-426614174000",
+                  "name": "John Doe",
+                  "email": "john@example.com",
+                  "email_verified_at": "2025-05-10T12:00:00.000000Z",
+                  "created_at": "2025-05-01T10:00:00.000000Z",
+                  "updated_at": "2025-05-10T12:00:00.000000Z",
+                  "roles": [
+                      {
+                          "id": 1,
+                          "name": "admin"
+                      }
+                  ]
+              }
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 401
+        content: |-
+          {
+              "message": "Link inválido ou expirado"
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 500
+        content: |-
+          {
+              "message": "Ocorreu um erro ao processar a solicitação"
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: v1/auth/otp/request
+    metadata:
+      groupName: Auth
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Request an OTP code via email'
+      description: |-
+        This endpoint generates and sends a one-time password to the provided email address.
+        The OTP code can be used for authentication or verification purposes.
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      email:
+        name: email
+        description: 'The email address to send the OTP code to.'
+        required: true
+        example: user@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      email: user@example.com
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "message": "Código enviado por e-mail."
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 422
+        content: |-
+          {
+              "message": "The given data was invalid.",
+              "errors": {
+                  "email": [
+                      "The email field is required.",
+                      "The email must be a valid email address."
+                  ]
+              }
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: v1/auth/impersonate/stop
+    metadata:
+      groupName: Auth
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Stop impersonating another user'
+      description: |-
+        This endpoint ends the current impersonation session and revokes
+        the impersonation token.
+      authenticated: true
+      custom: []
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "message": "Sessão de impersonation encerrada com sucesso."
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 400
+        content: |-
+          {
+              "message": "Você não está impersonando nenhum usuário."
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: v1/auth/impersonate/history
+    metadata:
+      groupName: Auth
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get impersonation history'
+      description: |-
+        This endpoint returns a list of all impersonation sessions started by the
+        current user, both active and historical. It requires the 'impersonate-users' permission.
+      authenticated: true
+      custom: []
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "impersonations": [
+                  {
+                      "id": "01HZ2XABCDEF1234567890ABCDE",
+                      "impersonated_id": "123e4567-e89b-12d3-a456-426614174000",
+                      "created_at": "2025-05-10T12:00:00.000000Z",
+                      "ended_at": "2025-05-10T12:30:00.000000Z",
+                      "impersonated": {
+                          "id": "123e4567-e89b-12d3-a456-426614174000",
+                          "name": "John Doe",
+                          "email": "john@example.com"
+                      }
+                  },
+                  {
+                      "id": "01HZ2XABCDEF1234567890ABCDF",
+                      "impersonated_id": "223e4567-e89b-12d3-a456-426614174001",
+                      "created_at": "2025-05-09T10:00:00.000000Z",
+                      "ended_at": "2025-05-09T10:45:00.000000Z",
+                      "impersonated": {
+                          "id": "223e4567-e89b-12d3-a456-426614174001",
+                          "name": "Jane Smith",
+                          "email": "jane@example.com"
+                      }
+                  }
+              ]
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 403
+        content: |-
+          {
+              "message": "Você não tem permissão para visualizar o histórico de impersonation."
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: 'v1/auth/impersonate/{user_id}'
+    metadata:
+      groupName: Auth
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Start impersonating another user'
+      description: |-
+        This endpoint allows an admin to impersonate another user in the system.
+        It requires the 'impersonate-users' permission.
+      authenticated: true
+      custom: []
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      user_id:
+        name: user_id
+        description: 'The ID of the user.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      user:
+        name: user
+        description: 'The ID of the user to impersonate.'
+        required: true
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      user_id: 1
+      user: 123e4567-e89b-12d3-a456-426614174000
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "message": "Você está agora impersonando John Doe.",
+              "token": "3|impersonation_token_hash",
+              "user": {
+                  "id": "123e4567-e89b-12d3-a456-426614174000",
+                  "name": "John Doe",
+                  "email": "john@example.com",
+                  "email_verified_at": "2025-05-10T12:00:00.000000Z",
+                  "created_at": "2025-05-01T10:00:00.000000Z",
+                  "updated_at": "2025-05-10T12:00:00.000000Z"
+              },
+              "impersonation_id": "01HZ2XABCDEF1234567890ABCDE"
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 400
+        content: |-
+          {
+              "message": "Você não pode impersonar a si mesmo."
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 400
+        content: |-
+          {
+              "message": "Você já está impersonando outro usuário. Termine a sessão atual antes de iniciar uma nova."
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 403
+        content: |-
+          {
+              "message": "Você não tem permissão para impersonar outros usuários."
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 21|Ndbif5zyU1Zr3sxt1y1iuCkRRBm5TutkKQM4esje633b331e'
+    controller: null
+    method: null
+    route: null
+    custom: []

@@ -3,7 +3,7 @@
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-use function Pest\Laravel\{actingAs, deleteJson, getJson, postJson, putJson};
+use function Pest\Laravel\{actingAs, assertDatabaseHas, assertDatabaseMissing, deleteJson, getJson, postJson, putJson};
 
 uses(RefreshDatabase::class);
 
@@ -25,7 +25,7 @@ it('should be able to list users', function (): void {
             'data' => [
                 '*' => [
                     'id',
-                    'name',
+                    'nickname',
                     'email',
                     'avatar',
                     'email_verified_at',
@@ -38,12 +38,12 @@ it('should be able to list users', function (): void {
 
 it('should be able to filter users by name', function (): void {
     User::factory()->create([
-        'name' => 'Test User',
+        'nickname' => 'Test User',
     ]);
 
     $response = getJson(route('users.index', [
         'filter' => [
-            'name' => 'Test',
+            'nickname' => 'Test',
         ],
     ]), [
         'Idempotency-Key' => \Illuminate\Support\Str::uuid()->toString(),
@@ -54,7 +54,7 @@ it('should be able to filter users by name', function (): void {
             'data' => [
                 '*' => [
                     'id',
-                    'name',
+                    'nickname',
                     'email',
                     'avatar',
                     'email_verified_at',
@@ -68,7 +68,7 @@ it('should be able to filter users by name', function (): void {
     $found        = false;
 
     foreach ($responseData as $user) {
-        if ($user['name'] === 'Test User') {
+        if ($user['nickname'] === 'Test User') {
             $found = true;
 
             break;
@@ -79,7 +79,7 @@ it('should be able to filter users by name', function (): void {
 
 it('should be able to create a new user', function (): void {
     $userData = [
-        'name'     => 'New User',
+        'nickname' => 'New User',
         'email'    => 'newuser@example.com',
         'password' => 'password123',
     ];
@@ -92,7 +92,7 @@ it('should be able to create a new user', function (): void {
         ->assertJsonStructure([
             'data' => [
                 'id',
-                'name',
+                'nickname',
                 'email',
                 'avatar',
                 'created_at',
@@ -100,9 +100,9 @@ it('should be able to create a new user', function (): void {
             ],
         ]);
 
-    $this->assertDatabaseHas('users', [
-        'name'  => 'New User',
-        'email' => 'newuser@example.com',
+    assertDatabaseHas('users', [
+        'nickname' => 'New User',
+        'email'    => 'newuser@example.com',
     ]);
 });
 
@@ -117,7 +117,7 @@ it('should be able to show a user', function (): void {
         ->assertJsonStructure([
             'data' => [
                 'id',
-                'name',
+                'nickname',
                 'email',
                 'avatar',
                 'email_verified_at',
@@ -127,15 +127,15 @@ it('should be able to show a user', function (): void {
         ]);
 
     expect($response->json('data.id'))->toBe($user->id)
-        ->and($response->json('data.name'))->toBe($user->name)
+        ->and($response->json('data.nickname'))->toBe($user->nickname)
         ->and($response->json('data.email'))->toBe($user->email);
 });
 
 it('should be able to update a user', function (): void {
     $user       = User::factory()->create();
     $updateData = [
-        'name'  => 'Updated Name',
-        'email' => 'updated@example.com',
+        'nickname' => 'Updated Name',
+        'email'    => 'updated@example.com',
     ];
 
     $response = putJson(route('users.update', $user->id), $updateData, [
@@ -146,7 +146,7 @@ it('should be able to update a user', function (): void {
         ->assertJsonStructure([
             'data' => [
                 'id',
-                'name',
+                'nickname',
                 'email',
                 'avatar',
                 'email_verified_at',
@@ -155,13 +155,13 @@ it('should be able to update a user', function (): void {
             ],
         ]);
 
-    expect($response->json('data.name'))->toBe('Updated Name')
+    expect($response->json('data.nickname'))->toBe('Updated Name')
         ->and($response->json('data.email'))->toBe('updated@example.com');
 
-    $this->assertDatabaseHas('users', [
-        'id'    => $user->id,
-        'name'  => 'Updated Name',
-        'email' => 'updated@example.com',
+    assertDatabaseHas('users', [
+        'id'       => $user->id,
+        'nickname' => 'Updated Name',
+        'email'    => 'updated@example.com',
     ]);
 });
 
@@ -174,7 +174,7 @@ it('should be able to delete a user', function (): void {
 
     $response->assertNoContent();
 
-    $this->assertDatabaseMissing('users', [
+    assertDatabaseMissing('users', [
         'id' => $user->id,
     ]);
 });

@@ -11,14 +11,16 @@ return new class() extends Migration {
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table): void {
-            $table->id();
-            $table->string('name');
+            $table->ulid('id')->primary();
+            $table->string('nickname')->unique();
+            $table->string('first_name')->nullable();
+            $table->string('last_name')->nullable();
             $table->string('email')->unique();
             $table->string('avatar')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('totp_secret')->nullable();
-            $table->enum('otp_method', ['email', 'totp'])->nullable()->default(null);
+            $table->string('otp_method')->nullable()->default(null);
             $table->boolean('totp_verified')->default(false);
             $table->rememberToken();
             $table->timestamps();

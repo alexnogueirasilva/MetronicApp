@@ -89,8 +89,7 @@ it('can create a new tenant', function () {
     ];
 
     $response = postJson(route('tenant.store'), $data, ['Idempotency-Key' => Str::uuid()]);
-    ds($response->json());
-    // Verificar resposta
+
     $response->assertCreated();
     $response->assertJsonStructure([
         'data' => [
