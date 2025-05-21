@@ -33,6 +33,7 @@ class RoleController extends Controller
         $roles = Role::query()
             ->filtrable([
                 Filter::like('name', 'name'),
+                Filter::relationship('permissions', 'name', 'LIKE', 'permissions'),
             ])
             ->customPaginate();
 
