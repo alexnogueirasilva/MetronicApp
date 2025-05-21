@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\{Tenant, User};
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
@@ -20,10 +21,13 @@ class DatabaseSeeder extends Seeder
         ]);
 
         User::factory()->create([
-            'tenant_id' => $tenant->id,
-            'name'      => 'Alex Nogueira',
-            'email'     => 'alex@devaction.com.br',
-            'password'  => 'password',
+            'id'         => Str::lower(Str::ulid()),
+            'tenant_id'  => $tenant->id,
+            'nickname'   => 'alex',
+            'first_name' => 'Alex',
+            'last_name'  => 'Nogueira',
+            'email'      => 'alex@devaction.com.br',
+            'password'   => 'password',
         ]);
 
         $this->call([

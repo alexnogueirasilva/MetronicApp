@@ -5,7 +5,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\{GoogleProvider, User as SocialiteUser};
 
-use function Pest\Laravel\{getJson, postJson};
+use function Pest\Laravel\{assertDatabaseCount, assertDatabaseHas, getJson, postJson};
 
 uses(RefreshDatabase::class);
 
@@ -49,10 +49,10 @@ it('handles invalid provider in api flow', function () {
 it('creates new user with social login', function () {
     $socialiteUser = new SocialiteUser();
     $socialiteUser->map([
-        'id'     => '123456789',
-        'name'   => 'Test User',
-        'email'  => 'testuser@gmail.com',
-        'avatar' => 'https://example.com/avatar.jpg',
+        'id'       => '123456789',
+        'nickname' => 'Test User',
+        'email'    => 'testuser@gmail.com',
+        'avatar'   => 'https://example.com/avatar.jpg',
     ]);
 
     $this->mock->shouldReceive('stateless')->andReturnSelf();
@@ -62,9 +62,9 @@ it('creates new user with social login', function () {
         'code' => 'valid-auth-code',
     ]);
 
-    $this->assertDatabaseHas('users', [
+    assertDatabaseHas('users', [
         'email'       => 'testuser@gmail.com',
-        'name'        => 'Test User',
+        'nickname'    => 'Test User',
         'provider'    => 'google',
         'provider_id' => '123456789',
     ]);
@@ -83,17 +83,17 @@ it('creates new user with social login', function () {
 
 it('connects existing account by email', function () {
     $existingUser = User::create([
-        'name'     => 'Existing User',
+        'nickname' => 'Existing User',
         'email'    => 'testuser@gmail.com',
         'password' => bcrypt('password'),
     ]);
 
     $socialiteUser = new SocialiteUser();
     $socialiteUser->map([
-        'id'     => '123456789',
-        'name'   => 'Test User',
-        'email'  => 'testuser@gmail.com',
-        'avatar' => 'https://example.com/avatar.jpg',
+        'id'       => '123456789',
+        'nickname' => 'Test User',
+        'email'    => 'testuser@gmail.com',
+        'avatar'   => 'https://example.com/avatar.jpg',
     ]);
 
     $this->mock->shouldReceive('stateless')->andReturnSelf();
@@ -103,8 +103,8 @@ it('connects existing account by email', function () {
         'code' => 'valid-auth-code',
     ]);
 
-    $this->assertDatabaseCount('users', 1);
-    $this->assertDatabaseHas('users', [
+    assertDatabaseCount('users', 1);
+    assertDatabaseHas('users', [
         'id'          => $existingUser->id,
         'email'       => 'testuser@gmail.com',
         'provider'    => 'google',
@@ -116,7 +116,7 @@ it('connects existing account by email', function () {
 
 it('reuses existing social user', function () {
     $existingUser = User::create([
-        'name'        => 'Social User',
+        'nickname'    => 'Social User',
         'email'       => 'socialuser@gmail.com',
         'provider'    => 'google',
         'provider_id' => '123456789',
@@ -137,7 +137,7 @@ it('reuses existing social user', function () {
         'code' => 'valid-auth-code',
     ]);
 
-    $this->assertDatabaseCount('users', 1);
+    assertDatabaseCount('users', 1);
 
     $response->assertStatus(200);
 });

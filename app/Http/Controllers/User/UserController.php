@@ -36,7 +36,7 @@ class UserController extends Controller
         $users = User::query()
             ->with(['role.permissions'])
             ->filtrable([
-                Filter::like('name', 'name'),
+                Filter::like('nickname', 'nickname'),
                 Filter::like('email', 'email'),
             ])
             ->customPaginate();

@@ -5,11 +5,9 @@ namespace App\Models\Auth;
 
 use App\Models\User;
 use App\Observers\Auth\RoleObserver;
-use Database\Factories\Auth\RoleFactory;
 use DevactionLabs\FilterablePackage\Traits\Filterable;
-use Illuminate\Database\Eloquent\{Attributes\ObservedBy, Collection, Model};
+use Illuminate\Database\Eloquent\{Attributes\ObservedBy, Casts\Attribute, Collection, Factories\HasFactory, Model};
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\{BelongsToMany};
 use Illuminate\Support\Carbon;
 
@@ -17,19 +15,23 @@ use Illuminate\Support\Carbon;
  * @property string $id
  * @property string $name
  * @property ?string $icon
+ * @property ?string $icon_class
+ * @property ?string $fill_class
+ * @property ?string $stroke_class
+ * @property ?string $size_class
  * @property ?string $description
  * @property bool $is_default
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property-read Permission[]|Collection $permissions
+ * @property-read int $count_users
  */
 
 #[ObservedBy(RoleObserver::class)]
 class Role extends Model
 {
-    use Filterable;
-    /** @use HasFactory<RoleFactory> */
     use HasFactory;
+    use Filterable;
     use HasUlids;
 
     /**
@@ -38,14 +40,6 @@ class Role extends Model
     public function permissions(): BelongsToMany
     {
         return $this->belongsToMany(Permission::class, 'permission_role');
-    }
-
-    /**
-     * @return BelongsToMany<User, $this>
-     */
-    public function users(): BelongsToMany
-    {
-        return $this->belongsToMany(User::class, 'role_user');
     }
 
     /**
@@ -64,6 +58,24 @@ class Role extends Model
             'granted' => $all->whereIn('id', $grantedIds)->values(),
             'revoked' => $all->whereNotIn('id', $grantedIds)->values(),
         ];
+    }
+
+    /**
+     * @return Attribute<int, User>
+     */
+    public function countUsers(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->users()->count(),
+        )->shouldCache();
+    }
+
+    /**
+     * @return BelongsToMany<User, $this>
+     */
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'role_user');
     }
 
     protected function casts(): array

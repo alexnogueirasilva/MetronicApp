@@ -23,6 +23,7 @@ class SocialAuthController extends Controller
      * Currently supported providers: google.
      *
      * @group Auth
+     *
      * @unauthenticated
      *
      * @urlParam provider string required The social authentication provider. Example: google
@@ -37,7 +38,6 @@ class SocialAuthController extends Controller
      *         "api_version": "v1"
      *     }
      * }
-     *
      * @response 400 {
      *     "status": "error",
      *     "message": "Provedor de autenticação não suportado."
@@ -86,6 +86,7 @@ class SocialAuthController extends Controller
      * and logs in the user if authentication is successful.
      *
      * @group Auth
+     *
      * @unauthenticated
      *
      * @urlParam provider string required The social authentication provider. Example: google
@@ -101,7 +102,6 @@ class SocialAuthController extends Controller
      *     },
      *     "token": "2|laravel_sanctum_token_hash"
      * }
-     *
      * @response 500 {
      *     "message": "Falha na autenticação social. Ocorreu um erro ao processar a requisição."
      * }
@@ -119,21 +119,21 @@ class SocialAuthController extends Controller
             $socialUser = $driver->user();
 
             $providerId = (string) $socialUser->getId();
-            $name       = $socialUser->getName();
+            $nickname   = $socialUser->getName();
             $email      = $socialUser->getEmail();
             $avatar     = $socialUser->getAvatar();
 
-            $name   = $name !== null ? (string) $name : null;
-            $email  = $email !== null ? (string) $email : null;
-            $avatar = $avatar !== null ? (string) $avatar : null;
+            $nickname = $nickname !== null ? (string) $nickname : null;
+            $email    = $email !== null ? (string) $email : null;
+            $avatar   = $avatar !== null ? (string) $avatar : null;
 
             $user = User::findOrCreateSocialUser(
                 provider: $provider,
                 providerId: $providerId,
                 userData: [
-                    'name'   => $name,
-                    'email'  => $email,
-                    'avatar' => $avatar,
+                    'nickname' => $nickname,
+                    'email'    => $email,
+                    'avatar'   => $avatar,
                 ]
             );
 
@@ -141,7 +141,7 @@ class SocialAuthController extends Controller
 
             $token = $user->createToken('auth-token')->plainTextToken;
 
-            if ($request->expectsJson() || $request->is('api/*')) {
+            if ($request->expectsJson() || $request->is('v1/*')) {
                 return response()->json([
                     'user'  => $user,
                     'token' => $token,

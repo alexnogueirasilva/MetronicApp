@@ -7,7 +7,7 @@ use function Pest\Laravel\postJson;
 
 beforeEach(function (): void {
     $user = User::factory()->create([
-        'name'     => 'Reggie Swift',
+        'nickname' => 'Reggie Swift',
         'email'    => 'test@example.com',
         'password' => bcrypt('secret123'),
     ]);
@@ -26,7 +26,7 @@ it('logs in successfully with correct credentials', function (): void {
             fn (AssertableJson $json): AssertableJson => $json->hasAll(['token', 'user'])
             ->has('user.id')
             ->where('user.email', 'test@example.com')
-            ->where('user.name', 'Reggie Swift')
+            ->where('user.nickname', 'Reggie Swift')
         );
 
     expect(auth()->user())->toBeNull();

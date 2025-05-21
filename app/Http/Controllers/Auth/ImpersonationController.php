@@ -1,4 +1,5 @@
-<?php declare(strict_types = 1);
+<?php
+declare(strict_types = 1);
 
 namespace App\Http\Controllers\Auth;
 
@@ -18,7 +19,9 @@ class ImpersonationController extends Controller
      * It requires the 'impersonate-users' permission.
      *
      * @group Auth
+     *
      * @authenticated
+     *
      * @middleware auth:sanctum
      * @middleware totp.verify
      *
@@ -37,15 +40,12 @@ class ImpersonationController extends Controller
      *     },
      *     "impersonation_id": "01HZ2XABCDEF1234567890ABCDE"
      * }
-     *
      * @response 403 {
      *     "message": "Você não tem permissão para impersonar outros usuários."
      * }
-     *
      * @response 400 {
      *     "message": "Você não pode impersonar a si mesmo."
      * }
-     *
      * @response 400 {
      *     "message": "Você já está impersonando outro usuário. Termine a sessão atual antes de iniciar uma nova."
      * }
@@ -84,7 +84,7 @@ class ImpersonationController extends Controller
         $token = $user->createToken('impersonation-token', ['impersonated'])->plainTextToken;
 
         return response()->json([
-            'message'          => "Você está agora impersonando {$user->name}.",
+            'message'          => "Você está agora impersonando {$user->last_name}.",
             'token'            => $token,
             'user'             => $user,
             'impersonation_id' => $impersonation->id,
@@ -98,13 +98,14 @@ class ImpersonationController extends Controller
      * the impersonation token.
      *
      * @group Auth
+     *
      * @authenticated
+     *
      * @middleware auth:sanctum
      *
      * @response {
      *     "message": "Sessão de impersonation encerrada com sucesso."
      * }
-     *
      * @response 400 {
      *     "message": "Você não está impersonando nenhum usuário."
      * }
@@ -138,7 +139,9 @@ class ImpersonationController extends Controller
      * current user, both active and historical. It requires the 'impersonate-users' permission.
      *
      * @group Auth
+     *
      * @authenticated
+     *
      * @middleware auth:sanctum
      * @middleware totp.verify
      *
@@ -168,7 +171,6 @@ class ImpersonationController extends Controller
      *         }
      *     ]
      * }
-     *
      * @response 403 {
      *     "message": "Você não tem permissão para visualizar o histórico de impersonation."
      * }

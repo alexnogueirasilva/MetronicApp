@@ -18,9 +18,14 @@ class RoleFactory extends Factory
     public function definition(): array
     {
         return [
-            'name'        => $this->faker->unique()->word(),
-            'description' => $this->faker->sentence(),
-            'is_default'  => false,
+            'name'         => $this->faker->unique()->word(),
+            'icon'         => $this->faker->word(),
+            'icon_class'   => $this->faker->word(),
+            'fill_class'   => $this->faker->word(),
+            'stroke_class' => $this->faker->word(),
+            'size_class'   => $this->faker->word(),
+            'description'  => $this->faker->sentence(),
+            'is_default'   => false,
         ];
     }
 }

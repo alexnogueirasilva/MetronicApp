@@ -8,6 +8,8 @@ use App\Models\Auth\{Role};
 use App\Models\Traits\HasRole;
 use Database\Factories\UserFactory;
 use DevactionLabs\FilterablePackage\Traits\Filterable;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, BelongsToMany, HasMany};
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -20,7 +22,9 @@ use OwenIt\Auditing\Contracts\Auditable;
 /**
  * @property string $id
  * @property ?int $tenant_id
- * @property string $name
+ * @property string $nickname
+ * @property ?string $first_name
+ * @property ?string $last_name
  * @property string $email
  * @property string $avatar
  * @property ?string $password
@@ -38,14 +42,15 @@ use OwenIt\Auditing\Contracts\Auditable;
  * @property-read Impersonation[] $impersonations
  * @property-read Impersonation[] $beingImpersonated
  */
+#[UseFactory(UserFactory::class)]
 class User extends Authenticatable implements Auditable
 {
     use AuditableTrait;
     use Filterable;
     use HasApiTokens;
-    /** @use HasFactory<UserFactory> */
     use HasFactory;
     use HasRole;
+    use HasUlids;
     use Notifiable;
 
     /**
@@ -88,7 +93,7 @@ class User extends Authenticatable implements Auditable
         }
 
         return self::query()->create([
-            'name'              => $userData['name'],
+            'nickname'          => $userData['nickname'],
             'email'             => $userData['email'],
             'avatar'            => $userData['avatar'] ?? null,
             'provider'          => $provider,
