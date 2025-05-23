@@ -1,6 +1,7 @@
 # Sugestões de Melhorias para o Boilerplate
 
-Este documento contém uma lista de funcionalidades que podem ser adicionadas ao boilerplate para torná-lo mais completo e abrangente para projetos de API.
+Este documento contém uma lista de funcionalidades que podem ser adicionadas ao boilerplate para torná-lo mais completo
+e abrangente para projetos de API.
 
 ## Recursos Prioritários
 
@@ -14,7 +15,7 @@ Este documento contém uma lista de funcionalidades que podem ser adicionadas ao
 
 ### 2. Sistema de Versionamento de API
 
-- Implementar versionamento de rotas (ex: `/api/v1/auth/login`)
+- Implementar versionamento de rotas (ex: `/v1/auth/login`)
 - Suporte à depreciação gradual de endpoints
 - Documentação específica por versão
 - Middleware para controle de versão via header

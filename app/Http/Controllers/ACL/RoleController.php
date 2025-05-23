@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\ACL;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ACL\RoleCollection;
+use App\Http\Requests\Acl\RoleStoreRequest;
+use App\Http\Resources\ACL\{RoleCollection, RoleResource};
 use App\Models\Auth\Role;
 use DevactionLabs\FilterablePackage\Filter;
 use Illuminate\Http\Request;
@@ -43,9 +44,11 @@ class RoleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): void
+    public function store(RoleStoreRequest $request): RoleResource
     {
-        //
+        $role = Role::query()->create($request->validated());
+
+        return new RoleResource($role);
     }
 
     /**

@@ -181,7 +181,16 @@ POST /api/v1/auth/magic-link/verify
         "created_at": "datetime",
         "updated_at": "datetime",
         "roles": [
-            ...
+            {
+                "id": "integer",
+                "name": "string",
+                "permissions": [
+                    {
+                        "id": "integer",
+                        "name": "string"
+                    }
+                ]
+            }
         ]
     }
 }
@@ -251,7 +260,16 @@ POST /api/v1/auth/otp/verify
         "created_at": "datetime",
         "updated_at": "datetime",
         "roles": [
-            ...
+            {
+                "id": "integer",
+                "name": "string",
+                "permissions": [
+                    {
+                        "id": "integer",
+                        "name": "string"
+                    }
+                ]
+            }
         ]
     }
 }
@@ -316,6 +334,295 @@ GET /api/v1/auth/me
                     "name": "string"
                 }
             ]
+        }
+    ]
+}
+```
+
+## Autenticação Social
+
+### Redirecionar para Provedor Social
+
+```
+GET /api/v1/auth/social/{provider}
+```
+
+**Parâmetros de URL**:
+
+- `provider`: string, obrigatório, provedor de autenticação (atualmente suporta apenas 'google')
+
+**Headers**:
+
+- `Accept`: application/json
+
+**Resposta de Sucesso (200 OK)**:
+
+```json
+{
+    "status": "success",
+    "message": "URL de redirecionamento para autenticação.",
+    "data": {
+        "url": "https://accounts.google.com/o/oauth2/auth?client_id=..."
+    },
+    "meta": {
+        "api_version": "v1"
+    }
+}
+```
+
+**Resposta de Erro (400 Bad Request)**:
+
+```json
+{
+    "status": "error",
+    "message": "Provedor de autenticação não suportado."
+}
+```
+
+### Callback de Autenticação Social
+
+```
+GET /api/v1/auth/social/{provider}/callback
+```
+
+**Parâmetros de URL**:
+
+- `provider`: string, obrigatório, provedor de autenticação (atualmente suporta apenas 'google')
+
+**Resposta de Sucesso (200 OK)**:
+
+```json
+{
+    "user": {
+        "id": "uuid",
+        "name": "string",
+        "email": "string",
+        "email_verified_at": "datetime",
+        "created_at": "datetime",
+        "updated_at": "datetime"
+    },
+    "token": "string"
+}
+```
+
+**Resposta de Erro (500 Internal Server Error)**:
+
+```json
+{
+    "message": "Falha na autenticação social. Ocorreu um erro ao processar a requisição."
+}
+```
+
+## Autenticação TOTP (Time-based One-Time Password)
+
+### Confirmar Código TOTP
+
+```
+POST /api/v1/auth/totp/confirm
+```
+
+**Parâmetros**:
+
+- `code`: string, obrigatório, código TOTP gerado pelo aplicativo autenticador
+
+**Headers**:
+
+- `Content-Type`: application/json
+- `Accept`: application/json
+- `Authorization`: Bearer {token}
+- `X-Idempotence-Key`: UUID v4 (obrigatório)
+
+**Resposta de Sucesso (200 OK)**:
+
+```json
+{
+    "message": "TOTP ativado com sucesso."
+}
+```
+
+### Desativar OTP
+
+```
+DELETE /api/v1/auth/otp/disable
+```
+
+**Headers**:
+
+- `Accept`: application/json
+- `Authorization`: Bearer {token}
+- `X-Idempotence-Key`: UUID v4 (obrigatório)
+
+**Resposta de Sucesso (200 OK)**:
+
+```json
+{
+    "message": "Autenticação OTP desativada com sucesso."
+}
+```
+
+## Redefinição de Senha
+
+### Solicitar Redefinição de Senha
+
+```
+POST /api/v1/auth/forgot-password
+```
+
+**Parâmetros**:
+
+- `email`: string, obrigatório, formato de email válido
+
+**Headers**:
+
+- `Content-Type`: application/json
+- `Accept`: application/json
+- `X-Idempotence-Key`: UUID v4 (obrigatório)
+
+**Resposta de Sucesso (200 OK)**:
+
+```json
+{
+    "message": "If your email is registered, you will receive a password reset link."
+}
+```
+
+### Redefinir Senha
+
+```
+POST /api/v1/auth/reset-password
+```
+
+**Parâmetros**:
+
+- `email`: string, obrigatório, email codificado em Base64 URL-safe
+- `token`: string, obrigatório, token de redefinição de senha enviado por email
+- `password`: string, obrigatório, mínimo 8 caracteres
+- `password_confirmation`: string, obrigatório, deve corresponder ao campo password
+
+**Headers**:
+
+- `Content-Type`: application/json
+- `Accept`: application/json
+- `X-Idempotence-Key`: UUID v4 (obrigatório)
+
+**Resposta de Sucesso (200 OK)**:
+
+```json
+{
+    "message": "Your password has been reset!"
+}
+```
+
+**Resposta de Erro (422 Unprocessable Entity)**:
+
+```json
+{
+    "message": "E-mail inválido ou corrompido."
+}
+```
+
+ou
+
+```json
+{
+    "message": "The given data was invalid.",
+    "errors": {
+        "token": ["This password reset token is invalid."],
+        "password": ["The password must be at least 8 characters."]
+    }
+}
+```
+
+## Impersonação de Usuário
+
+### Iniciar Impersonação
+
+```
+POST /api/v1/auth/impersonate/{user}
+```
+
+**Parâmetros de URL**:
+
+- `user`: string, obrigatório, ID do usuário a ser impersonado
+
+**Headers**:
+
+- `Accept`: application/json
+- `Authorization`: Bearer {token}
+- `X-Idempotence-Key`: UUID v4 (obrigatório)
+
+**Resposta de Sucesso (200 OK)**:
+
+```json
+{
+    "message": "Você está agora impersonando John Doe.",
+    "token": "string",
+    "user": {
+        "id": "uuid",
+        "name": "string",
+        "email": "string",
+        "email_verified_at": "datetime",
+        "created_at": "datetime",
+        "updated_at": "datetime"
+    },
+    "impersonation_id": "string"
+}
+```
+
+**Resposta de Erro (403 Forbidden)**:
+
+```json
+{
+    "message": "Você não tem permissão para impersonar outros usuários."
+}
+```
+
+### Encerrar Impersonação
+
+```
+DELETE /api/v1/auth/impersonate
+```
+
+**Headers**:
+
+- `Accept`: application/json
+- `Authorization`: Bearer {token}
+- `X-Idempotence-Key`: UUID v4 (obrigatório)
+
+**Resposta de Sucesso (200 OK)**:
+
+```json
+{
+    "message": "Sessão de impersonation encerrada com sucesso."
+}
+```
+
+### Histórico de Impersonação
+
+```
+GET /api/v1/auth/impersonate/history
+```
+
+**Headers**:
+
+- `Accept`: application/json
+- `Authorization`: Bearer {token}
+
+**Resposta de Sucesso (200 OK)**:
+
+```json
+{
+    "impersonations": [
+        {
+            "id": "string",
+            "impersonated_id": "uuid",
+            "created_at": "datetime",
+            "ended_at": "datetime",
+            "impersonated": {
+                "id": "uuid",
+                "name": "string",
+                "email": "string"
+            }
         }
     ]
 }
