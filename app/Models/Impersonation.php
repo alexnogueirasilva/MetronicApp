@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\{Builder, Concerns\HasUlids, Model};
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\{Carbon, Str};
+use Override;
 use OwenIt\Auditing\Auditable as AuditableTrait;
 use OwenIt\Auditing\Contracts\Auditable;
 
@@ -64,6 +65,7 @@ class Impersonation extends Model implements Auditable
     /**
      * Boot function from Laravel.
      */
+    #[Override]
     protected static function boot(): void
     {
         parent::boot();

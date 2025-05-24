@@ -9,7 +9,7 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.2",
+        "php": "^8.4",
         "captainhook/captainhook": "^5.25",
         "devaction-labs/filterable-package": "^1.0",
         "doctrine/dbal": "^4.2",
@@ -27,7 +27,9 @@
         "owen-it/laravel-auditing": "^14.0",
         "scalar/laravel": "^0.2.0",
         "spatie/laravel-data": "^4.15",
-        "spomky-labs/otphp": "^11.3"
+        "spomky-labs/otphp": "^11.3",
+        "saloonphp/laravel-plugin": "^3.5",
+        "saloonphp/saloon": "^v3.13.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

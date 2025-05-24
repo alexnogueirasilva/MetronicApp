@@ -5,6 +5,7 @@ namespace App\Http\Resources\User;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Override;
 
 /**
  * @mixin User
@@ -16,6 +17,7 @@ class UserResource extends JsonResource
      *
      * @return array<string, mixed>
      */
+    #[Override]
     public function toArray(Request $request): array
     {
         return [
@@ -26,6 +28,8 @@ class UserResource extends JsonResource
             'email'             => $this->email,
             'avatar'            => $this->avatar,
             'email_verified_at' => $this->email_verified_at,
+            'otp_method'        => $this->otp_method,
+            'totp_verified'     => $this->totp_verified,
             'created_at'        => $this->created_at,
             'updated_at'        => $this->updated_at,
             'roles'             => $this->whenLoaded('role', fn () => $this->role->map(fn ($role): array => [

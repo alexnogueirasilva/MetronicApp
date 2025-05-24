@@ -5,6 +5,7 @@ namespace App\Http\Resources\Finance;
 use App\Models\Finance\Account;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Override;
 
 /**
  * @mixin Account
@@ -16,6 +17,7 @@ class AccountResource extends JsonResource
      *
      * @return array<string, mixed>
      */
+    #[Override]
     public function toArray(Request $request): array
     {
         return [

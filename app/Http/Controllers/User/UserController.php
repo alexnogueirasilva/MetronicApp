@@ -67,7 +67,7 @@ class UserController extends Controller
         $user = User::create($request->validated());
         $user->load(['role.permissions']);
 
-        return (new UserResource($user))
+        return new UserResource($user)
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
     }

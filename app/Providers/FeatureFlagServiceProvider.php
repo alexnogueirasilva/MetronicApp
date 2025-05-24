@@ -8,6 +8,7 @@ use Blade;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Pennant\{Feature, PennantServiceProvider};
+use Override;
 use Throwable;
 
 class FeatureFlagServiceProvider extends ServiceProvider
@@ -15,6 +16,7 @@ class FeatureFlagServiceProvider extends ServiceProvider
     /**
      * Register services.
      */
+    #[Override]
     public function register(): void
     {
         $this->app->singleton(FeatureFlagManager::class, function ($app): FeatureFlagManager {
