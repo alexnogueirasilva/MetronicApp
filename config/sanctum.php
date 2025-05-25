@@ -19,8 +19,10 @@ return [
         '%s%s',
         'localhost,localhost:3000,localhost:5173,127.0.0.1,127.0.0.1:8000,::1',
         Sanctum::currentApplicationUrlWithPort(),
-        // Sanctum::currentRequestHost(),
+        //        Sanctum::currentRequestHost(),
     ))),
+
+    'cors_allowed_origins' => env('CORS_ALLOWED_ORIGINS', '*'),
 
     /*
     |--------------------------------------------------------------------------

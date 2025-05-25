@@ -2,4 +2,4 @@
 
 use Illuminate\Support\Facades\Broadcast;
 
-Broadcast::channel('App.Models.User.{id}', fn ($user, $id): bool => (int) $user->id === (int) $id);
+Broadcast::channel('App.Models.User.{id}', static fn ($user, $id): bool => (int) $user->id === (int) $id);
