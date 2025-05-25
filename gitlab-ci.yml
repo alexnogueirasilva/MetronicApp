@@ -1,0 +1,294 @@
+# CI/CD Pipeline Otimizada
+# 1. Quando é feito um merge para a branch principal:
+#    - Testes e validações são executados automaticamente
+#    - O job "tag" fica disponível para criar uma nova release
+#
+# 2. Quando uma tag é criada:
+#    - Uma nova pipeline é iniciada automaticamente
+#    - O deploy para o ambiente de staging é executado automaticamente
+#    - Testes e validações NÃO são executados novamente (reduz carga nos runners)
+#
+# 3. Jobs manuais:
+#    - deploy_to_stage/deploy_to_production - Deploy manual para ambientes específicos
+#    - rollback - Reverte para a tag anterior (ROLLBACK_ENV: stage ou prod)
+
+stages:
+  - build
+  - test
+  - tag
+  - deploy
+  - rollback
+
+variables:
+  PHP_VERSION: "8.4"
+  AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+  AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+  AWS_BUCKET: "${AWS_BUCKET}"
+  CNJPA_TOKEN: "${CNJPA_TOKEN}"
+  CNJPA_URL_BASE: "${CNJPA_URL_BASE}"
+  GITLAB_USER: "${GITLAB_USER_LOGIN}"
+  GITLAB_TOKEN: "${GITLAB_TOKEN}"
+  REDIS_HOST: "redis"
+  REDIS_PORT: 6379
+  TZ: America/Sao_Paulo
+  FORGE_SERVER_PROD: "Agency-app"
+  FORGE_SERVER_STAGE: "Agency-app"
+  ROLLBACK_ENV: "stage"
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - vendor/
+
+before_script:
+  - apt-get update -qq && apt-get install -y build-essential libpng-dev libjpeg62-turbo-dev libfreetype6-dev zip unzip git libzip-dev
+  - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+  - composer --version
+  - php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+install_dependencies:
+  stage: build
+  image: php:8.4
+  script:
+    - composer install --prefer-dist --no-ansi --no-interaction --no-scripts --no-progress --ignore-platform-reqs
+  artifacts:
+    paths:
+      - vendor/
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != 'tag'
+
+test:
+  stage: test
+  services:
+    - mysql:latest
+    - redis:latest
+  image: php:8.4-bullseye
+  variables:
+    MYSQL_ROOT_PASSWORD: root
+    DB_CONNECTION: sqlite
+    DB_DATABASE: database/database.sqlite
+    CACHE_DRIVER: redis
+    PHP_MEMORY_LIMIT: 1G
+    TZ: America/Sao_Paulo
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y zlib1g-dev libzip-dev pkg-config libjpeg-dev libpng-dev libfreetype6-dev
+    - docker-php-ext-configure gd --with-freetype --with-jpeg
+    - docker-php-ext-install gd zip
+    - pecl install redis
+    - docker-php-ext-enable redis
+    - echo "memory_limit = 1G" > /usr/local/etc/php/conf.d/memory-limit.ini
+    - php -r "file_exists('.env') || copy('.env.example', '.env');"
+    - mkdir -p database && touch database/database.sqlite
+  script:
+    - php -d memory_limit=${PHP_MEMORY_LIMIT} artisan key:generate
+    - php artisan view:clear && php artisan view:cache
+    - php -d memory_limit=${PHP_MEMORY_LIMIT} ./vendor/bin/pint --test
+    - php -d memory_limit=${PHP_MEMORY_LIMIT} vendor/bin/pest --parallel --processes=8
+  artifacts:
+    paths:
+      - database/
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != 'tag'
+  needs:
+    - install_dependencies
+
+tag:
+  stage: tag
+  image: php:8.4
+  before_script:
+    - apt-get update -qq && apt-get install -y git curl
+  script:
+    - |
+      git fetch --tags
+      LAST_TAG=$(git tag --sort=-creatordate | head -n 1)
+      if [ -z "$LAST_TAG" ]; then
+        TAG_NAME="v1.0.0"
+      else
+        MAJOR=$(echo $LAST_TAG | awk -F. '{print substr($1,2)}')
+        MINOR=$(echo $LAST_TAG | awk -F. '{print $2}')
+        PATCH=$(echo $LAST_TAG | awk -F. '{print $3}')
+        if [ "$PATCH" -lt 99 ]; then
+          PATCH=$((PATCH + 1))
+        else
+          PATCH=0
+          MINOR=$((MINOR + 1))
+        fi
+        TAG_NAME="v${MAJOR}.${MINOR}.${PATCH}"
+      fi
+      echo "Creating tag $TAG_NAME based on the last tag $LAST_TAG"
+      git config --global user.email "ci@example.com"
+      git config --global user.name "CI Runner"
+      git tag $TAG_NAME
+      git push https://${GITLAB_USER}:${GITLAB_TOKEN}@gitlab.com/${CI_PROJECT_PATH}.git $TAG_NAME
+      echo "Creating release $TAG_NAME"
+      curl --request POST --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" \
+        --header "Content-Type: application/json" \
+        --data "{
+          \"name\": \"$TAG_NAME\",
+          \"tag_name\": \"$TAG_NAME\",
+          \"description\": \"Release $TAG_NAME - Deploy manual via CI/CD.\",
+          \"released_at\": \"$(date -Iseconds)\"
+        }" \
+        "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/releases"
+      echo "TAG_NAME=$TAG_NAME" > tag.env
+  artifacts:
+    reports:
+      dotenv: tag.env
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: manual
+
+deploy_from_tag:
+  stage: deploy
+  image: php:8.4
+  script:
+    - |
+      git fetch --tags
+      TAG_NAME=$CI_COMMIT_TAG
+
+      if [ -z "$TAG_NAME" ]; then
+        echo "No tag found. Deploy cannot proceed."
+        exit 1
+      fi
+
+      TAG=$TAG_NAME
+      CURRENT_DATE=$(TZ="America/Sao_Paulo" date +'%d/%m/%Y %H:%M:%S')
+      DEPLOY_TARGET="Stage"
+
+      curl -X POST \
+        -H "Content-type: application/json" \
+        -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+        --data '{"channel": "#deploy", "text": "<!here> :clock1: Deploy automático iniciando. Tag: '"$TAG"' \nIniciado por CI Pipeline\nàs: '"$CURRENT_DATE"'\nTarget: '"$DEPLOY_TARGET"'"}' \
+        https://slack.com/api/chat.postMessage
+
+      echo "Deploying to STAGE using tag $TAG"
+      composer global require laravel/forge-cli
+      ~/.composer/vendor/bin/forge server:switch "${FORGE_SERVER_STAGE}"
+      TAG_NAME=$TAG ~/.composer/vendor/bin/forge deploy api.stage.devaction.com.br
+
+      CURRENT_DATE=$(TZ="America/Sao_Paulo" date +'%d/%m/%Y %H:%M:%S')
+      curl -X POST \
+        -H "Content-type: application/json" \
+        -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+        --data '{"channel": "#deploy", "text": "<!here> :white_check_mark: Deploy automático finalizado com sucesso. Tag: '"$TAG"' \nFinalizado por CI Pipeline\nàs: '"$CURRENT_DATE"'\nTarget: '"$DEPLOY_TARGET"'"}' \
+        https://slack.com/api/chat.postMessage
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'tag'
+
+deploy_to_stage:
+  stage: deploy
+  image: php:8.4
+  when: manual
+  needs:
+    - job: tag
+      artifacts: true
+      optional: true
+  script:
+    - |
+      if [ -f tag.env ]; then
+        source tag.env
+      else
+        git fetch --tags
+        TAG_NAME=$(git tag --sort=-creatordate | head -n 1)
+      fi
+      TAG=${TAG_NAME:-"No tag"}
+      CURRENT_DATE=$(TZ="America/Sao_Paulo" date +'%d/%m/%Y %H:%M:%S')
+      DEPLOY_TARGET="Stage"
+
+      curl -X POST \
+        -H "Content-type: application/json" \
+        -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+        --data '{"channel": "#deploy", "text": "<!here> :clock1: O Deploy está iniciando. Tag: '"$TAG"' \nIniciado por: '"$GITLAB_USER"'\nàs: '"$CURRENT_DATE"'\nTarget: '"$DEPLOY_TARGET"'"}' \
+        https://slack.com/api/chat.postMessage
+
+      echo "Deploying to STAGE using tag $TAG"
+      composer global require laravel/forge-cli
+      ~/.composer/vendor/bin/forge server:switch "${FORGE_SERVER_STAGE}"
+      TAG_NAME=$TAG ~/.composer/vendor/bin/forge deploy api.stage.devaction.com.br
+
+      CURRENT_DATE=$(TZ="America/Sao_Paulo" date +'%d/%m/%Y %H:%M:%S')
+      curl -X POST \
+        -H "Content-type: application/json" \
+        -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+        --data '{"channel": "#deploy", "text": "<!here> :white_check_mark: O Deploy foi finalizado com sucesso. Tag: '"$TAG"' \nFinalizado por: '"$GITLAB_USER"'\nàs: '"$CURRENT_DATE"'\nTarget: '"$DEPLOY_TARGET"'"}' \
+        https://slack.com/api/chat.postMessage
+
+deploy_to_production:
+  stage: deploy
+  image: php:8.4
+  when: manual
+  needs:
+    - job: tag
+      artifacts: true
+      optional: true
+  script:
+    - |
+      if [ -f tag.env ]; then
+        source tag.env
+      else
+        git fetch --tags
+        TAG_NAME=$(git tag --sort=-creatordate | head -n 1)
+      fi
+      TAG=${TAG_NAME:-"No tag"}
+      CURRENT_DATE=$(TZ="America/Sao_Paulo" date +'%d/%m/%Y %H:%M:%S')
+      DEPLOY_TARGET="Production"
+
+      curl -X POST \
+        -H "Content-type: application/json" \
+        -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+        --data '{"channel": "#deploy", "text": "<!here> :clock1: O Deploy está iniciando. Tag: '"$TAG"' \nIniciado por: '"$GITLAB_USER"'\nàs: '"$CURRENT_DATE"'\nTarget: '"$DEPLOY_TARGET"'"}' \
+        https://slack.com/api/chat.postMessage
+
+      echo "Deploying to PRODUCTION using tag $TAG"
+      composer global require laravel/forge-cli
+      ~/.composer/vendor/bin/forge server:switch "${FORGE_SERVER_PROD}"
+      TAG_NAME=$TAG ~/.composer/vendor/bin/forge deploy alanti.com.br
+
+      CURRENT_DATE=$(TZ="America/Sao_Paulo" date +'%d/%m/%Y %H:%M:%S')
+      curl -X POST \
+        -H "Content-type: application/json" \
+        -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+        --data '{"channel": "#deploy", "text": "<!here> :white_check_mark: O Deploy foi finalizado com sucesso. Tag: '"$TAG"' \nFinalizado por: '"$GITLAB_USER"'\nàs: '"$CURRENT_DATE"'\nTarget: '"$DEPLOY_TARGET"'"}' \
+        https://slack.com/api/chat.postMessage
+
+rollback:
+  stage: rollback
+  image: php:8.4
+  script:
+    - |
+      echo "Performing manual rollback to previous tag."
+      PREVIOUS_TAG=$(git tag --sort=-creatordate | sed -n 2p)
+      if [ -z "$PREVIOUS_TAG" ]; then
+        echo "No previous tag found. Rollback cannot proceed."
+        exit 1
+      fi
+      echo "Rolling back to tag $PREVIOUS_TAG"
+      git checkout $PREVIOUS_TAG
+      composer global require laravel/forge-cli
+
+      CURRENT_DATE=$(TZ="America/Sao_Paulo" date +'%d/%m/%Y %H:%M:%S')
+
+      curl -X POST \
+        -H "Content-type: application/json" \
+        -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+        --data '{"channel": "#deploy", "text": "<!here> :warning: ROLLBACK está iniciando. Tag: '"$PREVIOUS_TAG"' \nIniciado por: '"$GITLAB_USER"'\nàs: '"$CURRENT_DATE"'"}' \
+        https://slack.com/api/chat.postMessage
+
+      if [ "$ROLLBACK_ENV" = "prod" ]; then
+        ~/.composer/vendor/bin/forge server:switch "${FORGE_SERVER_PROD}"
+        TAG_NAME=$PREVIOUS_TAG ~/.composer/vendor/bin/forge deploy devaction.com.br
+      else
+        ~/.composer/vendor/bin/forge server:switch "${FORGE_SERVER_STAGE}"
+        TAG_NAME=$PREVIOUS_TAG ~/.composer/vendor/bin/forge deploy api.stage.devaction.com.br
+      fi
+
+      CURRENT_DATE=$(TZ="America/Sao_Paulo" date +'%d/%m/%Y %H:%M:%S')
+      curl -X POST \
+        -H "Content-type: application/json" \
+        -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+        --data '{"channel": "#deploy", "text": "<!here> :white_check_mark: ROLLBACK foi finalizado com sucesso. Tag: '"$PREVIOUS_TAG"' \nFinalizado por: '"$GITLAB_USER"'\nàs: '"$CURRENT_DATE"'"}' \
+        https://slack.com/api/chat.postMessage
+  when: manual
