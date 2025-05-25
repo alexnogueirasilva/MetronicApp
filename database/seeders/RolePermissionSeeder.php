@@ -29,7 +29,7 @@ class RolePermissionSeeder extends Seeder
 
         foreach ($subjects as $subject) {
             foreach ($actions as $action) {
-                Permission::firstOrCreate([
+                Permission::query()->firstOrCreate([
                     'name' => "{$subject}:{$action}",
                 ]);
             }
@@ -109,7 +109,7 @@ class RolePermissionSeeder extends Seeder
         ];
 
         foreach ($roles as $roleData) {
-            Role::firstOrCreate(
+            Role::query()->firstOrCreate(
                 ['name' => $roleData['name']],
                 collect($roleData)->except('name')->toArray()
             );
@@ -117,7 +117,7 @@ class RolePermissionSeeder extends Seeder
 
         $user = User::query()->where('email', 'alex@devaction.com.br')->first();
 
-        $adminRole = Role::where('name', 'Administrator')->first();
+        $adminRole = Role::query()->where('name', 'Administrator')->first();
         $user->role()->sync($adminRole);
 
         $adminRole->permissions()->sync(Permission::pluck('id'));
