@@ -15,10 +15,6 @@ use Illuminate\Support\Carbon;
  * @property string $id
  * @property string $name
  * @property ?string $icon
- * @property ?string $icon_class
- * @property ?string $fill_class
- * @property ?string $stroke_class
- * @property ?string $size_class
  * @property ?string $description
  * @property bool $is_default
  * @property Carbon $created_at
@@ -26,12 +22,11 @@ use Illuminate\Support\Carbon;
  * @property-read Permission[]|Collection $permissions
  * @property-read int $count_users
  */
-
 #[ObservedBy(RoleObserver::class)]
 class Role extends Model
 {
-    use HasFactory;
     use Filterable;
+    use HasFactory;
     use HasUlids;
 
     /**
