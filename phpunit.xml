@@ -33,5 +33,7 @@
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
+        <env name="FILESYSTEM_DISK" value="s3"/>
+        <env name="AWS_BUCKET" value="grock-api"/>
     </php>
 </phpunit>

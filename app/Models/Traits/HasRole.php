@@ -19,7 +19,6 @@ trait HasRole
             ? $role
             : Role::query()->where('name', $role)->firstOrFail();
 
-        // Garante que só haja uma role por vez
         $this->roles()
             ->wherePivot('role_id', '!=', $roleInstance->id)
             ->detach();

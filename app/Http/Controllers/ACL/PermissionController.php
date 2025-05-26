@@ -34,7 +34,7 @@ class PermissionController extends Controller
             ->filtrable([
                 Filter::like('name', 'name'),
             ])
-            ->customPaginate();
+            ->get();
 
         return new PermissionCollection($permissions);
     }

@@ -187,7 +187,7 @@ class ImpersonationController extends Controller
         }
 
         $impersonations = $user->impersonations()
-            ->with('impersonated:id,name,email')
+            ->with('impersonated:id,first_name,last_name,email')
             ->orderBy('created_at', 'desc')
             ->get(['id', 'impersonated_id', 'created_at', 'ended_at']);
 

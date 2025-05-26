@@ -9,12 +9,13 @@ use App\Models\Traits\HasRole;
 use Database\Factories\UserFactory;
 use DevactionLabs\FilterablePackage\Traits\Filterable;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, BelongsToMany, HasMany};
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\{Carbon};
+use Illuminate\Support\{Carbon, Facades\Storage};
 use Laravel\Sanctum\HasApiTokens;
 use OwenIt\Auditing\Auditable as AuditableTrait;
 use OwenIt\Auditing\Contracts\Auditable;
@@ -41,6 +42,7 @@ use OwenIt\Auditing\Contracts\Auditable;
  * @property-read FeatureFlag[] $featureFlags
  * @property-read Impersonation[] $impersonations
  * @property-read Impersonation[] $beingImpersonated
+ * @property-read string $url_avatar
  */
 #[UseFactory(UserFactory::class)]
 class User extends Authenticatable implements Auditable
@@ -206,6 +208,31 @@ class User extends Authenticatable implements Auditable
     public function isAdmin(): bool
     {
         return $this->hasRole('admin');
+    }
+
+    /**
+     * Get the user's avatar.
+     *
+     * @return Attribute<string, never>
+     */
+    public function urlAvatar(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                $cacheKey = "user:{$this->id}:avatar_url";
+
+                return cache()->remember($cacheKey, now()->addDays(7), function () {
+                    if (!empty($this->avatar) && Storage::disk('s3')->exists($this->avatar)) {
+                        return Storage::disk('s3')->temporaryUrl(
+                            $this->avatar,
+                            now()->addWeek()
+                        );
+                    }
+
+                    return 'https://ui-avatars.com/api/?name=' . urlencode((string) $this->first_name) . '&color=7F9CF5&background=EBF4FF&size=256';
+                });
+            }
+        );
     }
 
     /**
