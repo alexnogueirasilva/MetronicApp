@@ -42,6 +42,7 @@ use OwenIt\Auditing\Contracts\Auditable;
  * @property-read FeatureFlag[] $featureFlags
  * @property-read Impersonation[] $impersonations
  * @property-read Impersonation[] $beingImpersonated
+ * @property-read string $url_avatar
  */
 #[UseFactory(UserFactory::class)]
 class User extends Authenticatable implements Auditable

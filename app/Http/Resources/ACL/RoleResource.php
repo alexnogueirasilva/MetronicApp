@@ -39,7 +39,7 @@ class RoleResource extends JsonResource
                     'nickname'   => $user->nickname,
                     'first_name' => $user->first_name,
                     'last_name'  => $user->last_name,
-                    'avatar'     => $user->urlAvatar(),
+                    'avatar'     => $user->url_avatar,
                 ]);
             }),
             'permissions' => $this->groupedPermissions(),
