@@ -8,14 +8,12 @@ use Illuminate\Support\Str;
 use function Pest\Laravel\{actingAs};
 
 beforeEach(function () {
-    // Criar permissão de impersonation se não existir
     $permission = Permission::firstOrCreate([
         'name' => 'impersonate-users',
     ], [
         'description' => 'Allows impersonation of other users',
     ]);
 
-    // Criar role de admin
     $adminRole = Role::firstOrCreate([
         'name' => 'admin',
     ], [
@@ -23,18 +21,14 @@ beforeEach(function () {
         'is_default'  => false,
     ]);
 
-    // Associar permissão à role
     if (!$adminRole->permissions()->where('id', $permission->id)->exists()) {
         $adminRole->permissions()->attach($permission->id);
     }
 
-    // Limpar tabela de impersonation antes de cada teste
     DB::table('impersonations')->truncate();
 
-    // Limpar tabela de audits antes de cada teste
     DB::table('audits')->truncate();
 
-    // Falsificador de eventos para processamento síncrono
     Event::fake([ImpersonationActionPerformed::class]);
 });
 

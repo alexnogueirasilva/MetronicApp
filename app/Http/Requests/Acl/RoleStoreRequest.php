@@ -46,7 +46,25 @@ class RoleStoreRequest extends FormRequest
             icon: toString($data['icon'] ?? null),
             permissions: isset($data['permissions']) && is_array($data['permissions'])
                 ? array_values(array_map(
-                    static fn ($id): string => toString($id),
+                    static function (mixed $permission): int|string {
+                        if (is_array($permission) && isset($permission['id'])) {
+                            return toString($permission['id']);
+                        }
+
+                        if (is_int($permission)) {
+                            return $permission;
+                        }
+
+                        if (is_string($permission)) {
+                            return $permission;
+                        }
+
+                        if (is_scalar($permission)) {
+                            return (string)$permission;
+                        }
+
+                        return '';
+                    },
                     $data['permissions']
                 ))
                 : null

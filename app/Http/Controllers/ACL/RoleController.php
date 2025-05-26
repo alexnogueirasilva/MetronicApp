@@ -34,6 +34,7 @@ class RoleController extends Controller
     public function index(): RoleCollection
     {
         $roles = Role::query()
+            ->with('users')
             ->filtrable([
                 Filter::like('name', 'name'),
                 Filter::relationship('permissions', 'name', 'LIKE', 'permissions'),
