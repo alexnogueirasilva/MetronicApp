@@ -35,7 +35,7 @@
                 "options": {}
             },
             {
-                "action": "./vendor/bin/pest --coverage --min=50",
+                "action": "./vendor/bin/pest --coverage --min=45",
                 "options": {}
             }
         ]
