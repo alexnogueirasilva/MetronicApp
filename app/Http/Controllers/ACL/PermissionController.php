@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\ACL;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ACL\PermissionCollection;
+use App\Http\Resources\ACL\{GroupedPermissionResource};
 use App\Models\Auth\Permission;
 use DevactionLabs\FilterablePackage\Filter;
 use Illuminate\Http\Request;
@@ -28,7 +28,7 @@ class PermissionController extends Controller
      * - 401: {"message": "Unauthenticated."}
      * - 403: {"message": "Permission Denied."}
      */
-    public function index(): PermissionCollection
+    public function index(): GroupedPermissionResource
     {
         $permissions = Permission::query()
             ->filtrable([
@@ -36,7 +36,7 @@ class PermissionController extends Controller
             ])
             ->get();
 
-        return new PermissionCollection($permissions);
+        return new GroupedPermissionResource($permissions);
     }
 
     /**

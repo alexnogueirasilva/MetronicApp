@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Actions\Auth\AuthMeAction;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\User\UserResource;
+use App\Http\Resources\User\UserMeResource;
 
 class AuthMeController extends Controller
 {
@@ -21,8 +21,8 @@ class AuthMeController extends Controller
      * - 401: {"message": "Unauthenticated."}
      * - 403: {"message": "TOTP not verified."}
      */
-    public function __invoke(AuthMeAction $action): UserResource
+    public function __invoke(AuthMeAction $action): UserMeResource
     {
-        return new UserResource($action->execute());
+        return new UserMeResource($action->execute());
     }
 }
