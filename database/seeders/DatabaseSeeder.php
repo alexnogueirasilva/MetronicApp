@@ -30,6 +30,10 @@ class DatabaseSeeder extends Seeder
             'password'   => 'password',
         ]);
 
+        User::factory(50)->create([
+            'tenant_id' => $tenant->id,
+        ]);
+
         $this->call([
             RolePermissionSeeder::class,
         ]);

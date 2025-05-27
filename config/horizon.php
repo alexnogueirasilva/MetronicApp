@@ -70,7 +70,10 @@ return [
     |
     */
 
-    'middleware' => ['web'],
+    'middleware' => [
+        'web',
+        'auth.very_basic:' . env('AUTH_DEVOPS_API', 'username,password'),
+    ],
 
     /*
     |--------------------------------------------------------------------------

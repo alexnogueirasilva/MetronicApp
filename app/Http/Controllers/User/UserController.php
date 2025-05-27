@@ -4,7 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\{StoreUserRequest, UpdateUserRequest};
-use App\Http\Resources\User\{UserCollection, UserResource};
+use App\Http\Resources\User\{UserCollection, UserMeResource};
 use App\Models\User;
 use DevactionLabs\FilterablePackage\Filter;
 use Illuminate\Http\{JsonResponse};
@@ -39,7 +39,7 @@ class UserController extends Controller
                 Filter::like('nickname', 'nickname'),
                 Filter::like('email', 'email'),
             ])
-            ->customPaginate();
+            ->customPaginate(data: ['per_page' => 10]);
 
         return new UserCollection($users);
     }
@@ -64,10 +64,10 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request): JsonResponse
     {
-        $user = User::create($request->validated());
+        $user = User::query()->create($request->validated());
         $user->load(['role.permissions']);
 
-        return new UserResource($user)
+        return new UserMeResource($user)
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
     }
@@ -84,11 +84,11 @@ class UserController extends Controller
      * - 200: Detalhes do usuário
      * - 404: Usuário não encontrado
      */
-    public function show(string $user): UserResource
+    public function show(string $user): UserMeResource
     {
         $userModel = User::with(['role.permissions'])->findOrFail($user);
 
-        return new UserResource($userModel);
+        return new UserMeResource($userModel);
     }
 
     /**
@@ -110,13 +110,13 @@ class UserController extends Controller
      * - 404: Usuário não encontrado
      * - 422: Erros de validação
      */
-    public function update(UpdateUserRequest $request, string $user): UserResource
+    public function update(UpdateUserRequest $request, string $user): UserMeResource
     {
         $userModel = User::findOrFail($user);
         $userModel->update($request->validated());
         $userModel->load(['role.permissions']);
 
-        return new UserResource($userModel);
+        return new UserMeResource($userModel);
     }
 
     /**
