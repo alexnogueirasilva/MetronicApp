@@ -9,7 +9,7 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.2",
+        "php": "^8.4",
         "captainhook/captainhook": "^5.25",
         "devaction-labs/filterable-package": "^1.0",
         "doctrine/dbal": "^4.2",
@@ -20,12 +20,18 @@
         "laravel/horizon": "^5.31",
         "laravel/octane": "^2.9",
         "laravel/pennant": "^1.16",
+        "laravel/pulse": "^1.4",
+        "laravel/reverb": "^1.0",
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.20",
         "laravel/tinker": "^2.10.1",
         "league/flysystem-aws-s3-v3": "^3.29",
+        "olssonm/l5-very-basic-auth": "^7.2",
         "owen-it/laravel-auditing": "^14.0",
+        "saloonphp/laravel-plugin": "^3.5",
+        "saloonphp/saloon": "^v3.13.0",
         "scalar/laravel": "^0.2.0",
+        "spatie/laravel-data": "^4.15",
         "spomky-labs/otphp": "^11.3"
     },
     "require-dev": {

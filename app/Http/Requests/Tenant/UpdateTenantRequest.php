@@ -6,6 +6,7 @@ use App\Enums\PlanType;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Override;
 
 class UpdateTenantRequest extends FormRequest
 {
@@ -48,6 +49,7 @@ class UpdateTenantRequest extends FormRequest
      *
      * @return array<string, string>
      */
+    #[Override]
     public function messages(): array
     {
         return [

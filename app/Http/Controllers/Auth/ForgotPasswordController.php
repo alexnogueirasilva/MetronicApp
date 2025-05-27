@@ -12,7 +12,30 @@ use Illuminate\Http\JsonResponse;
 class ForgotPasswordController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Request password reset email
+     *
+     * This endpoint sends a password reset link to the provided email address,
+     * if it exists in the system. For security reasons, it always returns success
+     * even if the email is not registered.
+     *
+     * @group Auth
+     * @unauthenticated
+     *
+     * @bodyParam email string required The email address to send the reset link to. Example: user@example.com
+     *
+     * @response {
+     *     "message": "If your email is registered, you will receive a password reset link."
+     * }
+     *
+     * @response 422 {
+     *     "message": "The given data was invalid.",
+     *     "errors": {
+     *         "email": [
+     *             "The email field is required.",
+     *             "The email must be a valid email address."
+     *         ]
+     *     }
+     * }
      */
     public function __invoke(ForgotPasswordRequest $request): JsonResponse
     {
@@ -28,6 +51,5 @@ class ForgotPasswordController extends Controller
         return response()->json([
             'message' => 'If your email is registered, you will receive a password reset link.',
         ]);
-
     }
 }

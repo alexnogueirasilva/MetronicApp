@@ -6,6 +6,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
+use Override;
 
 class UpdateUserRequest extends FormRequest
 {
@@ -25,8 +26,8 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'  => ['sometimes', 'string', 'max:255'],
-            'email' => [
+            'nickname' => ['sometimes', 'string', 'max:255'],
+            'email'    => [
                 'sometimes',
                 'string',
                 'email',
@@ -44,6 +45,7 @@ class UpdateUserRequest extends FormRequest
      *
      * @return array<string, string>
      */
+    #[Override]
     public function messages(): array
     {
         return [

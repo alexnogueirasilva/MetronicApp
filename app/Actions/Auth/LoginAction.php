@@ -3,7 +3,7 @@
 namespace App\Actions\Auth;
 
 use App\DTO\Auth\LoginDTO;
-use App\Http\Resources\User\UserResource;
+use App\Http\Resources\User\UserMeResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
@@ -13,7 +13,10 @@ class LoginAction
 {
     public function execute(LoginDTO $dto): JsonResponse
     {
-        $user = User::query()->where('email', $dto->email)->firstOrFail();
+        $user = User::query()
+            ->where('email', $dto->email)
+            ->with(['role.permissions'])
+            ->firstOrFail();
 
         // Ensure password is a string
         $password = $user->password ?? '';
@@ -26,7 +29,7 @@ class LoginAction
 
         return response()->json([
             'token' => $token,
-            'user'  => new UserResource($user),
+            'user'  => new UserMeResource($user),
         ]);
     }
 }

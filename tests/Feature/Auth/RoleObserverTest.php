@@ -12,13 +12,10 @@ it('clears permissions cache for users when role is updated', function (): void 
 
     $users->each(fn (User $user) => $user->assignRole($role));
 
-    // Finge que há cache
     $users->each(fn (User $user) => Cache::put("user_{$user->id}_permissions", collect(['mocked']), now()->addMinutes(60)));
 
-    // Atualiza a role (dispara o observer)
     $role->update(['name' => 'Updated']);
 
-    // Verifica se o cache foi limpo
     $users->each(fn (User $user) => expect(Cache::has("user_{$user->id}_permissions"))->toBeFalse());
 });
 
@@ -29,7 +26,7 @@ it('clears permissions cache for users when role is deleted', function (): void 
     $users->each(fn (User $user) => $user->assignRole($role));
     $users->each(fn (User $user) => Cache::put("user_{$user->id}_permissions", collect(['mocked']), now()->addMinutes(60)));
 
-    $role->delete(); // Observer agora acessa os users corretamente
+    $role->delete();
 
     $users->each(fn (User $user) => expect(Cache::has("user_{$user->id}_permissions"))->toBeFalse());
 

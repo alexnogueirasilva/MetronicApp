@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\ACL;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ACL\PermissionCollection;
+use App\Http\Resources\ACL\{GroupedPermissionResource};
 use App\Models\Auth\Permission;
 use DevactionLabs\FilterablePackage\Filter;
 use Illuminate\Http\Request;
@@ -11,17 +11,32 @@ use Illuminate\Http\Request;
 class PermissionController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Lista todas as permissões do sistema
+     *
+     * Endpoint: GET /acl/permission
+     * Grupo: ACL
+     * Autenticação: Requerida (Sanctum)
+     * Middleware: totp.verify
+     *
+     * Filtros:
+     * - page: Número da página para paginação
+     * - per_page: Itens por página
+     * - name: Filtrar por nome (correspondência parcial)
+     *
+     * Respostas:
+     * - 200: Lista paginada de permissões
+     * - 401: {"message": "Unauthenticated."}
+     * - 403: {"message": "Permission Denied."}
      */
-    public function index(): PermissionCollection
+    public function index(): GroupedPermissionResource
     {
         $permissions = Permission::query()
             ->filtrable([
                 Filter::like('name', 'name'),
             ])
-            ->customPaginate();
+            ->get();
 
-        return new PermissionCollection($permissions);
+        return new GroupedPermissionResource($permissions);
     }
 
     /**

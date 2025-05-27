@@ -74,9 +74,9 @@ function createPercentageFeature(
 }
 
 function createABTestFeature(
-    array $variants = null,
-    string $defaultVariant = null,
-    string $featureName = null,
+    ?array $variants = null,
+    ?string $defaultVariant = null,
+    ?string $featureName = null,
     bool $isActive = true
 ): FeatureFlag {
     return FeatureFlag::factory()->abTest($variants, $defaultVariant)->create([
@@ -89,7 +89,7 @@ function setFeatureForTenant(
     FeatureFlag $feature,
     Tenant $tenant,
     bool $value = true,
-    DateTimeInterface $expiresAt = null
+    ?DateTimeInterface $expiresAt = null
 ): void {
     $feature->tenants()->attach($tenant, [
         'value'      => $value,
@@ -104,7 +104,7 @@ function setFeatureForUser(
     FeatureFlag $feature,
     User $user,
     bool $value = true,
-    DateTimeInterface $expiresAt = null
+    ?DateTimeInterface $expiresAt = null
 ): void {
     $feature->users()->attach($user, [
         'value'      => $value,

@@ -12,8 +12,8 @@ return new class() extends Migration {
     {
         Schema::create('impersonations', function (Blueprint $table): void {
             $table->ulid('id')->primary();
-            $table->foreignId('impersonator_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('impersonated_id')->constrained('users')->onDelete('cascade');
+            $table->foreignUlid('impersonator_id')->constrained('users')->onDelete('cascade');
+            $table->foreignUlid('impersonated_id')->constrained('users')->onDelete('cascade');
             $table->timestamp('ended_at')->nullable();
             $table->timestamps();
 

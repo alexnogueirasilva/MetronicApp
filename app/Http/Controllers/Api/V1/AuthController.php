@@ -1,4 +1,5 @@
-<?php declare(strict_types = 1);
+<?php
+declare(strict_types = 1);
 
 namespace App\Http\Controllers\Api\V1;
 
@@ -53,21 +54,21 @@ class AuthController extends ApiController
             $socialiteUser = $driver->user();
 
             $providerId = (string) $socialiteUser->getId();
-            $name       = $socialiteUser->getName();
+            $nickname   = $socialiteUser->getNickname();
             $email      = $socialiteUser->getEmail();
             $avatar     = $socialiteUser->getAvatar();
 
-            $name   = $name !== null ? (string) $name : null;
-            $email  = $email !== null ? (string) $email : null;
-            $avatar = $avatar !== null ? (string) $avatar : null;
+            $nickname = $nickname !== null ? (string) $nickname : null;
+            $email    = $email !== null ? (string) $email : null;
+            $avatar   = $avatar !== null ? (string) $avatar : null;
 
             $user = User::findOrCreateSocialUser(
                 provider: $provider,
                 providerId: $providerId,
                 userData: [
-                    'name'   => $name,
-                    'email'  => $email,
-                    'avatar' => $avatar,
+                    'nickname' => $nickname,
+                    'email'    => $email,
+                    'avatar'   => $avatar,
                 ]
             );
 

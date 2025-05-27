@@ -4,7 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\{StoreUserRequest, UpdateUserRequest};
-use App\Http\Resources\User\{UserCollection, UserResource};
+use App\Http\Resources\User\{UserCollection, UserMeResource};
 use App\Models\User;
 use DevactionLabs\FilterablePackage\Filter;
 use Illuminate\Http\{JsonResponse};
@@ -13,55 +13,123 @@ use Symfony\Component\HttpFoundation\Response;
 class UserController extends Controller
 {
     /**
-     * Display a listing of the users.
+     * Lista todos os usuários do sistema
+     *
+     * Endpoint: GET /users
+     * Grupo: Users
+     * Autenticação: Requerida (Sanctum)
+     * Middleware: totp.verify, tenant.ratelimit
+     *
+     * Filtros:
+     * - page: Número da página para paginação
+     * - per_page: Itens por página
+     * - name: Filtrar por nome (correspondência parcial)
+     * - email: Filtrar por email (correspondência parcial)
+     *
+     * Respostas:
+     * - 200: Lista paginada de usuários com seus papéis
+     * - 401: {"message": "Unauthenticated."}
+     * - 403: {"message": "Permission Denied."}
      */
     public function index(): UserCollection
     {
         $users = User::query()
+            ->with(['role.permissions'])
             ->filtrable([
-                Filter::like('name', 'name'),
+                Filter::like('nickname', 'nickname'),
                 Filter::like('email', 'email'),
             ])
-            ->customPaginate();
+            ->customPaginate(data: ['per_page' => 10]);
 
         return new UserCollection($users);
     }
 
     /**
-     * Store a newly created user in storage.
+     * Cria um novo usuário
+     *
+     * Endpoint: POST /users
+     * Grupo: Users
+     * Autenticação: Requerida (Sanctum)
+     * Middleware: totp.verify, tenant.ratelimit
+     *
+     * Parâmetros:
+     * - name: Nome do usuário
+     * - email: Email do usuário
+     * - password: Senha do usuário
+     * - password_confirmation: Confirmação da senha
+     *
+     * Respostas:
+     * - 201: Usuário criado com sucesso
+     * - 422: Erros de validação
      */
     public function store(StoreUserRequest $request): JsonResponse
     {
-        $user = User::create($request->validated());
+        $user = User::query()->create($request->validated());
+        $user->load(['role.permissions']);
 
-        return (new UserResource($user))
+        return new UserMeResource($user)
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
     }
 
     /**
-     * Display the specified user.
+     * Exibe detalhes de um usuário específico
+     *
+     * Endpoint: GET /users/{user}
+     * Grupo: Users
+     * Autenticação: Requerida (Sanctum)
+     * Middleware: totp.verify, tenant.ratelimit
+     *
+     * Respostas:
+     * - 200: Detalhes do usuário
+     * - 404: Usuário não encontrado
      */
-    public function show(string $user): UserResource
+    public function show(string $user): UserMeResource
     {
-        $userModel = User::findOrFail($user);
+        $userModel = User::with(['role.permissions'])->findOrFail($user);
 
-        return new UserResource($userModel);
+        return new UserMeResource($userModel);
     }
 
     /**
-     * Update the specified user in storage.
+     * Atualiza um usuário existente
+     *
+     * Endpoint: PUT /users/{user}
+     * Grupo: Users
+     * Autenticação: Requerida (Sanctum)
+     * Middleware: totp.verify, tenant.ratelimit
+     *
+     * Parâmetros:
+     * - name: Nome do usuário
+     * - email: Email do usuário
+     * - (opcional) password: Nova senha
+     * - (opcional) password_confirmation: Confirmação da senha
+     *
+     * Respostas:
+     * - 200: Usuário atualizado com sucesso
+     * - 404: Usuário não encontrado
+     * - 422: Erros de validação
      */
-    public function update(UpdateUserRequest $request, string $user): UserResource
+    public function update(UpdateUserRequest $request, string $user): UserMeResource
     {
         $userModel = User::findOrFail($user);
         $userModel->update($request->validated());
+        $userModel->load(['role.permissions']);
 
-        return new UserResource($userModel);
+        return new UserMeResource($userModel);
     }
 
     /**
-     * Remove the specified user from storage.
+     * Remove um usuário do sistema
+     *
+     * Endpoint: DELETE /users/{user}
+     * Grupo: Users
+     * Autenticação: Requerida (Sanctum)
+     * Middleware: totp.verify, tenant.ratelimit
+     *
+     * Respostas:
+     * - 204: Usuário removido com sucesso (No Content)
+     * - 404: Usuário não encontrado
      */
     public function destroy(string $user): JsonResponse
     {

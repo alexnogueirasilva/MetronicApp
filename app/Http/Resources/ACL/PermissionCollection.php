@@ -4,6 +4,7 @@ namespace App\Http\Resources\ACL;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Override;
 
 class PermissionCollection extends ResourceCollection
 {
@@ -12,6 +13,7 @@ class PermissionCollection extends ResourceCollection
      *
      * @return array<int|string, mixed>
      */
+    #[Override]
     public function toArray(Request $request): array
     {
         return [

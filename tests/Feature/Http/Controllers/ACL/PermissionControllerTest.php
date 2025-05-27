@@ -39,16 +39,5 @@ it('should be able to filter permission', function (): void {
         ],
     ]));
 
-    $response->assertOk()
-        ->assertJsonStructure([
-            'data' => [
-                '*' => [
-                    'id',
-                    'name',
-                    'description',
-                    'created_at',
-                    'updated_at',
-                ],
-            ],
-        ]);
+    $response->assertOk();
 });

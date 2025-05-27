@@ -1,4 +1,5 @@
-<?php declare(strict_types = 1);
+<?php
+declare(strict_types = 1);
 
 namespace App\Models;
 
@@ -7,11 +8,14 @@ use App\Models\Auth\{Role};
 use App\Models\Traits\HasRole;
 use Database\Factories\UserFactory;
 use DevactionLabs\FilterablePackage\Traits\Filterable;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, BelongsToMany, HasMany};
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\{Carbon};
+use Illuminate\Support\{Carbon, Facades\Storage};
 use Laravel\Sanctum\HasApiTokens;
 use OwenIt\Auditing\Auditable as AuditableTrait;
 use OwenIt\Auditing\Contracts\Auditable;
@@ -19,7 +23,9 @@ use OwenIt\Auditing\Contracts\Auditable;
 /**
  * @property string $id
  * @property ?int $tenant_id
- * @property string $name
+ * @property string $nickname
+ * @property ?string $first_name
+ * @property ?string $last_name
  * @property string $email
  * @property string $avatar
  * @property ?string $password
@@ -36,16 +42,18 @@ use OwenIt\Auditing\Contracts\Auditable;
  * @property-read FeatureFlag[] $featureFlags
  * @property-read Impersonation[] $impersonations
  * @property-read Impersonation[] $beingImpersonated
+ * @property-read string $url_avatar
  */
+#[UseFactory(UserFactory::class)]
 class User extends Authenticatable implements Auditable
 {
-    /** @use HasFactory<UserFactory> */
-    use HasFactory;
-    use Notifiable;
-    use HasApiTokens;
-    use HasRole;
-    use Filterable;
     use AuditableTrait;
+    use Filterable;
+    use HasApiTokens;
+    use HasFactory;
+    use HasRole;
+    use HasUlids;
+    use Notifiable;
 
     /**
      * The attributes that should be hidden for serialization.
@@ -62,12 +70,11 @@ class User extends Authenticatable implements Auditable
     /**
      * Find or create a user based on OAuth data
      *
-     * @param array<string, string|null> $userData User data from OAuth provider
+     * @param  array<string, string|null>  $userData
      */
     public static function findOrCreateSocialUser(string $provider, string $providerId, array $userData): self
     {
-        // First try to find the user by provider and provider_id
-        $user = self::where('provider', $provider)
+        $user = self::query()->where('provider', $provider)
             ->where('provider_id', $providerId)
             ->first();
 
@@ -75,11 +82,9 @@ class User extends Authenticatable implements Auditable
             return $user;
         }
 
-        // Then try to find by email
-        $user = self::where('email', $userData['email'])->first();
+        $user = self::query()->where('email', $userData['email'])->first();
 
         if ($user) {
-            // Update user with provider information
             $user->update([
                 'provider'    => $provider,
                 'provider_id' => $providerId,
@@ -89,14 +94,13 @@ class User extends Authenticatable implements Auditable
             return $user;
         }
 
-        // Create a new user if not found
-        return self::create([
-            'name'              => $userData['name'],
+        return self::query()->create([
+            'nickname'          => $userData['nickname'],
             'email'             => $userData['email'],
             'avatar'            => $userData['avatar'] ?? null,
             'provider'          => $provider,
             'provider_id'       => $providerId,
-            'email_verified_at' => now(), // Email is verified by the provider
+            'email_verified_at' => now(),
         ]);
     }
 
@@ -204,6 +208,31 @@ class User extends Authenticatable implements Auditable
     public function isAdmin(): bool
     {
         return $this->hasRole('admin');
+    }
+
+    /**
+     * Get the user's avatar.
+     *
+     * @return Attribute<string, never>
+     */
+    public function urlAvatar(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                $cacheKey = "user:{$this->id}:avatar_url";
+
+                return cache()->remember($cacheKey, now()->addDays(7), function () {
+                    if (!empty($this->avatar) && Storage::disk('s3')->exists($this->avatar)) {
+                        return Storage::disk('s3')->temporaryUrl(
+                            $this->avatar,
+                            now()->addWeek()
+                        );
+                    }
+
+                    return 'https://ui-avatars.com/api/?name=' . urlencode((string) $this->first_name) . '&color=7F9CF5&background=EBF4FF&size=256';
+                });
+            }
+        );
     }
 
     /**

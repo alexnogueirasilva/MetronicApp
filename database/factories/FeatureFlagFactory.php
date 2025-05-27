@@ -106,7 +106,7 @@ class FeatureFlagFactory extends Factory
     /**
      * Configure the model factory to create an environment-specific feature flag.
      */
-    public function environment(array $environments = null): self
+    public function environment(?array $environments = null): self
     {
         $environments ??= [Config::get('app.env')];
 
@@ -119,7 +119,7 @@ class FeatureFlagFactory extends Factory
     /**
      * Configure the model factory to create an A/B test feature flag.
      */
-    public function abTest(array $variants = null, string $defaultVariant = null): self
+    public function abTest(?array $variants = null, ?string $defaultVariant = null): self
     {
         $variants ??= [
             'A' => 0.5,

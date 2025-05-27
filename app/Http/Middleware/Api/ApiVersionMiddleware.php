@@ -65,9 +65,16 @@ class ApiVersionMiddleware
         }
 
         // Verificar no path da URL
-        $pathParts = explode('/', trim($request->getPathInfo(), '/'));
+        $path = trim($request->getPathInfo(), '/');
 
-        if (preg_match('/^v\d+$/', $pathParts[0])) {
+        // Check for version pattern in path and use only the first occurrence
+        if (preg_match('/^(v\d+)/', $path, $matches)) {
+            return $matches[1];
+        }
+
+        $pathParts = explode('/', $path);
+
+        if (isset($pathParts[0]) && ($pathParts[0] !== '' && $pathParts[0] !== '0') && preg_match('/^v\d+$/', $pathParts[0])) {
             return $pathParts[0];
         }
 
